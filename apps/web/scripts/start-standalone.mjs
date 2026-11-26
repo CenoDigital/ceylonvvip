@@ -20,5 +20,6 @@ cpSync(path.join(appDir, '.next/static'), path.join(standaloneApp, '.next/static
 cpSync(path.join(appDir, 'public'), path.join(standaloneApp, 'public'), { recursive: true })
 
 process.env.PORT ??= '3000'
-process.env.HOSTNAME ??= '127.0.0.1'
+// Not HOSTNAME's existing value: inside containers it is the container ID, not an address.
+process.env.HOSTNAME = process.env.SERVER_HOST ?? '127.0.0.1'
 await import(pathToFileURL(server).href)

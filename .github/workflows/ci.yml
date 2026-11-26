@@ -85,7 +85,10 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Throwaway Payload secret
-        run: echo "PAYLOAD_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+        run: |
+          secret="$(openssl rand -hex 32)"
+          echo "::add-mask::$secret"
+          echo "PAYLOAD_SECRET=$secret" >> "$GITHUB_ENV"
       - run: pnpm --filter web test:int
       - name: Every schema change has a migration
         run: |
@@ -155,7 +158,10 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Throwaway Payload secret
-        run: echo "PAYLOAD_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+        run: |
+          secret="$(openssl rand -hex 32)"
+          echo "::add-mask::$secret"
+          echo "PAYLOAD_SECRET=$secret" >> "$GITHUB_ENV"
       - name: Production build
         run: pnpm turbo run build --filter=web
       - name: Start the production server (runs migrations on boot)
@@ -177,7 +183,7 @@ jobs:
         run: |
           CHROME_PATH="$(node -e "console.log(require('@playwright/test').chromium.executablePath())")"
           export CHROME_PATH
-          pnpm dlx @lhci/cli@0.16.1 autorun
+          pnpm exec lhci autorun
       - name: Upload reports
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

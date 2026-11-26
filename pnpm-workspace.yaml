@@ -4,12 +4,16 @@ packages:
 
 # Supply-chain guards: skip versions younger than a day, refuse packages whose
 # publishing trust drops between versions, and block git/tarball sub-dependencies.
-minimumReleaseAge: 1440
+# One day keeps the project-start versions installable; Dependabot holds every later
+# update back 7 days (cooldown), which is what Semgrep's 7-day rule asks for.
+minimumReleaseAge: 1440 # nosemgrep: package_managers.pnpm.pnpm-missing-minimum-release-age.pnpm-minimum-release-age
 trustPolicy: no-downgrade
 # Reviewed 2026-11-26: published in 2025 by their long-time maintainers without provenance.
 trustPolicyExclude:
   - pino@9.14.0
   - eslint-import-resolver-typescript@3.10.1
+  # Google Chrome DevTools automation account; pulled in by Lighthouse CI.
+  - chromium-bidi@157.0.8090-0
 blockExoticSubdeps: true
 
 # Packages allowed to run install scripts (native binaries).

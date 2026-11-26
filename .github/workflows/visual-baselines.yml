@@ -44,7 +44,11 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: echo "PAYLOAD_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+      - name: Throwaway Payload secret
+        run: |
+          secret="$(openssl rand -hex 32)"
+          echo "::add-mask::$secret"
+          echo "PAYLOAD_SECRET=$secret" >> "$GITHUB_ENV"
       - run: pnpm turbo run build --filter=web
       - name: Start the production server
         working-directory: apps/web
