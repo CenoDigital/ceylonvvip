@@ -11,7 +11,12 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   // Trace from the monorepo root so workspace packages land in the standalone build.
   outputFileTracingRoot: monorepoRoot,
-  transpilePackages: ['@ceylonvvip/core', '@ceylonvvip/db'],
+  transpilePackages: [
+    '@ceylonvvip/cms-schema',
+    '@ceylonvvip/core',
+    '@ceylonvvip/db',
+    '@ceylonvvip/tokens',
+  ],
   poweredByHeader: false,
   images: {
     localPatterns: [{ pathname: '/api/media/file/**' }],
