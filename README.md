@@ -72,3 +72,6 @@ Staging sits behind basic auth, and every environment except production sends
 Postgres 16; migrations run when the app starts. Runtime secrets (`DATABASE_URI`,
 `PAYLOAD_SECRET`, storage keys) live only in Coolify. The one GitHub secret is
 `COOLIFY_TOKEN`, a deploy-only token.
+
+In Coolify, each app health-checks `GET http://127.0.0.1:3000/api/health`. Use `127.0.0.1`, not
+`localhost`: in the Alpine image `localhost` resolves to IPv6 `::1`, which the server does not listen on.
