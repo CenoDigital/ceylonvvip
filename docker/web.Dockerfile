@@ -36,6 +36,9 @@ ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     PORT=3000 \
     HOSTNAME=0.0.0.0
+# The server only needs node itself: drop the bundled package managers and their CVEs.
+RUN rm -rf /usr/local/lib/node_modules /usr/local/bin/npm /usr/local/bin/npx \
+      /usr/local/bin/corepack /usr/local/bin/yarn /usr/local/bin/yarnpkg /opt/yarn-*
 COPY --from=builder --chown=node:node /repo/apps/web/.next/standalone ./
 COPY --from=builder --chown=node:node /repo/apps/web/.next/static ./apps/web/.next/static
 COPY --from=builder --chown=node:node /repo/apps/web/public ./apps/web/public

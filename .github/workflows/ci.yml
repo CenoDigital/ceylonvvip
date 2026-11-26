@@ -1,0 +1,233 @@
+# All testing happens here, in throwaway GitHub runners. Coolify only receives images
+# that passed every job below.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  IMAGE_NAME: ghcr.io/cenodigital/ceylonvvip-web
+
+jobs:
+  verify:
+    name: Format, lint, types, unit tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - name: Generated Payload types are committed
+        env:
+          PAYLOAD_SECRET: ci-type-generation-only
+          DATABASE_URI: postgres://unused:unused@127.0.0.1:5432/unused
+        run: |
+          pnpm --filter web generate:types
+          pnpm prettier --write packages/db/src/payload-types.ts > /dev/null || true
+          git diff --exit-code -- packages/db/src/payload-types.ts
+
+  integration:
+    name: Integration tests (Postgres)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16.16-alpine
+        env:
+          POSTGRES_USER: ceylonvvip
+          POSTGRES_PASSWORD: ceylonvvip
+          POSTGRES_DB: ceylonvvip
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U ceylonvvip -d ceylonvvip"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+      storage:
+        image: rustfs/rustfs:1.0.6
+        env:
+          RUSTFS_ACCESS_KEY: ceylonvvip
+          RUSTFS_SECRET_KEY: ceylonvvip-ci
+        ports: ['9000:9000']
+    env:
+      DATABASE_URI: postgres://ceylonvvip:ceylonvvip@127.0.0.1:5432/ceylonvvip
+      S3_ENDPOINT: http://127.0.0.1:9000
+      S3_REGION: us-east-1
+      S3_BUCKET: ceylonvvip-media
+      S3_ACCESS_KEY_ID: ceylonvvip
+      S3_SECRET_ACCESS_KEY: ceylonvvip-ci
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Throwaway Payload secret
+        run: echo "PAYLOAD_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+      - run: pnpm --filter web test:int
+      - name: Every schema change has a migration
+        run: |
+          pnpm --filter web migrate:create schema-check --skip-empty
+          if [ -n "$(git status --porcelain -- apps/web/src/migrations)" ]; then
+            git status --short -- apps/web/src/migrations
+            echo "::error::The Payload schema changed without a migration. Run: pnpm --filter web migrate:create <name>"
+            exit 1
+          fi
+
+  security:
+    name: Dependency audit, secrets, SAST
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      - name: pnpm audit (production dependencies, high and critical)
+        run: pnpm audit --prod --audit-level high
+      - name: gitleaks (full history)
+        run: >-
+          docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.30.1
+          git /repo --redact --verbose --exit-code 1
+      - name: Semgrep SAST
+        run: >-
+          docker run --rm -v "$PWD:/src" semgrep/semgrep:1.187.0
+          semgrep scan --config p/default --config p/typescript --config p/react --config p/nextjs
+          --error --metrics off /src
+
+  browser:
+    name: E2E, accessibility, visual, Lighthouse
+    if: github.event_name != 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    # Same image that produced the visual baselines, so fonts render identically.
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.1-noble
+      options: --ipc=host
+    services:
+      postgres:
+        image: postgres:16.16-alpine
+        env:
+          POSTGRES_USER: ceylonvvip
+          POSTGRES_PASSWORD: ceylonvvip
+          POSTGRES_DB: ceylonvvip
+        options: >-
+          --health-cmd "pg_isready -U ceylonvvip -d ceylonvvip"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      CI: 'true'
+      DATABASE_URI: postgres://ceylonvvip:ceylonvvip@postgres:5432/ceylonvvip
+      PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Throwaway Payload secret
+        run: echo "PAYLOAD_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+      - name: Production build
+        run: pnpm turbo run build --filter=web
+      - name: Start the production server (runs migrations on boot)
+        working-directory: apps/web
+        run: |
+          nohup node scripts/start-standalone.mjs > server.log 2>&1 &
+          for _ in $(seq 1 60); do
+            curl -fsS http://127.0.0.1:3000/api/health && exit 0
+            sleep 2
+          done
+          cat server.log
+          exit 1
+      - name: Playwright (mobile 390 px, desktop 1440 px)
+        working-directory: apps/web
+        run: pnpm test:e2e
+      - name: Lighthouse CI (mobile budgets 90+)
+        if: ${{ !cancelled() }}
+        working-directory: apps/web
+        run: |
+          CHROME_PATH="$(node -e "console.log(require('@playwright/test').chromium.executablePath())")"
+          export CHROME_PATH
+          pnpm dlx @lhci/cli@0.16.1 autorun
+      - name: Upload reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: browser-reports
+          path: |
+            apps/web/playwright-report
+            apps/web/test-results
+            apps/web/lighthouse-report
+            apps/web/server.log
+          retention-days: 14
+
+  image:
+    name: Docker image and Trivy scan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    needs: [verify, integration, security]
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Build
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: docker/web.Dockerfile
+          load: true
+          tags: ceylonvvip-web:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Trivy image scan (vulnerabilities and secrets)
+        run: >-
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.76.2
+          image --scanners vuln,secret --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1
+          --no-progress ceylonvvip-web:ci
+      - name: Trivy Dockerfile scan
+        run: >-
+          docker run --rm -v "$PWD:/repo" aquasec/trivy:0.76.2
+          config --severity HIGH,CRITICAL --exit-code 1 /repo/docker
+      - name: Push to GHCR (main only)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$GH_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          for tag in "sha-${GITHUB_SHA::12}" main; do
+            docker tag ceylonvvip-web:ci "$IMAGE_NAME:$tag"
+            docker push "$IMAGE_NAME:$tag"
+          done

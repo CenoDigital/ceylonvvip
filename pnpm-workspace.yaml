@@ -2,8 +2,23 @@ packages:
   - apps/*
   - packages/*
 
+# Supply-chain guards: skip versions younger than a day, refuse packages whose
+# publishing trust drops between versions, and block git/tarball sub-dependencies.
+minimumReleaseAge: 1440
+trustPolicy: no-downgrade
+# Reviewed 2026-11-26: published in 2025 by their long-time maintainers without provenance.
+trustPolicyExclude:
+  - pino@9.14.0
+  - eslint-import-resolver-typescript@3.10.1
+blockExoticSubdeps: true
+
 # Packages allowed to run install scripts (native binaries).
 allowBuilds:
   esbuild: true
   sharp: true
   unrs-resolver: true
+
+overrides:
+  # GHSA-c8p4-j97h-3vg8 and the iframe SSRF advisory: @lexical/headless still asks for ^20.
+  # Remove once @payloadcms/richtext-lexical ships a Lexical release on happy-dom 21.
+  happy-dom: 21.0.4
