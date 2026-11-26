@@ -537,7 +537,7 @@ export interface Header {
         label: string;
         link?: {
           label?: string | null;
-          type: 'url' | 'phone' | 'whatsapp' | 'email';
+          type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
           url?: string | null;
           /**
            * International format, for example +94 77 123 4567.
@@ -551,7 +551,7 @@ export interface Header {
           | {
               link: {
                 label?: string | null;
-                type: 'url' | 'phone' | 'whatsapp' | 'email';
+                type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
                 url?: string | null;
                 /**
                  * International format, for example +94 77 123 4567.
@@ -607,7 +607,7 @@ export interface Header {
               )
             | null;
           link: {
-            type: 'url' | 'phone' | 'whatsapp' | 'email';
+            type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
             url?: string | null;
             /**
              * International format, for example +94 77 123 4567.
@@ -626,7 +626,7 @@ export interface Header {
     text?: string | null;
     link?: {
       label?: string | null;
-      type: 'url' | 'phone' | 'whatsapp' | 'email';
+      type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
       url?: string | null;
       /**
        * International format, for example +94 77 123 4567.
@@ -653,7 +653,7 @@ export interface Footer {
           | {
               link: {
                 label?: string | null;
-                type: 'url' | 'phone' | 'whatsapp' | 'email';
+                type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
                 url?: string | null;
                 /**
                  * International format, for example +94 77 123 4567.
@@ -673,7 +673,7 @@ export interface Footer {
     | {
         link: {
           label?: string | null;
-          type: 'url' | 'phone' | 'whatsapp' | 'email';
+          type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
           url?: string | null;
           /**
            * International format, for example +94 77 123 4567.
@@ -739,7 +739,7 @@ export interface MobileActionBar {
         action?: ('link' | 'menu') | null;
         link?: {
           label?: string | null;
-          type: 'url' | 'phone' | 'whatsapp' | 'email';
+          type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
           url?: string | null;
           /**
            * International format, for example +94 77 123 4567.

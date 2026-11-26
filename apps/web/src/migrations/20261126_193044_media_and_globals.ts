@@ -5,18 +5,18 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
    CREATE TYPE "public"."enum_site_settings_translate_languages" AS ENUM('de', 'fr', 'it', 'es', 'ru', 'zh-CN', 'ja', 'ar', 'hi', 'nl');
   CREATE TYPE "public"."enum_contact_business_opening_hours_days" AS ENUM('Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su');
   CREATE TYPE "public"."enum_contact_business_social_platform" AS ENUM('instagram', 'facebook', 'tiktok', 'youtube', 'linkedin', 'tripadvisor', 'x');
-  CREATE TYPE "public"."enum_header_navigation_children_link_type" AS ENUM('url', 'phone', 'whatsapp', 'email');
+  CREATE TYPE "public"."enum_header_navigation_children_link_type" AS ENUM('internal', 'url', 'phone', 'whatsapp', 'email');
   CREATE TYPE "public"."enum_header_navigation_kind" AS ENUM('link', 'dropdown');
-  CREATE TYPE "public"."enum_header_navigation_link_type" AS ENUM('url', 'phone', 'whatsapp', 'email');
+  CREATE TYPE "public"."enum_header_navigation_link_type" AS ENUM('internal', 'url', 'phone', 'whatsapp', 'email');
   CREATE TYPE "public"."enum_header_ctas_cta_appearance" AS ENUM('button', 'link');
   CREATE TYPE "public"."enum_header_ctas_cta_icon" AS ENUM('arrow-left', 'arrow-right', 'arrow-up-right', 'bed', 'calendar', 'car', 'check', 'chevron-down', 'clock', 'compass', 'droplet', 'gem', 'glass-water', 'globe', 'heart', 'home', 'map-pin', 'menu', 'phone', 'plane', 'shield', 'square', 'square-check', 'whatsapp', 'wifi', 'x');
-  CREATE TYPE "public"."enum_header_ctas_cta_link_type" AS ENUM('url', 'phone', 'whatsapp', 'email');
-  CREATE TYPE "public"."enum_header_announcement_link_type" AS ENUM('url', 'phone', 'whatsapp', 'email');
-  CREATE TYPE "public"."enum_footer_columns_links_link_type" AS ENUM('url', 'phone', 'whatsapp', 'email');
-  CREATE TYPE "public"."enum_footer_legal_links_link_type" AS ENUM('url', 'phone', 'whatsapp', 'email');
+  CREATE TYPE "public"."enum_header_ctas_cta_link_type" AS ENUM('internal', 'url', 'phone', 'whatsapp', 'email');
+  CREATE TYPE "public"."enum_header_announcement_link_type" AS ENUM('internal', 'url', 'phone', 'whatsapp', 'email');
+  CREATE TYPE "public"."enum_footer_columns_links_link_type" AS ENUM('internal', 'url', 'phone', 'whatsapp', 'email');
+  CREATE TYPE "public"."enum_footer_legal_links_link_type" AS ENUM('internal', 'url', 'phone', 'whatsapp', 'email');
   CREATE TYPE "public"."enum_mobile_action_bar_buttons_icon" AS ENUM('arrow-left', 'arrow-right', 'arrow-up-right', 'bed', 'calendar', 'car', 'check', 'chevron-down', 'clock', 'compass', 'droplet', 'gem', 'glass-water', 'globe', 'heart', 'home', 'map-pin', 'menu', 'phone', 'plane', 'shield', 'square', 'square-check', 'whatsapp', 'wifi', 'x');
   CREATE TYPE "public"."enum_mobile_action_bar_buttons_action" AS ENUM('link', 'menu');
-  CREATE TYPE "public"."enum_mobile_action_bar_buttons_link_type" AS ENUM('url', 'phone', 'whatsapp', 'email');
+  CREATE TYPE "public"."enum_mobile_action_bar_buttons_link_type" AS ENUM('internal', 'url', 'phone', 'whatsapp', 'email');
   CREATE TYPE "public"."enum_booking_settings_visible_fields" AS ENUM('service', 'vehicle', 'date', 'time', 'pickup', 'dropoff', 'passengers', 'luggage', 'flightNumber', 'name', 'email', 'phone', 'notes');
   CREATE TYPE "public"."enum_booking_settings_required_fields" AS ENUM('service', 'vehicle', 'date', 'time', 'pickup', 'dropoff', 'passengers', 'luggage', 'flightNumber', 'name', 'email', 'phone', 'notes');
   CREATE TABLE "media" (

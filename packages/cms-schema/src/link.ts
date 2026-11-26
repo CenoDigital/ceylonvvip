@@ -32,7 +32,9 @@ export function link({
   withLabel = true,
   required = false,
 }: LinkOptions = {}): GroupField {
-  const types = LINK_TYPES.filter((t) => t !== 'internal' || relationTo.length > 0)
+  // Every type stays in the schema (so the database enum never needs changing); internal
+  // links are only usable once there are collections to link to.
+  const types = LINK_TYPES
   const show = (type: LinkType) => (_: unknown, sibling: { type?: string }) =>
     sibling?.type === type
 
@@ -41,8 +43,12 @@ export function link({
       name: 'type',
       type: 'radio',
       required: true,
-      defaultValue: types[0],
+      defaultValue: relationTo.length > 0 ? 'internal' : 'url',
       options: types.map((value) => ({ value, label: typeLabels[value] })),
+      validate: (value: unknown) =>
+        value !== 'internal' ||
+        relationTo.length > 0 ||
+        'Internal links are not available here yet.',
       admin: { layout: 'horizontal' },
     },
   ]

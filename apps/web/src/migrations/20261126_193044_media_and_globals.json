@@ -3428,6 +3428,7 @@
       "name": "enum_header_navigation_children_link_type",
       "schema": "public",
       "values": [
+        "internal",
         "url",
         "phone",
         "whatsapp",
@@ -3446,6 +3447,7 @@
       "name": "enum_header_navigation_link_type",
       "schema": "public",
       "values": [
+        "internal",
         "url",
         "phone",
         "whatsapp",
@@ -3496,6 +3498,7 @@
       "name": "enum_header_ctas_cta_link_type",
       "schema": "public",
       "values": [
+        "internal",
         "url",
         "phone",
         "whatsapp",
@@ -3506,6 +3509,7 @@
       "name": "enum_header_announcement_link_type",
       "schema": "public",
       "values": [
+        "internal",
         "url",
         "phone",
         "whatsapp",
@@ -3516,6 +3520,7 @@
       "name": "enum_footer_columns_links_link_type",
       "schema": "public",
       "values": [
+        "internal",
         "url",
         "phone",
         "whatsapp",
@@ -3526,6 +3531,7 @@
       "name": "enum_footer_legal_links_link_type",
       "schema": "public",
       "values": [
+        "internal",
         "url",
         "phone",
         "whatsapp",
@@ -3576,6 +3582,7 @@
       "name": "enum_mobile_action_bar_buttons_link_type",
       "schema": "public",
       "values": [
+        "internal",
         "url",
         "phone",
         "whatsapp",
@@ -3631,6 +3638,6 @@
     "tables": {},
     "columns": {}
   },
-  "id": "1bc0740b-1dca-44dc-96f9-4e101b6aaf45",
+  "id": "daa473b4-5a4c-4b2e-a836-30d4905e7beb",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }
