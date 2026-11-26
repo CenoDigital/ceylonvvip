@@ -2,14 +2,13 @@
 
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { usePathname } from 'next/navigation'
 
 import { motion as m } from '@ceylonvvip/tokens'
 
 import { countFrame, gsapEase, seconds } from '@/lib/motion'
 
-gsap.registerPlugin(useGSAP, ScrollTrigger)
+gsap.registerPlugin(useGSAP)
 
 declare global {
   interface Window {
@@ -20,8 +19,9 @@ declare global {
 /*
  * Plays the animation preset each block picked in the CMS (its `data-animate`). The
  * hero intro is CSS (globals.css) so it starts with the first paint, before any JS.
- * Everything here only moves opacity, transform and clip-path, so nothing shifts
- * layout (CLS stays 0). Reduced motion: every preset becomes a short fade.
+ * Sections start when they scroll into view (an IntersectionObserver, which costs
+ * nothing at load); ScrollTrigger is only loaded for desktop parallax. Only opacity,
+ * transform and clip-path move, so nothing shifts layout (CLS stays 0). Reduced motion: every preset becomes a short fade.
  */
 
 // Undo steps GSAP cannot revert itself (counter text), run when the presets are reverted.
@@ -162,56 +162,76 @@ function parallax(section: HTMLElement) {
   }
 }
 
+/** A ScrollTrigger-style start ("top 85%") as an IntersectionObserver root margin. */
+const rootMargin = (start: string) =>
+  `0px 0px -${100 - Number(/(\d+)%/.exec(start)?.[1] ?? 85)}% 0px`
+
 export function Motion() {
   const pathname = usePathname()
 
   useGSAP(
-    () => {
-      const root = document.documentElement
+    (_context, contextSafe) => {
       window.__motion = true
-      if (!root.classList.contains('motion')) return
+      if (!document.documentElement.classList.contains('motion') || !contextSafe) return
+      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
+      const desktop = matchMedia('(min-width: 1024px)').matches
       const sections = Array.from(
         document.querySelectorAll<HTMLElement>('[data-animate]:not([data-animate="hero-intro"])'),
       )
-      const mm = gsap.matchMedia()
+      const observers: IntersectionObserver[] = []
+      let live = true
 
-      mm.add(
-        {
-          full: '(prefers-reduced-motion: no-preference)',
-          reduced: '(prefers-reduced-motion: reduce)',
-          desktop: '(min-width: 1024px)',
-        },
-        (ctx) => {
-          const { reduced, desktop } = ctx.conditions as Record<string, boolean>
-          for (const section of sections) {
-            const name = section.dataset.animate ?? ''
-            const content = kids(section)
-            if (reduced) {
-              if (name !== 'image-parallax')
-                gsap.from(content, {
-                  opacity: 0,
-                  duration: seconds(m.reducedMotion.duration),
-                  scrollTrigger: { trigger: section, start: 'top 85%', once: true },
-                })
-            } else if (name === 'image-parallax') {
-              if (desktop) parallax(section)
-            } else if (PRESETS[name]) {
-              const { preset, start } = PRESETS[name]
-              const tl = gsap.timeline({
-                scrollTrigger: { trigger: section, start, once: true },
-              })
-              preset(section, tl)
+      // globals.css hides animated content until its starting state is set.
+      const show = (section: HTMLElement) => gsap.set(kids(section), { visibility: 'visible' })
+
+      const play = contextSafe((section: HTMLElement) => {
+        const entry = PRESETS[section.dataset.animate ?? '']
+        if (reduced) {
+          gsap.from(kids(section), { opacity: 0, duration: seconds(m.reducedMotion.duration) })
+        } else if (entry) {
+          entry.preset(section, gsap.timeline())
+        }
+        show(section)
+      })
+
+      for (const section of sections) {
+        const name = section.dataset.animate ?? ''
+        if (name === 'image-parallax') {
+          show(section)
+          if (desktop && !reduced)
+            void import('gsap/ScrollTrigger').then(
+              contextSafe(({ ScrollTrigger }) => {
+                if (!live) return
+                gsap.registerPlugin(ScrollTrigger)
+                parallax(section)
+              }),
+            )
+          continue
+        }
+        if (!reduced && !PRESETS[name]) {
+          show(section)
+          continue
+        }
+        const io = new IntersectionObserver(
+          (entries) => {
+            // In view, or already scrolled past (a page opened at an #anchor).
+            if (entries.some((e) => e.isIntersecting || e.boundingClientRect.bottom < 0)) {
+              io.disconnect()
+              play(section)
             }
-            // The starting states are set, so the content can be shown (globals.css
-            // hides it until now to avoid a flash of the final state).
-            gsap.set(content, { visibility: 'visible' })
-          }
-          return () => {
-            cleanups.forEach((fn) => fn())
-            cleanups = []
-          }
-        },
-      )
+          },
+          { rootMargin: rootMargin(PRESETS[name]?.start ?? m.fadeUp.start) },
+        )
+        io.observe(section)
+        observers.push(io)
+      }
+
+      return () => {
+        live = false
+        observers.forEach((o) => o.disconnect())
+        cleanups.forEach((fn) => fn())
+        cleanups = []
+      }
     },
     { dependencies: [pathname], revertOnUpdate: true },
   )
