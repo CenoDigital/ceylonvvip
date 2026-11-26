@@ -70,11 +70,12 @@ export function SiteFooter({
           </div>
         ))}
       </div>
-      <div className="border-t border-border pt-20 lg:pt-24">
-        {/* The wordmark scales with the viewport so it always fills the width. */}
+      <div className="@container border-t border-border pt-20 lg:pt-24">
+        {/* The wordmark fills the column at every width: Figma sets 56px in 342px (390 wide)
+            and 215px in 1312px (1440 wide), so its size is the column width / 6.1. */}
         <p
           aria-hidden
-          className="text-center font-display text-[clamp(56px,14.9vw,215px)] leading-none font-light whitespace-nowrap"
+          className="text-center font-display text-[min(215px,calc(100cqw/6.1))] leading-none font-light whitespace-nowrap"
         >
           CEYLONVVIP
         </p>
