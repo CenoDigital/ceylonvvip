@@ -1,0 +1,27 @@
+{
+  "name": "@ceylonvvip/ui-brand",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Front-end design system: themed components and GSAP motion presets",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@ceylonvvip/config": "workspace:*",
+    "eslint": "9.39.5",
+    "typescript": "6.0.3",
+    "vitest": "5.1.1",
+    "@types/react": "19.3.0",
+    "react": "19.3.1"
+  },
+  "peerDependencies": {
+    "react": "^19.3.1"
+  }
+}

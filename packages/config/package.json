@@ -1,0 +1,24 @@
+{
+  "name": "@ceylonvvip/config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./tsconfig/base.json": "./tsconfig/base.json",
+    "./tsconfig/library.json": "./tsconfig/library.json",
+    "./tsconfig/nextjs.json": "./tsconfig/nextjs.json",
+    "./eslint/base": "./eslint/base.js",
+    "./eslint/next": "./eslint/next.js"
+  },
+  "dependencies": {
+    "@eslint/js": "9.39.5",
+    "eslint-config-next": "16.4.6",
+    "eslint-config-prettier": "10.1.8",
+    "globals": "16.4.0",
+    "typescript-eslint": "8.74.0"
+  },
+  "peerDependencies": {
+    "eslint": "^9.39.0",
+    "typescript": "^6.0.0"
+  }
+}
