@@ -44,7 +44,7 @@ const formatPrice = (p: Pricing) =>
 async function HeroBlockView({ block, first }: { block: Block; first: boolean }) {
   const ctas = docs<{ cta?: Parameters<typeof Cta>[0]['cta'] }>(block.ctas)
   const action = ctas.length ? (
-    <div className="flex flex-wrap items-center gap-24 lg:gap-40">
+    <div className="flex flex-wrap items-center gap-24 lg:gap-40" data-hero-action>
       {ctas.map((c, i) => (
         <Cta key={i} cta={c.cta} />
       ))}
@@ -52,15 +52,18 @@ async function HeroBlockView({ block, first }: { block: Block; first: boolean })
   ) : undefined
   const image =
     block.mediaType === 'image' && asMedia(block.image) ? (
-      <div className="relative aspect-[390/440] w-full lg:aspect-[1440/864]">
+      <div className="relative aspect-[390/440] w-full overflow-hidden lg:aspect-[1440/864]">
         <CmsImage media={block.image} sizes="100vw" priority={first} />
       </div>
     ) : null
   const Heading = first ? 'h1' : 'h2'
+  // The preset picked in the CMS; heroes default to their own intro.
+  const anim = (block.settings as { anim?: string | null } | undefined)?.anim || 'hero-intro'
+  const animate = anim === 'none' ? undefined : anim
 
   if (block.variant === 'home') {
     return (
-      <section data-animate="hero-intro">
+      <section data-animate={animate}>
         {/* Figma 01 Home / Hero: centred, D/Hero 120 in 1100px, lead 520px, 40/40/48 gaps. */}
         <div className="flex flex-col items-center px-24 pt-72 pb-48 text-center lg:px-64 lg:pt-136 lg:pb-96">
           {block.eyebrow ? (
@@ -81,7 +84,7 @@ async function HeroBlockView({ block, first }: { block: Block; first: boolean })
     )
   }
   return (
-    <section data-animate="hero-intro">
+    <section data-animate={animate}>
       <PageHero
         label={block.eyebrow ? String(block.eyebrow) : undefined}
         title={String(block.heading ?? '')}
@@ -409,7 +412,10 @@ function StatsView({ block }: { block: Block }) {
       <dl className="grid grid-cols-2 gap-32 lg:grid-cols-4">
         {items.map((s, i) => (
           <div key={s.id ?? i} className="flex flex-col gap-8 border-t border-foreground pt-24">
-            <dd className="order-1 font-display text-h1 text-foreground" data-count={s.value}>
+            <dd
+              className="order-1 font-display text-h1 text-foreground tabular-nums"
+              data-count={s.value}
+            >
               {s.prefix}
               {s.value.toLocaleString('en')}
               {s.suffix}
