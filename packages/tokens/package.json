@@ -1,0 +1,11 @@
+{
+  "name": "@ceylonvvip/tokens",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Design tokens exported from Figma: CSS variables and a TypeScript mirror",
+  "type": "module",
+  "exports": {
+    "./tokens.css": "./src/tokens.css",
+    ".": "./src/tokens.ts"
+  }
+}

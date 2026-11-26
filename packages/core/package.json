@@ -1,0 +1,22 @@
+{
+  "name": "@ceylonvvip/core",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Domain logic shared by every app: slugs, booking message builder, pricing display",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@ceylonvvip/config": "workspace:*",
+    "eslint": "9.39.5",
+    "typescript": "6.0.3",
+    "vitest": "5.1.1"
+  }
+}
