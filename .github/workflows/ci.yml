@@ -147,6 +147,8 @@ jobs:
       CI: 'true'
       DATABASE_URI: postgres://ceylonvvip:ceylonvvip@postgres:5432/ceylonvvip
       PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
+      # Test the build as production serves it (indexable), so Lighthouse SEO is meaningful.
+      SITE_ENV: production
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -237,3 +239,23 @@ jobs:
             docker tag ceylonvvip-web:ci "$IMAGE_NAME:$tag"
             docker push "$IMAGE_NAME:$tag"
           done
+
+  deploy-staging:
+    name: Deploy to staging
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    needs: [image]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    concurrency:
+      group: deploy-staging
+      cancel-in-progress: false
+    steps:
+      - name: Ask Coolify to pull the new image
+        env:
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+        run: |
+          curl -fsS --max-time 60 -H "Authorization: Bearer $COOLIFY_TOKEN" \
+            "$COOLIFY_URL/api/v1/deploy?uuid=$COOLIFY_STAGING_APP&force=false"
+    env:
+      COOLIFY_URL: https://cenocloud.cc
+      COOLIFY_STAGING_APP: 1butpqa26ab144jja7vtblav
