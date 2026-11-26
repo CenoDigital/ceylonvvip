@@ -20,12 +20,15 @@
     "test:e2e:update": "playwright test --update-snapshots"
   },
   "dependencies": {
+    "@ceylonvvip/cms-schema": "workspace:*",
     "@ceylonvvip/core": "workspace:*",
     "@ceylonvvip/db": "workspace:*",
     "@ceylonvvip/tokens": "workspace:*",
     "@payloadcms/db-postgres": "3.94.2",
     "@payloadcms/next": "3.94.2",
+    "@payloadcms/plugin-seo": "3.94.2",
     "@payloadcms/richtext-lexical": "3.94.2",
+    "@payloadcms/storage-s3": "3.94.2",
     "@payloadcms/ui": "3.94.2",
     "cross-env": "10.1.0",
     "graphql": "16.15.0",
@@ -36,6 +39,7 @@
     "sharp": "0.35.5"
   },
   "devDependencies": {
+    "@aws-sdk/client-s3": "3.1177.0",
     "@axe-core/playwright": "4.14.1",
     "@ceylonvvip/config": "workspace:*",
     "@lhci/cli": "0.16.1",

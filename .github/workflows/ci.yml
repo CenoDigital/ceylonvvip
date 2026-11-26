@@ -40,6 +40,8 @@ jobs:
       - name: Generated Payload types are committed
         env:
           PAYLOAD_SECRET: ci-type-generation-only
+          # Storage on, as in every real environment, so its fields are in the types.
+          S3_BUCKET: ceylonvvip-media
           DATABASE_URI: postgres://unused:unused@127.0.0.1:5432/unused
         run: |
           pnpm --filter web generate:types

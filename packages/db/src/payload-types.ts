@@ -68,6 +68,7 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
+    media: Media;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -76,6 +77,7 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -85,8 +87,24 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'site-settings': SiteSetting;
+    'contact-business': ContactBusiness;
+    header: Header;
+    footer: Footer;
+    'mobile-action-bar': MobileActionBar;
+    'seo-defaults': SeoDefault;
+    'booking-settings': BookingSetting;
+  };
+  globalsSelect: {
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    'contact-business': ContactBusinessSelect<false> | ContactBusinessSelect<true>;
+    header: HeaderSelect<false> | HeaderSelect<true>;
+    footer: FooterSelect<false> | FooterSelect<true>;
+    'mobile-action-bar': MobileActionBarSelect<false> | MobileActionBarSelect<true>;
+    'seo-defaults': SeoDefaultsSelect<false> | SeoDefaultsSelect<true>;
+    'booking-settings': BookingSettingsSelect<false> | BookingSettingsSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -121,6 +139,11 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  name?: string | null;
+  /**
+   * Admins also manage users and settings. Editors manage content.
+   */
+  role: 'admin' | 'editor';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -140,6 +163,68 @@ export interface User {
     | null;
   password?: string | null;
   collection: 'users';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number;
+  /**
+   * Describe the image for people who cannot see it. Required for accessibility and SEO.
+   */
+  alt: string;
+  caption?: string | null;
+  /**
+   * Photographer or source, if it must be credited.
+   */
+  credit?: string | null;
+  _objectKey?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    wide?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    og?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -164,10 +249,15 @@ export interface PayloadKv {
  */
 export interface PayloadLockedDocument {
   id: number;
-  document?: {
-    relationTo: 'users';
-    value: number | User;
-  } | null;
+  document?:
+    | ({
+        relationTo: 'users';
+        value: number | User;
+      } | null)
+    | ({
+        relationTo: 'media';
+        value: number | Media;
+      } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
@@ -215,6 +305,8 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  name?: T;
+  role?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -231,6 +323,71 @@ export interface UsersSelect<T extends boolean = true> {
         id?: T;
         createdAt?: T;
         expiresAt?: T;
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  caption?: T;
+  credit?: T;
+  _objectKey?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        wide?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        og?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
       };
 }
 /**
@@ -272,6 +429,702 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  siteName: string;
+  logos?: {
+    light?: (number | null) | Media;
+    dark?: (number | null) | Media;
+    mobile?: (number | null) | Media;
+  };
+  icons?: {
+    /**
+     * SVG or 48 by 48 PNG.
+     */
+    favicon?: (number | null) | Media;
+    /**
+     * 180 by 180 PNG.
+     */
+    appleTouchIcon?: (number | null) | Media;
+  };
+  /**
+   * 1200 by 630. Used when a page has none.
+   */
+  ogDefault?: (number | null) | Media;
+  /**
+   * Leave empty to use the design system colour (bronze #846429).
+   */
+  brandColour?: string | null;
+  translate?: {
+    enabled?: boolean | null;
+    languages?: ('de' | 'fr' | 'it' | 'es' | 'ru' | 'zh-CN' | 'ja' | 'ar' | 'hi' | 'nl')[] | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact-business".
+ */
+export interface ContactBusiness {
+  id: number;
+  /**
+   * International format, for example +94 77 123 4567. Used by every WhatsApp button.
+   */
+  whatsapp: string;
+  phones?:
+    | {
+        label?: string | null;
+        number: string;
+        id?: string | null;
+      }[]
+    | null;
+  emails?:
+    | {
+        label?: string | null;
+        email: string;
+        id?: string | null;
+      }[]
+    | null;
+  address?: {
+    street?: string | null;
+    city?: string | null;
+    region?: string | null;
+    postcode?: string | null;
+    country?: string | null;
+  };
+  /**
+   * From Google Maps: right-click the place and copy the two numbers.
+   */
+  mapPin?: {
+    latitude?: number | null;
+    longitude?: number | null;
+  };
+  openingHours?:
+    | {
+        days: ('Mo' | 'Tu' | 'We' | 'Th' | 'Fr' | 'Sa' | 'Su')[];
+        opens?: string | null;
+        closes?: string | null;
+        allDay?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  social?:
+    | {
+        platform: 'instagram' | 'facebook' | 'tiktok' | 'youtube' | 'linkedin' | 'tripadvisor' | 'x';
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  registeredName?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "header".
+ */
+export interface Header {
+  id: number;
+  navigation?:
+    | {
+        kind?: ('link' | 'dropdown') | null;
+        label: string;
+        link?: {
+          label?: string | null;
+          type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
+          url?: string | null;
+          /**
+           * International format, for example +94 77 123 4567.
+           */
+          phone?: string | null;
+          message?: string | null;
+          email?: string | null;
+          newTab?: boolean | null;
+        };
+        children?:
+          | {
+              link: {
+                label?: string | null;
+                type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
+                url?: string | null;
+                /**
+                 * International format, for example +94 77 123 4567.
+                 */
+                phone?: string | null;
+                message?: string | null;
+                email?: string | null;
+                newTab?: boolean | null;
+              };
+              /**
+               * Short line shown in dropdowns.
+               */
+              description?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  ctas?:
+    | {
+        cta: {
+          label?: string | null;
+          appearance?: ('button' | 'link') | null;
+          icon?:
+            | (
+                | 'arrow-left'
+                | 'arrow-right'
+                | 'arrow-up-right'
+                | 'bed'
+                | 'calendar'
+                | 'car'
+                | 'check'
+                | 'chevron-down'
+                | 'clock'
+                | 'compass'
+                | 'droplet'
+                | 'gem'
+                | 'glass-water'
+                | 'globe'
+                | 'heart'
+                | 'home'
+                | 'map-pin'
+                | 'menu'
+                | 'phone'
+                | 'plane'
+                | 'shield'
+                | 'square'
+                | 'square-check'
+                | 'whatsapp'
+                | 'wifi'
+                | 'x'
+              )
+            | null;
+          link: {
+            type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
+            url?: string | null;
+            /**
+             * International format, for example +94 77 123 4567.
+             */
+            phone?: string | null;
+            message?: string | null;
+            email?: string | null;
+            newTab?: boolean | null;
+          };
+        };
+        id?: string | null;
+      }[]
+    | null;
+  announcement?: {
+    enabled?: boolean | null;
+    text?: string | null;
+    link?: {
+      label?: string | null;
+      type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
+      url?: string | null;
+      /**
+       * International format, for example +94 77 123 4567.
+       */
+      phone?: string | null;
+      message?: string | null;
+      email?: string | null;
+      newTab?: boolean | null;
+    };
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer".
+ */
+export interface Footer {
+  id: number;
+  columns?:
+    | {
+        heading: string;
+        links?:
+          | {
+              link: {
+                label?: string | null;
+                type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
+                url?: string | null;
+                /**
+                 * International format, for example +94 77 123 4567.
+                 */
+                phone?: string | null;
+                message?: string | null;
+                email?: string | null;
+                newTab?: boolean | null;
+              };
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  legalLinks?:
+    | {
+        link: {
+          label?: string | null;
+          type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
+          url?: string | null;
+          /**
+           * International format, for example +94 77 123 4567.
+           */
+          phone?: string | null;
+          message?: string | null;
+          email?: string | null;
+          newTab?: boolean | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  newsletterText?: string | null;
+  /**
+   * {year} becomes the current year.
+   */
+  copyright?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mobile-action-bar".
+ */
+export interface MobileActionBar {
+  id: number;
+  /**
+   * Shown in the sticky bar on phones, in this order.
+   */
+  buttons?:
+    | {
+        label: string;
+        icon?:
+          | (
+              | 'arrow-left'
+              | 'arrow-right'
+              | 'arrow-up-right'
+              | 'bed'
+              | 'calendar'
+              | 'car'
+              | 'check'
+              | 'chevron-down'
+              | 'clock'
+              | 'compass'
+              | 'droplet'
+              | 'gem'
+              | 'glass-water'
+              | 'globe'
+              | 'heart'
+              | 'home'
+              | 'map-pin'
+              | 'menu'
+              | 'phone'
+              | 'plane'
+              | 'shield'
+              | 'square'
+              | 'square-check'
+              | 'whatsapp'
+              | 'wifi'
+              | 'x'
+            )
+          | null;
+        action?: ('link' | 'menu') | null;
+        link?: {
+          label?: string | null;
+          type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
+          url?: string | null;
+          /**
+           * International format, for example +94 77 123 4567.
+           */
+          phone?: string | null;
+          message?: string | null;
+          email?: string | null;
+          newTab?: boolean | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "seo-defaults".
+ */
+export interface SeoDefault {
+  id: number;
+  /**
+   * %s is replaced by the page title.
+   */
+  titleTemplate: string;
+  defaultDescription?: string | null;
+  organisation?: {
+    legalName?: string | null;
+    businessType?: string | null;
+    priceRange?: string | null;
+  };
+  verification?: {
+    google?: string | null;
+    bing?: string | null;
+  };
+  /**
+   * Loaded only after the visitor accepts cookies.
+   */
+  analytics?: {
+    ga4?: string | null;
+    metaPixel?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "booking-settings".
+ */
+export interface BookingSetting {
+  id: number;
+  /**
+   * Placeholders: {service}, {vehicle}, {date}, {time}, {pickup}, {dropoff}, {passengers}, {luggage}, {flightNumber}, {name}, {email}, {phone}, {notes}.
+   */
+  whatsappTemplate?: string | null;
+  /**
+   * Shown after the form is sent, while WhatsApp opens.
+   */
+  successMessage?: string | null;
+  visibleFields?:
+    | (
+        | 'service'
+        | 'vehicle'
+        | 'date'
+        | 'time'
+        | 'pickup'
+        | 'dropoff'
+        | 'passengers'
+        | 'luggage'
+        | 'flightNumber'
+        | 'name'
+        | 'email'
+        | 'phone'
+        | 'notes'
+      )[]
+    | null;
+  requiredFields?:
+    | (
+        | 'service'
+        | 'vehicle'
+        | 'date'
+        | 'time'
+        | 'pickup'
+        | 'dropoff'
+        | 'passengers'
+        | 'luggage'
+        | 'flightNumber'
+        | 'name'
+        | 'email'
+        | 'phone'
+        | 'notes'
+      )[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  siteName?: T;
+  logos?:
+    | T
+    | {
+        light?: T;
+        dark?: T;
+        mobile?: T;
+      };
+  icons?:
+    | T
+    | {
+        favicon?: T;
+        appleTouchIcon?: T;
+      };
+  ogDefault?: T;
+  brandColour?: T;
+  translate?:
+    | T
+    | {
+        enabled?: T;
+        languages?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact-business_select".
+ */
+export interface ContactBusinessSelect<T extends boolean = true> {
+  whatsapp?: T;
+  phones?:
+    | T
+    | {
+        label?: T;
+        number?: T;
+        id?: T;
+      };
+  emails?:
+    | T
+    | {
+        label?: T;
+        email?: T;
+        id?: T;
+      };
+  address?:
+    | T
+    | {
+        street?: T;
+        city?: T;
+        region?: T;
+        postcode?: T;
+        country?: T;
+      };
+  mapPin?:
+    | T
+    | {
+        latitude?: T;
+        longitude?: T;
+      };
+  openingHours?:
+    | T
+    | {
+        days?: T;
+        opens?: T;
+        closes?: T;
+        allDay?: T;
+        id?: T;
+      };
+  social?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
+        id?: T;
+      };
+  registeredName?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "header_select".
+ */
+export interface HeaderSelect<T extends boolean = true> {
+  navigation?:
+    | T
+    | {
+        kind?: T;
+        label?: T;
+        link?:
+          | T
+          | {
+              label?: T;
+              type?: T;
+              url?: T;
+              phone?: T;
+              message?: T;
+              email?: T;
+              newTab?: T;
+            };
+        children?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    label?: T;
+                    type?: T;
+                    url?: T;
+                    phone?: T;
+                    message?: T;
+                    email?: T;
+                    newTab?: T;
+                  };
+              description?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  ctas?:
+    | T
+    | {
+        cta?:
+          | T
+          | {
+              label?: T;
+              appearance?: T;
+              icon?: T;
+              link?:
+                | T
+                | {
+                    type?: T;
+                    url?: T;
+                    phone?: T;
+                    message?: T;
+                    email?: T;
+                    newTab?: T;
+                  };
+            };
+        id?: T;
+      };
+  announcement?:
+    | T
+    | {
+        enabled?: T;
+        text?: T;
+        link?:
+          | T
+          | {
+              label?: T;
+              type?: T;
+              url?: T;
+              phone?: T;
+              message?: T;
+              email?: T;
+              newTab?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer_select".
+ */
+export interface FooterSelect<T extends boolean = true> {
+  columns?:
+    | T
+    | {
+        heading?: T;
+        links?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    label?: T;
+                    type?: T;
+                    url?: T;
+                    phone?: T;
+                    message?: T;
+                    email?: T;
+                    newTab?: T;
+                  };
+              id?: T;
+            };
+        id?: T;
+      };
+  legalLinks?:
+    | T
+    | {
+        link?:
+          | T
+          | {
+              label?: T;
+              type?: T;
+              url?: T;
+              phone?: T;
+              message?: T;
+              email?: T;
+              newTab?: T;
+            };
+        id?: T;
+      };
+  newsletterText?: T;
+  copyright?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mobile-action-bar_select".
+ */
+export interface MobileActionBarSelect<T extends boolean = true> {
+  buttons?:
+    | T
+    | {
+        label?: T;
+        icon?: T;
+        action?: T;
+        link?:
+          | T
+          | {
+              label?: T;
+              type?: T;
+              url?: T;
+              phone?: T;
+              message?: T;
+              email?: T;
+              newTab?: T;
+            };
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "seo-defaults_select".
+ */
+export interface SeoDefaultsSelect<T extends boolean = true> {
+  titleTemplate?: T;
+  defaultDescription?: T;
+  organisation?:
+    | T
+    | {
+        legalName?: T;
+        businessType?: T;
+        priceRange?: T;
+      };
+  verification?:
+    | T
+    | {
+        google?: T;
+        bing?: T;
+      };
+  analytics?:
+    | T
+    | {
+        ga4?: T;
+        metaPixel?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "booking-settings_select".
+ */
+export interface BookingSettingsSelect<T extends boolean = true> {
+  whatsappTemplate?: T;
+  successMessage?: T;
+  visibleFields?: T;
+  requiredFields?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
