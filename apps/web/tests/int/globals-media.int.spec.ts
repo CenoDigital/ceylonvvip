@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto'
+
 import { CreateBucketCommand, HeadBucketCommand, S3Client } from '@aws-sdk/client-s3'
 import { migrations } from '@/migrations'
 import config from '@payload-config'
@@ -10,7 +12,8 @@ let payload: Payload
 let admin: User
 let editor: User
 const suffix = Date.now().toString(36)
-const password = 'Galle-fort-ramparts-2026'
+// Generated per run so no credential-like string is committed.
+const password = `Test-${randomUUID()}`
 const as = (user: User | null) => ({ overrideAccess: false as const, user })
 
 // A 1x1 PNG, enough for sharp to produce every image size.

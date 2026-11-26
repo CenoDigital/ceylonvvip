@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto'
+
 import { migrations } from '@/migrations'
 import config from '@payload-config'
 import { getPayload, type Migration, type Payload } from 'payload'
@@ -14,7 +16,8 @@ let otherEditor: User
 
 const suffix = Date.now().toString(36)
 const email = (who: string) => `${who}-${suffix}@test.ceylonvvip.local`
-const strong = 'Kandy-lake-at-dawn-2026'
+// Generated per run so no credential-like string is committed.
+const strong = `Test-${randomUUID()}`
 
 const as = (user: User | null) => ({ overrideAccess: false as const, user })
 
