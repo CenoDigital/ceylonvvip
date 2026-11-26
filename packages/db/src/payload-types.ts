@@ -185,6 +185,7 @@ export interface Page {
         | FormBlock
         | MapBlock
         | LogoStripBlock
+        | DestinationsBlock
         | SpacerBlock
       )[]
     | null;
@@ -441,6 +442,7 @@ export interface Service {
         | FormBlock
         | MapBlock
         | LogoStripBlock
+        | DestinationsBlock
         | SpacerBlock
       )[]
     | null;
@@ -745,6 +747,10 @@ export interface FeatureListBlock {
   };
   items?:
     | {
+        /**
+         * Small bronze line above the title (Signature variant), like "Signature experience".
+         */
+        label?: string | null;
         title: string;
         text?: string | null;
         icon?:
@@ -1408,6 +1414,100 @@ export interface LogoStripBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DestinationsBlock".
+ */
+export interface DestinationsBlock {
+  variant: 'columns';
+  header?: {
+    /**
+     * Small line above, like "Services".
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    intro?: string | null;
+  };
+  cta: {
+    label?: string | null;
+    appearance?: ('button' | 'link') | null;
+    icon?:
+      | (
+          | 'arrow-left'
+          | 'arrow-right'
+          | 'arrow-up-right'
+          | 'bed'
+          | 'calendar'
+          | 'car'
+          | 'check'
+          | 'chevron-down'
+          | 'clock'
+          | 'compass'
+          | 'droplet'
+          | 'gem'
+          | 'glass-water'
+          | 'globe'
+          | 'heart'
+          | 'home'
+          | 'map-pin'
+          | 'menu'
+          | 'phone'
+          | 'plane'
+          | 'shield'
+          | 'square'
+          | 'square-check'
+          | 'whatsapp'
+          | 'wifi'
+          | 'x'
+        )
+      | null;
+    link: {
+      type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: number | Page;
+          } | null)
+        | ({
+            relationTo: 'services';
+            value: number | Service;
+          } | null);
+      url?: string | null;
+      /**
+       * International format, for example +94 77 123 4567.
+       */
+      phone?: string | null;
+      message?: string | null;
+      email?: string | null;
+      newTab?: boolean | null;
+    };
+  };
+  items?:
+    | {
+        name: string;
+        /**
+         * One short line, like "Tea country and cool hills".
+         */
+        line?: string | null;
+        photo?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  settings?: {
+    bg?: ('default' | 'card') | null;
+    pt?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    pb?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    anim?:
+      ('none' | 'fade-up' | 'stagger-children' | 'reveal-mask' | 'image-parallax' | 'counter' | 'line-draw') | null;
+    /**
+     * Optional id for links to this section, like #booking.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'destinations';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "SpacerBlock".
  */
 export interface SpacerBlock {
@@ -1703,6 +1803,7 @@ export interface PagesSelect<T extends boolean = true> {
         form?: T | FormBlockSelect<T>;
         map?: T | MapBlockSelect<T>;
         logoStrip?: T | LogoStripBlockSelect<T>;
+        destinations?: T | DestinationsBlockSelect<T>;
         spacer?: T | SpacerBlockSelect<T>;
       };
   image?: T;
@@ -1913,6 +2014,7 @@ export interface FeatureListBlockSelect<T extends boolean = true> {
   items?:
     | T
     | {
+        label?: T;
         title?: T;
         text?: T;
         icon?: T;
@@ -2309,6 +2411,57 @@ export interface LogoStripBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DestinationsBlock_select".
+ */
+export interface DestinationsBlockSelect<T extends boolean = true> {
+  variant?: T;
+  header?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+      };
+  cta?:
+    | T
+    | {
+        label?: T;
+        appearance?: T;
+        icon?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              reference?: T;
+              url?: T;
+              phone?: T;
+              message?: T;
+              email?: T;
+              newTab?: T;
+            };
+      };
+  items?:
+    | T
+    | {
+        name?: T;
+        line?: T;
+        photo?: T;
+        id?: T;
+      };
+  settings?:
+    | T
+    | {
+        bg?: T;
+        pt?: T;
+        pb?: T;
+        anim?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "SpacerBlock_select".
  */
 export interface SpacerBlockSelect<T extends boolean = true> {
@@ -2348,6 +2501,7 @@ export interface ServicesSelect<T extends boolean = true> {
         form?: T | FormBlockSelect<T>;
         map?: T | MapBlockSelect<T>;
         logoStrip?: T | LogoStripBlockSelect<T>;
+        destinations?: T | DestinationsBlockSelect<T>;
         spacer?: T | SpacerBlockSelect<T>;
       };
   vehicles?: T;
@@ -2708,6 +2862,10 @@ export interface ContactBusiness {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Short line shown with the phone number, like "Available 24 hours".
+   */
+  availability?: string | null;
   registeredName?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -2718,8 +2876,12 @@ export interface ContactBusiness {
  */
 export interface Header {
   id: number;
+  /**
+   * Desktop shows links either side of the wordmark; the mobile menu lists them all in order.
+   */
   navigation?:
     | {
+        side?: ('left' | 'right') | null;
         kind?: ('link' | 'dropdown') | null;
         label: string;
         link?: {
@@ -2869,6 +3031,13 @@ export interface Header {
  */
 export interface Footer {
   id: number;
+  /**
+   * Large line at the top left of the footer.
+   */
+  tagline?: string | null;
+  /**
+   * Link columns. A Contact column is added automatically from Contact & Business.
+   */
   columns?:
     | {
         heading: string;
@@ -2901,6 +3070,10 @@ export interface Footer {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Heading of the contact column (address and phone from Contact & Business).
+   */
+  contactHeading?: string | null;
   legalLinks?:
     | {
         link: {
@@ -2928,6 +3101,10 @@ export interface Footer {
       }[]
     | null;
   newsletterText?: string | null;
+  credit?: {
+    label?: string | null;
+    url?: string | null;
+  };
   /**
    * {year} becomes the current year.
    */
@@ -3168,6 +3345,7 @@ export interface ContactBusinessSelect<T extends boolean = true> {
         url?: T;
         id?: T;
       };
+  availability?: T;
   registeredName?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -3181,6 +3359,7 @@ export interface HeaderSelect<T extends boolean = true> {
   navigation?:
     | T
     | {
+        side?: T;
         kind?: T;
         label?: T;
         link?:
@@ -3265,6 +3444,7 @@ export interface HeaderSelect<T extends boolean = true> {
  * via the `definition` "footer_select".
  */
 export interface FooterSelect<T extends boolean = true> {
+  tagline?: T;
   columns?:
     | T
     | {
@@ -3288,6 +3468,7 @@ export interface FooterSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  contactHeading?: T;
   legalLinks?:
     | T
     | {
@@ -3306,6 +3487,12 @@ export interface FooterSelect<T extends boolean = true> {
         id?: T;
       };
   newsletterText?: T;
+  credit?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+      };
   copyright?: T;
   updatedAt?: T;
   createdAt?: T;

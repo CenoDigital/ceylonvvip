@@ -191,7 +191,8 @@ export const RichText: Block = {
   fields: [
     variant(['detail', 'statement', 'story'], {
       detail: 'In detail (section header and text)',
-      statement: 'Statement (large text, like the Manifesto)',
+      statement:
+        'Statement (large centred text; the eyebrow shows below, separate words with commas)',
       story: 'Story (About)',
     }),
     header,
@@ -257,6 +258,14 @@ export const FeatureList: Block = {
       type: 'array',
       minRows: 1,
       fields: [
+        {
+          name: 'label',
+          type: 'text',
+          admin: {
+            description:
+              'Small bronze line above the title (Signature variant), like "Signature experience".',
+          },
+        },
         { name: 'title', type: 'text', required: true },
         { name: 'text', type: 'textarea' },
         { name: 'icon', type: 'select', options: iconOptions },
@@ -493,6 +502,33 @@ export const LogoStrip: Block = {
   ],
 }
 
+// Figma 01 Home / Destinations: places guests ask for, three to a row with photos.
+export const Destinations: Block = {
+  slug: 'destinations',
+  interfaceName: 'DestinationsBlock',
+  fields: [
+    variant(['columns'], { columns: 'Photo columns' }),
+    header,
+    ctaField(),
+    {
+      name: 'items',
+      label: 'Places',
+      type: 'array',
+      minRows: 1,
+      fields: [
+        { name: 'name', type: 'text', required: true },
+        {
+          name: 'line',
+          type: 'text',
+          admin: { description: 'One short line, like "Tea country and cool hills".' },
+        },
+        media({ name: 'photo' }),
+      ],
+    },
+    settings(),
+  ],
+}
+
 export const Spacer: Block = {
   slug: 'spacer',
   interfaceName: 'SpacerBlock',
@@ -525,6 +561,7 @@ export const pageBlocks: Block[] = [
   FormBlock,
   MapBlock,
   LogoStrip,
+  Destinations,
   Spacer,
 ]
 
@@ -539,4 +576,5 @@ export const DESIGNED_BLOCKS = [
   'processSteps',
   'ctaBanner',
   'form',
+  'destinations',
 ]

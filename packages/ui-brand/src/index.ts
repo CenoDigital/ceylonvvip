@@ -26,6 +26,7 @@ export {
 export { IndexRow, type IndexRowProps } from './components/IndexRow'
 export { LinkUnderline, linkUnderlineClass } from './components/LinkUnderline'
 export { MobileBar, type MobileBarItem, type MobileBarProps } from './components/MobileBar'
+export { MobileMenu, type MobileMenuProps } from './components/MobileMenu'
 export { NextLink, type NextLinkProps } from './components/NextLink'
 export { PageHero, type PageHeroProps } from './components/PageHero'
 export { RouteRow, type RouteRowProps } from './components/RouteRow'

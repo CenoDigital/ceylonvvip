@@ -53,6 +53,11 @@ jobs:
           echo "::add-mask::$secret"
           echo "PAYLOAD_SECRET=$secret" >> "$GITHUB_ENV"
       - run: pnpm turbo run build --filter=web
+      - name: Load the Figma content (migrate, then seed)
+        working-directory: apps/web
+        run: |
+          pnpm migrate
+          pnpm seed
       - name: Start the production server
         working-directory: apps/web
         run: |

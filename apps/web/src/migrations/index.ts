@@ -3,6 +3,7 @@ import * as migration_20261126_190954_users_roles from './20261126_190954_users_
 import * as migration_20261126_193044_media_and_globals from './20261126_193044_media_and_globals'
 import * as migration_20261126_193302_content_collections from './20261126_193302_content_collections'
 import * as migration_20261126_195225_page_blocks from './20261126_195225_page_blocks'
+import * as migration_20261126_213209_site_chrome_and_destinations from './20261126_213209_site_chrome_and_destinations'
 
 export const migrations = [
   {
@@ -29,5 +30,10 @@ export const migrations = [
     up: migration_20261126_195225_page_blocks.up,
     down: migration_20261126_195225_page_blocks.down,
     name: '20261126_195225_page_blocks',
+  },
+  {
+    up: migration_20261126_213209_site_chrome_and_destinations.up,
+    down: migration_20261126_213209_site_chrome_and_destinations.down,
+    name: '20261126_213209_site_chrome_and_destinations',
   },
 ]
