@@ -166,6 +166,28 @@ export interface Page {
    * The address of this page. Filled in from the title if left empty.
    */
   slug?: string | null;
+  layout?:
+    | (
+        | HeroBlock
+        | RichTextBlock
+        | ServicesGridBlock
+        | VehicleShowcaseBlock
+        | FleetComparisonBlock
+        | FeatureListBlock
+        | StatsBlock
+        | ImageTextBlock
+        | GalleryBlock
+        | TestimonialsBlock
+        | FaqBlock
+        | PricingTableBlock
+        | ProcessStepsBlock
+        | CtaBannerBlock
+        | FormBlock
+        | MapBlock
+        | LogoStripBlock
+        | SpacerBlock
+      )[]
+    | null;
   /**
    * Used for sharing and listings.
    */
@@ -199,6 +221,109 @@ export interface Page {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroBlock".
+ */
+export interface HeroBlock {
+  variant: 'page' | 'home';
+  /**
+   * Like "Services, 02".
+   */
+  eyebrow?: string | null;
+  heading: string;
+  intro?: string | null;
+  mediaType?: ('image' | 'video' | 'slider' | 'none') | null;
+  image?: (number | null) | Media;
+  /**
+   * MP4, muted and looping.
+   */
+  video?: (number | null) | Media;
+  slides?: (number | Media)[] | null;
+  ctas?:
+    | {
+        cta: {
+          label?: string | null;
+          appearance?: ('button' | 'link') | null;
+          icon?:
+            | (
+                | 'arrow-left'
+                | 'arrow-right'
+                | 'arrow-up-right'
+                | 'bed'
+                | 'calendar'
+                | 'car'
+                | 'check'
+                | 'chevron-down'
+                | 'clock'
+                | 'compass'
+                | 'droplet'
+                | 'gem'
+                | 'glass-water'
+                | 'globe'
+                | 'heart'
+                | 'home'
+                | 'map-pin'
+                | 'menu'
+                | 'phone'
+                | 'plane'
+                | 'shield'
+                | 'square'
+                | 'square-check'
+                | 'whatsapp'
+                | 'wifi'
+                | 'x'
+              )
+            | null;
+          link: {
+            type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
+            reference?:
+              | ({
+                  relationTo: 'pages';
+                  value: number | Page;
+                } | null)
+              | ({
+                  relationTo: 'services';
+                  value: number | Service;
+                } | null);
+            url?: string | null;
+            /**
+             * International format, for example +94 77 123 4567.
+             */
+            phone?: string | null;
+            message?: string | null;
+            email?: string | null;
+            newTab?: boolean | null;
+          };
+        };
+        id?: string | null;
+      }[]
+    | null;
+  settings?: {
+    bg?: ('default' | 'card') | null;
+    pt?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    pb?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    anim?:
+      | (
+          | 'none'
+          | 'fade-up'
+          | 'stagger-children'
+          | 'reveal-mask'
+          | 'image-parallax'
+          | 'counter'
+          | 'line-draw'
+          | 'hero-intro'
+        )
+      | null;
+    /**
+     * Optional id for links to this section, like #booking.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'hero';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -297,6 +422,28 @@ export interface Service {
     };
     [k: string]: unknown;
   } | null;
+  layout?:
+    | (
+        | HeroBlock
+        | RichTextBlock
+        | ServicesGridBlock
+        | VehicleShowcaseBlock
+        | FleetComparisonBlock
+        | FeatureListBlock
+        | StatsBlock
+        | ImageTextBlock
+        | GalleryBlock
+        | TestimonialsBlock
+        | FaqBlock
+        | PricingTableBlock
+        | ProcessStepsBlock
+        | CtaBannerBlock
+        | FormBlock
+        | MapBlock
+        | LogoStripBlock
+        | SpacerBlock
+      )[]
+    | null;
   vehicles?: (number | Vehicle)[] | null;
   pricing?: (number | Pricing)[] | null;
   faqs?: (number | Faq)[] | null;
@@ -329,6 +476,166 @@ export interface Service {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RichTextBlock".
+ */
+export interface RichTextBlock {
+  variant: 'detail' | 'statement' | 'story';
+  header?: {
+    /**
+     * Small line above, like "Services".
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    intro?: string | null;
+  };
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  settings?: {
+    bg?: ('default' | 'card') | null;
+    pt?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    pb?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    anim?:
+      ('none' | 'fade-up' | 'stagger-children' | 'reveal-mask' | 'image-parallax' | 'counter' | 'line-draw') | null;
+    /**
+     * Optional id for links to this section, like #booking.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'richText';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ServicesGridBlock".
+ */
+export interface ServicesGridBlock {
+  variant: 'index';
+  header?: {
+    /**
+     * Small line above, like "Services".
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    intro?: string | null;
+  };
+  source?: ('all' | 'chosen') | null;
+  items?: (number | Service)[] | null;
+  settings?: {
+    bg?: ('default' | 'card') | null;
+    pt?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    pb?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    anim?:
+      ('none' | 'fade-up' | 'stagger-children' | 'reveal-mask' | 'image-parallax' | 'counter' | 'line-draw') | null;
+    /**
+     * Optional id for links to this section, like #booking.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'servicesGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "VehicleShowcaseBlock".
+ */
+export interface VehicleShowcaseBlock {
+  variant: 'specs' | 'teaser';
+  header?: {
+    /**
+     * Small line above, like "Services".
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    intro?: string | null;
+  };
+  source?: ('all' | 'chosen') | null;
+  items?: (number | Vehicle)[] | null;
+  cta: {
+    label?: string | null;
+    appearance?: ('button' | 'link') | null;
+    icon?:
+      | (
+          | 'arrow-left'
+          | 'arrow-right'
+          | 'arrow-up-right'
+          | 'bed'
+          | 'calendar'
+          | 'car'
+          | 'check'
+          | 'chevron-down'
+          | 'clock'
+          | 'compass'
+          | 'droplet'
+          | 'gem'
+          | 'glass-water'
+          | 'globe'
+          | 'heart'
+          | 'home'
+          | 'map-pin'
+          | 'menu'
+          | 'phone'
+          | 'plane'
+          | 'shield'
+          | 'square'
+          | 'square-check'
+          | 'whatsapp'
+          | 'wifi'
+          | 'x'
+        )
+      | null;
+    link: {
+      type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: number | Page;
+          } | null)
+        | ({
+            relationTo: 'services';
+            value: number | Service;
+          } | null);
+      url?: string | null;
+      /**
+       * International format, for example +94 77 123 4567.
+       */
+      phone?: string | null;
+      message?: string | null;
+      email?: string | null;
+      newTab?: boolean | null;
+    };
+  };
+  settings?: {
+    bg?: ('default' | 'card') | null;
+    pt?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    pb?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    anim?:
+      ('none' | 'fade-up' | 'stagger-children' | 'reveal-mask' | 'image-parallax' | 'counter' | 'line-draw') | null;
+    /**
+     * Optional id for links to this section, like #booking.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'vehicleShowcase';
 }
 /**
  * Shown on the Fleet page and in booking forms. Vehicles have no page of their own.
@@ -392,6 +699,417 @@ export interface Pricing {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FleetComparisonBlock".
+ */
+export interface FleetComparisonBlock {
+  variant: 'default';
+  header?: {
+    /**
+     * Small line above, like "Services".
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    intro?: string | null;
+  };
+  source?: ('all' | 'chosen') | null;
+  items?: (number | Vehicle)[] | null;
+  compare?: ('class' | 'seats' | 'luggage' | 'features')[] | null;
+  settings?: {
+    bg?: ('default' | 'card') | null;
+    pt?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    pb?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    anim?:
+      ('none' | 'fade-up' | 'stagger-children' | 'reveal-mask' | 'image-parallax' | 'counter' | 'line-draw') | null;
+    /**
+     * Optional id for links to this section, like #booking.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'fleetComparison';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FeatureListBlock".
+ */
+export interface FeatureListBlock {
+  variant: 'large' | 'small' | 'signature' | 'title';
+  header?: {
+    /**
+     * Small line above, like "Services".
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    intro?: string | null;
+  };
+  items?:
+    | {
+        title: string;
+        text?: string | null;
+        icon?:
+          | (
+              | 'arrow-left'
+              | 'arrow-right'
+              | 'arrow-up-right'
+              | 'bed'
+              | 'calendar'
+              | 'car'
+              | 'check'
+              | 'chevron-down'
+              | 'clock'
+              | 'compass'
+              | 'droplet'
+              | 'gem'
+              | 'glass-water'
+              | 'globe'
+              | 'heart'
+              | 'home'
+              | 'map-pin'
+              | 'menu'
+              | 'phone'
+              | 'plane'
+              | 'shield'
+              | 'square'
+              | 'square-check'
+              | 'whatsapp'
+              | 'wifi'
+              | 'x'
+            )
+          | null;
+        /**
+         * Used by the Signature variant.
+         */
+        image?: (number | null) | Media;
+        cta: {
+          label?: string | null;
+          appearance?: ('button' | 'link') | null;
+          icon?:
+            | (
+                | 'arrow-left'
+                | 'arrow-right'
+                | 'arrow-up-right'
+                | 'bed'
+                | 'calendar'
+                | 'car'
+                | 'check'
+                | 'chevron-down'
+                | 'clock'
+                | 'compass'
+                | 'droplet'
+                | 'gem'
+                | 'glass-water'
+                | 'globe'
+                | 'heart'
+                | 'home'
+                | 'map-pin'
+                | 'menu'
+                | 'phone'
+                | 'plane'
+                | 'shield'
+                | 'square'
+                | 'square-check'
+                | 'whatsapp'
+                | 'wifi'
+                | 'x'
+              )
+            | null;
+          link: {
+            type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
+            reference?:
+              | ({
+                  relationTo: 'pages';
+                  value: number | Page;
+                } | null)
+              | ({
+                  relationTo: 'services';
+                  value: number | Service;
+                } | null);
+            url?: string | null;
+            /**
+             * International format, for example +94 77 123 4567.
+             */
+            phone?: string | null;
+            message?: string | null;
+            email?: string | null;
+            newTab?: boolean | null;
+          };
+        };
+        id?: string | null;
+      }[]
+    | null;
+  settings?: {
+    bg?: ('default' | 'card') | null;
+    pt?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    pb?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    anim?:
+      ('none' | 'fade-up' | 'stagger-children' | 'reveal-mask' | 'image-parallax' | 'counter' | 'line-draw') | null;
+    /**
+     * Optional id for links to this section, like #booking.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'featureList';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatsBlock".
+ */
+export interface StatsBlock {
+  variant: 'default';
+  header?: {
+    /**
+     * Small line above, like "Services".
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    intro?: string | null;
+  };
+  items?:
+    | {
+        prefix?: string | null;
+        value: number;
+        /**
+         * Like + or %.
+         */
+        suffix?: string | null;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  settings?: {
+    bg?: ('default' | 'card') | null;
+    pt?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    pb?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    anim?:
+      ('none' | 'fade-up' | 'stagger-children' | 'reveal-mask' | 'image-parallax' | 'counter' | 'line-draw') | null;
+    /**
+     * Optional id for links to this section, like #booking.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'stats';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ImageTextBlock".
+ */
+export interface ImageTextBlock {
+  variant: 'default';
+  header?: {
+    /**
+     * Small line above, like "Services".
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    intro?: string | null;
+  };
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  image: number | Media;
+  imagePosition?: ('left' | 'right') | null;
+  cta: {
+    label?: string | null;
+    appearance?: ('button' | 'link') | null;
+    icon?:
+      | (
+          | 'arrow-left'
+          | 'arrow-right'
+          | 'arrow-up-right'
+          | 'bed'
+          | 'calendar'
+          | 'car'
+          | 'check'
+          | 'chevron-down'
+          | 'clock'
+          | 'compass'
+          | 'droplet'
+          | 'gem'
+          | 'glass-water'
+          | 'globe'
+          | 'heart'
+          | 'home'
+          | 'map-pin'
+          | 'menu'
+          | 'phone'
+          | 'plane'
+          | 'shield'
+          | 'square'
+          | 'square-check'
+          | 'whatsapp'
+          | 'wifi'
+          | 'x'
+        )
+      | null;
+    link: {
+      type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: number | Page;
+          } | null)
+        | ({
+            relationTo: 'services';
+            value: number | Service;
+          } | null);
+      url?: string | null;
+      /**
+       * International format, for example +94 77 123 4567.
+       */
+      phone?: string | null;
+      message?: string | null;
+      email?: string | null;
+      newTab?: boolean | null;
+    };
+  };
+  settings?: {
+    bg?: ('default' | 'card') | null;
+    pt?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    pb?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    anim?:
+      ('none' | 'fade-up' | 'stagger-children' | 'reveal-mask' | 'image-parallax' | 'counter' | 'line-draw') | null;
+    /**
+     * Optional id for links to this section, like #booking.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'imageText';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "GalleryBlock".
+ */
+export interface GalleryBlock {
+  variant: 'default';
+  header?: {
+    /**
+     * Small line above, like "Services".
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    intro?: string | null;
+  };
+  images: (number | Media)[];
+  settings?: {
+    bg?: ('default' | 'card') | null;
+    pt?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    pb?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    anim?:
+      ('none' | 'fade-up' | 'stagger-children' | 'reveal-mask' | 'image-parallax' | 'counter' | 'line-draw') | null;
+    /**
+     * Optional id for links to this section, like #booking.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'gallery';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TestimonialsBlock".
+ */
+export interface TestimonialsBlock {
+  variant: 'default';
+  header?: {
+    /**
+     * Small line above, like "Services".
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    intro?: string | null;
+  };
+  source?: ('all' | 'chosen') | null;
+  items?: (number | Testimonial)[] | null;
+  settings?: {
+    bg?: ('default' | 'card') | null;
+    pt?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    pb?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    anim?:
+      ('none' | 'fade-up' | 'stagger-children' | 'reveal-mask' | 'image-parallax' | 'counter' | 'line-draw') | null;
+    /**
+     * Optional id for links to this section, like #booking.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'testimonials';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "testimonials".
+ */
+export interface Testimonial {
+  id: number;
+  quote: string;
+  name: string;
+  /**
+   * For example: Honeymoon guest, UK.
+   */
+  role?: string | null;
+  rating?: number | null;
+  photo?: (number | null) | Media;
+  /**
+   * Only real reviews may be shown with review stars in Google (schema).
+   */
+  verified?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FaqBlock".
+ */
+export interface FaqBlock {
+  variant: 'list';
+  header?: {
+    /**
+     * Small line above, like "Services".
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    intro?: string | null;
+  };
+  source?: ('topic' | 'chosen') | null;
+  topic?: string | null;
+  items?: (number | Faq)[] | null;
+  settings?: {
+    bg?: ('default' | 'card') | null;
+    pt?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    pb?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    anim?:
+      ('none' | 'fade-up' | 'stagger-children' | 'reveal-mask' | 'image-parallax' | 'counter' | 'line-draw') | null;
+    /**
+     * Optional id for links to this section, like #booking.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'faq';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "faqs".
  */
 export interface Faq {
@@ -422,24 +1140,282 @@ export interface Faq {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "testimonials".
+ * via the `definition` "PricingTableBlock".
  */
-export interface Testimonial {
-  id: number;
-  quote: string;
-  name: string;
+export interface PricingTableBlock {
+  variant: 'default';
+  header?: {
+    /**
+     * Small line above, like "Services".
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    intro?: string | null;
+  };
+  items: (number | Pricing)[];
+  settings?: {
+    bg?: ('default' | 'card') | null;
+    pt?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    pb?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    anim?:
+      ('none' | 'fade-up' | 'stagger-children' | 'reveal-mask' | 'image-parallax' | 'counter' | 'line-draw') | null;
+    /**
+     * Optional id for links to this section, like #booking.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'pricingTable';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProcessStepsBlock".
+ */
+export interface ProcessStepsBlock {
+  variant: 'steps';
+  header?: {
+    /**
+     * Small line above, like "Services".
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    intro?: string | null;
+  };
+  steps?:
+    | {
+        title: string;
+        text?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  settings?: {
+    bg?: ('default' | 'card') | null;
+    pt?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    pb?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    anim?:
+      ('none' | 'fade-up' | 'stagger-children' | 'reveal-mask' | 'image-parallax' | 'counter' | 'line-draw') | null;
+    /**
+     * Optional id for links to this section, like #booking.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'processSteps';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CtaBannerBlock".
+ */
+export interface CtaBannerBlock {
+  variant: 'enquiry' | 'next';
+  eyebrow?: string | null;
+  heading?: string | null;
+  text?: string | null;
+  cta?: {
+    label?: string | null;
+    appearance?: ('button' | 'link') | null;
+    icon?:
+      | (
+          | 'arrow-left'
+          | 'arrow-right'
+          | 'arrow-up-right'
+          | 'bed'
+          | 'calendar'
+          | 'car'
+          | 'check'
+          | 'chevron-down'
+          | 'clock'
+          | 'compass'
+          | 'droplet'
+          | 'gem'
+          | 'glass-water'
+          | 'globe'
+          | 'heart'
+          | 'home'
+          | 'map-pin'
+          | 'menu'
+          | 'phone'
+          | 'plane'
+          | 'shield'
+          | 'square'
+          | 'square-check'
+          | 'whatsapp'
+          | 'wifi'
+          | 'x'
+        )
+      | null;
+    link: {
+      type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: number | Page;
+          } | null)
+        | ({
+            relationTo: 'services';
+            value: number | Service;
+          } | null);
+      url?: string | null;
+      /**
+       * International format, for example +94 77 123 4567.
+       */
+      phone?: string | null;
+      message?: string | null;
+      email?: string | null;
+      newTab?: boolean | null;
+    };
+  };
+  showPhone?: boolean | null;
+  next?: {
+    type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'services';
+          value: number | Service;
+        } | null);
+    url?: string | null;
+    /**
+     * International format, for example +94 77 123 4567.
+     */
+    phone?: string | null;
+    message?: string | null;
+    email?: string | null;
+    newTab?: boolean | null;
+  };
+  settings?: {
+    bg?: ('default' | 'card') | null;
+    pt?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    pb?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    anim?:
+      ('none' | 'fade-up' | 'stagger-children' | 'reveal-mask' | 'image-parallax' | 'counter' | 'line-draw') | null;
+    /**
+     * Optional id for links to this section, like #booking.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'ctaBanner';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FormBlock".
+ */
+export interface FormBlock {
+  variant: 'booking';
+  header?: {
+    /**
+     * Small line above, like "Services".
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    intro?: string | null;
+  };
   /**
-   * For example: Honeymoon guest, UK.
+   * Leave empty on general pages. On a service page, choose that service.
    */
-  role?: string | null;
-  rating?: number | null;
-  photo?: (number | null) | Media;
-  /**
-   * Only real reviews may be shown with review stars in Google (schema).
-   */
-  verified?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
+  service?: (number | null) | Service;
+  settings?: {
+    bg?: ('default' | 'card') | null;
+    pt?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    pb?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    anim?:
+      ('none' | 'fade-up' | 'stagger-children' | 'reveal-mask' | 'image-parallax' | 'counter' | 'line-draw') | null;
+    /**
+     * Optional id for links to this section, like #booking.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'form';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MapBlock".
+ */
+export interface MapBlock {
+  variant: 'default';
+  header?: {
+    /**
+     * Small line above, like "Services".
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    intro?: string | null;
+  };
+  useBusinessAddress?: boolean | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  zoom?: number | null;
+  settings?: {
+    bg?: ('default' | 'card') | null;
+    pt?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    pb?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    anim?:
+      ('none' | 'fade-up' | 'stagger-children' | 'reveal-mask' | 'image-parallax' | 'counter' | 'line-draw') | null;
+    /**
+     * Optional id for links to this section, like #booking.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'map';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LogoStripBlock".
+ */
+export interface LogoStripBlock {
+  variant: 'default';
+  header?: {
+    /**
+     * Small line above, like "Services".
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    intro?: string | null;
+  };
+  logos?:
+    | {
+        name: string;
+        logo: number | Media;
+        url?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  settings?: {
+    bg?: ('default' | 'card') | null;
+    pt?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    pb?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    anim?:
+      ('none' | 'fade-up' | 'stagger-children' | 'reveal-mask' | 'image-parallax' | 'counter' | 'line-draw') | null;
+    /**
+     * Optional id for links to this section, like #booking.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'logoStrip';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SpacerBlock".
+ */
+export interface SpacerBlock {
+  size?: ('sm' | 'md' | 'lg' | 'xl') | null;
+  divider?: boolean | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'spacer';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -707,6 +1683,28 @@ export interface PayloadMigration {
 export interface PagesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
+  layout?:
+    | T
+    | {
+        hero?: T | HeroBlockSelect<T>;
+        richText?: T | RichTextBlockSelect<T>;
+        servicesGrid?: T | ServicesGridBlockSelect<T>;
+        vehicleShowcase?: T | VehicleShowcaseBlockSelect<T>;
+        fleetComparison?: T | FleetComparisonBlockSelect<T>;
+        featureList?: T | FeatureListBlockSelect<T>;
+        stats?: T | StatsBlockSelect<T>;
+        imageText?: T | ImageTextBlockSelect<T>;
+        gallery?: T | GalleryBlockSelect<T>;
+        testimonials?: T | TestimonialsBlockSelect<T>;
+        faq?: T | FaqBlockSelect<T>;
+        pricingTable?: T | PricingTableBlockSelect<T>;
+        processSteps?: T | ProcessStepsBlockSelect<T>;
+        ctaBanner?: T | CtaBannerBlockSelect<T>;
+        form?: T | FormBlockSelect<T>;
+        map?: T | MapBlockSelect<T>;
+        logoStrip?: T | LogoStripBlockSelect<T>;
+        spacer?: T | SpacerBlockSelect<T>;
+      };
   image?: T;
   seo?:
     | T
@@ -727,6 +1725,600 @@ export interface PagesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroBlock_select".
+ */
+export interface HeroBlockSelect<T extends boolean = true> {
+  variant?: T;
+  eyebrow?: T;
+  heading?: T;
+  intro?: T;
+  mediaType?: T;
+  image?: T;
+  video?: T;
+  slides?: T;
+  ctas?:
+    | T
+    | {
+        cta?:
+          | T
+          | {
+              label?: T;
+              appearance?: T;
+              icon?: T;
+              link?:
+                | T
+                | {
+                    type?: T;
+                    reference?: T;
+                    url?: T;
+                    phone?: T;
+                    message?: T;
+                    email?: T;
+                    newTab?: T;
+                  };
+            };
+        id?: T;
+      };
+  settings?:
+    | T
+    | {
+        bg?: T;
+        pt?: T;
+        pb?: T;
+        anim?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RichTextBlock_select".
+ */
+export interface RichTextBlockSelect<T extends boolean = true> {
+  variant?: T;
+  header?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+      };
+  content?: T;
+  settings?:
+    | T
+    | {
+        bg?: T;
+        pt?: T;
+        pb?: T;
+        anim?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ServicesGridBlock_select".
+ */
+export interface ServicesGridBlockSelect<T extends boolean = true> {
+  variant?: T;
+  header?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+      };
+  source?: T;
+  items?: T;
+  settings?:
+    | T
+    | {
+        bg?: T;
+        pt?: T;
+        pb?: T;
+        anim?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "VehicleShowcaseBlock_select".
+ */
+export interface VehicleShowcaseBlockSelect<T extends boolean = true> {
+  variant?: T;
+  header?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+      };
+  source?: T;
+  items?: T;
+  cta?:
+    | T
+    | {
+        label?: T;
+        appearance?: T;
+        icon?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              reference?: T;
+              url?: T;
+              phone?: T;
+              message?: T;
+              email?: T;
+              newTab?: T;
+            };
+      };
+  settings?:
+    | T
+    | {
+        bg?: T;
+        pt?: T;
+        pb?: T;
+        anim?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FleetComparisonBlock_select".
+ */
+export interface FleetComparisonBlockSelect<T extends boolean = true> {
+  variant?: T;
+  header?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+      };
+  source?: T;
+  items?: T;
+  compare?: T;
+  settings?:
+    | T
+    | {
+        bg?: T;
+        pt?: T;
+        pb?: T;
+        anim?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FeatureListBlock_select".
+ */
+export interface FeatureListBlockSelect<T extends boolean = true> {
+  variant?: T;
+  header?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+      };
+  items?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        icon?: T;
+        image?: T;
+        cta?:
+          | T
+          | {
+              label?: T;
+              appearance?: T;
+              icon?: T;
+              link?:
+                | T
+                | {
+                    type?: T;
+                    reference?: T;
+                    url?: T;
+                    phone?: T;
+                    message?: T;
+                    email?: T;
+                    newTab?: T;
+                  };
+            };
+        id?: T;
+      };
+  settings?:
+    | T
+    | {
+        bg?: T;
+        pt?: T;
+        pb?: T;
+        anim?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatsBlock_select".
+ */
+export interface StatsBlockSelect<T extends boolean = true> {
+  variant?: T;
+  header?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+      };
+  items?:
+    | T
+    | {
+        prefix?: T;
+        value?: T;
+        suffix?: T;
+        label?: T;
+        id?: T;
+      };
+  settings?:
+    | T
+    | {
+        bg?: T;
+        pt?: T;
+        pb?: T;
+        anim?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ImageTextBlock_select".
+ */
+export interface ImageTextBlockSelect<T extends boolean = true> {
+  variant?: T;
+  header?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+      };
+  content?: T;
+  image?: T;
+  imagePosition?: T;
+  cta?:
+    | T
+    | {
+        label?: T;
+        appearance?: T;
+        icon?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              reference?: T;
+              url?: T;
+              phone?: T;
+              message?: T;
+              email?: T;
+              newTab?: T;
+            };
+      };
+  settings?:
+    | T
+    | {
+        bg?: T;
+        pt?: T;
+        pb?: T;
+        anim?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "GalleryBlock_select".
+ */
+export interface GalleryBlockSelect<T extends boolean = true> {
+  variant?: T;
+  header?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+      };
+  images?: T;
+  settings?:
+    | T
+    | {
+        bg?: T;
+        pt?: T;
+        pb?: T;
+        anim?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TestimonialsBlock_select".
+ */
+export interface TestimonialsBlockSelect<T extends boolean = true> {
+  variant?: T;
+  header?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+      };
+  source?: T;
+  items?: T;
+  settings?:
+    | T
+    | {
+        bg?: T;
+        pt?: T;
+        pb?: T;
+        anim?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FaqBlock_select".
+ */
+export interface FaqBlockSelect<T extends boolean = true> {
+  variant?: T;
+  header?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+      };
+  source?: T;
+  topic?: T;
+  items?: T;
+  settings?:
+    | T
+    | {
+        bg?: T;
+        pt?: T;
+        pb?: T;
+        anim?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PricingTableBlock_select".
+ */
+export interface PricingTableBlockSelect<T extends boolean = true> {
+  variant?: T;
+  header?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+      };
+  items?: T;
+  settings?:
+    | T
+    | {
+        bg?: T;
+        pt?: T;
+        pb?: T;
+        anim?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProcessStepsBlock_select".
+ */
+export interface ProcessStepsBlockSelect<T extends boolean = true> {
+  variant?: T;
+  header?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+      };
+  steps?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        id?: T;
+      };
+  settings?:
+    | T
+    | {
+        bg?: T;
+        pt?: T;
+        pb?: T;
+        anim?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CtaBannerBlock_select".
+ */
+export interface CtaBannerBlockSelect<T extends boolean = true> {
+  variant?: T;
+  eyebrow?: T;
+  heading?: T;
+  text?: T;
+  cta?:
+    | T
+    | {
+        label?: T;
+        appearance?: T;
+        icon?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              reference?: T;
+              url?: T;
+              phone?: T;
+              message?: T;
+              email?: T;
+              newTab?: T;
+            };
+      };
+  showPhone?: T;
+  next?:
+    | T
+    | {
+        type?: T;
+        reference?: T;
+        url?: T;
+        phone?: T;
+        message?: T;
+        email?: T;
+        newTab?: T;
+      };
+  settings?:
+    | T
+    | {
+        bg?: T;
+        pt?: T;
+        pb?: T;
+        anim?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FormBlock_select".
+ */
+export interface FormBlockSelect<T extends boolean = true> {
+  variant?: T;
+  header?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+      };
+  service?: T;
+  settings?:
+    | T
+    | {
+        bg?: T;
+        pt?: T;
+        pb?: T;
+        anim?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MapBlock_select".
+ */
+export interface MapBlockSelect<T extends boolean = true> {
+  variant?: T;
+  header?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+      };
+  useBusinessAddress?: T;
+  latitude?: T;
+  longitude?: T;
+  zoom?: T;
+  settings?:
+    | T
+    | {
+        bg?: T;
+        pt?: T;
+        pb?: T;
+        anim?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LogoStripBlock_select".
+ */
+export interface LogoStripBlockSelect<T extends boolean = true> {
+  variant?: T;
+  header?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+      };
+  logos?:
+    | T
+    | {
+        name?: T;
+        logo?: T;
+        url?: T;
+        id?: T;
+      };
+  settings?:
+    | T
+    | {
+        bg?: T;
+        pt?: T;
+        pb?: T;
+        anim?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SpacerBlock_select".
+ */
+export interface SpacerBlockSelect<T extends boolean = true> {
+  size?: T;
+  divider?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "services_select".
  */
 export interface ServicesSelect<T extends boolean = true> {
@@ -736,6 +2328,28 @@ export interface ServicesSelect<T extends boolean = true> {
   summary?: T;
   image?: T;
   body?: T;
+  layout?:
+    | T
+    | {
+        hero?: T | HeroBlockSelect<T>;
+        richText?: T | RichTextBlockSelect<T>;
+        servicesGrid?: T | ServicesGridBlockSelect<T>;
+        vehicleShowcase?: T | VehicleShowcaseBlockSelect<T>;
+        fleetComparison?: T | FleetComparisonBlockSelect<T>;
+        featureList?: T | FeatureListBlockSelect<T>;
+        stats?: T | StatsBlockSelect<T>;
+        imageText?: T | ImageTextBlockSelect<T>;
+        gallery?: T | GalleryBlockSelect<T>;
+        testimonials?: T | TestimonialsBlockSelect<T>;
+        faq?: T | FaqBlockSelect<T>;
+        pricingTable?: T | PricingTableBlockSelect<T>;
+        processSteps?: T | ProcessStepsBlockSelect<T>;
+        ctaBanner?: T | CtaBannerBlockSelect<T>;
+        form?: T | FormBlockSelect<T>;
+        map?: T | MapBlockSelect<T>;
+        logoStrip?: T | LogoStripBlockSelect<T>;
+        spacer?: T | SpacerBlockSelect<T>;
+      };
   vehicles?: T;
   pricing?: T;
   faqs?: T;

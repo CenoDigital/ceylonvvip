@@ -2,6 +2,7 @@ import { link, media, seoTab, slugField } from '@ceylonvvip/cms-schema'
 import type { CollectionConfig } from 'payload'
 
 import { anyone, editors, publishedOrEditors } from '../access'
+import { pageBlocks } from '../blocks'
 import { revalidateDocument, revalidateOnDelete } from '../hooks/revalidate'
 import { LINKABLE } from '../linkable'
 import { RESERVED_PAGE_SLUGS } from '../paths'
@@ -38,8 +39,15 @@ export const Pages: CollectionConfig = {
       tabs: [
         {
           label: 'Content',
-          // The page block library (task 144) is added here as the `layout` field.
           fields: [
+            {
+              name: 'layout',
+              label: 'Sections',
+              type: 'blocks',
+              blocks: pageBlocks,
+              admin: { initCollapsed: true },
+            },
+
             media({
               name: 'image',
               label: 'Main image',
@@ -88,6 +96,13 @@ export const Services: CollectionConfig = {
             },
             media({ name: 'image', label: 'Main image' }),
             { name: 'body', type: 'richText' },
+            {
+              name: 'layout',
+              label: 'Sections',
+              type: 'blocks',
+              blocks: pageBlocks,
+              admin: { initCollapsed: true },
+            },
           ],
         },
         {
