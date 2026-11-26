@@ -24,11 +24,7 @@ export function FaqRow({ question, answer, open, className }: FaqRowProps) {
         )}
       >
         <span className="min-w-0 flex-1">{question}</span>
-        <Icon
-          name="chevron-down"
-          size={18}
-          className="shrink-0 transition-transform duration-300 group-open:rotate-180 motion-reduce:transition-none"
-        />
+        <Icon name="chevron-down" size={18} className="shrink-0" />
       </summary>
       <div className="pt-12 text-body text-muted-foreground">{answer}</div>
     </details>

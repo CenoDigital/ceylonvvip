@@ -197,6 +197,19 @@ export const RichText: Block = {
     }),
     header,
     { name: 'content', type: 'richText', required: true },
+    {
+      name: 'faqLabel',
+      label: 'Questions label',
+      type: 'text',
+      admin: { description: 'Small line above the questions, like "Questions guests ask".' },
+    },
+    {
+      name: 'faqs',
+      label: 'Questions under the text',
+      type: 'relationship',
+      relationTo: 'faqs',
+      hasMany: true,
+    },
     settings(),
   ],
 }
@@ -308,10 +321,25 @@ export const ImageText: Block = {
   slug: 'imageText',
   interfaceName: 'ImageTextBlock',
   fields: [
-    variant(['default']),
+    variant(['bleed', 'inset'], {
+      bleed: 'Photo to the page edge (Wedding cars, Travel manager)',
+      inset: 'Photo within the margins (Visit)',
+    }),
     header,
     { name: 'content', type: 'richText' },
-    media({ name: 'image', required: true }),
+    {
+      name: 'details',
+      type: 'array',
+      admin: { description: 'Optional rows under a line, like Address, Hours, Email.' },
+      fields: [
+        { name: 'title', type: 'text', required: true },
+        { name: 'text', type: 'text' },
+      ],
+    },
+    media({
+      name: 'image',
+      description: 'Until a photo is added, the parchment placeholder shows.',
+    }),
     {
       name: 'imagePosition',
       type: 'radio',
@@ -529,6 +557,33 @@ export const Destinations: Block = {
   ],
 }
 
+// Figma Prestige/Route/Row lists: Airport routes, Island Tours places, Wedding options,
+// About booking and payment. Header on the left, rows on the right.
+export const RouteList: Block = {
+  slug: 'routeList',
+  interfaceName: 'RouteListBlock',
+  fields: [
+    variant(['rows'], { rows: 'Rows beside the header' }),
+    header,
+    {
+      name: 'items',
+      label: 'Rows',
+      type: 'array',
+      minRows: 1,
+      fields: [
+        { name: 'name', type: 'text', required: true },
+        {
+          name: 'note',
+          type: 'text',
+          admin: { description: 'Shown at the right, like "Price on request".' },
+        },
+      ],
+    },
+    { name: 'footnote', type: 'text', admin: { description: 'Small line under the rows.' } },
+    settings(),
+  ],
+}
+
 export const Spacer: Block = {
   slug: 'spacer',
   interfaceName: 'SpacerBlock',
@@ -562,6 +617,7 @@ export const pageBlocks: Block[] = [
   MapBlock,
   LogoStrip,
   Destinations,
+  RouteList,
   Spacer,
 ]
 
@@ -577,4 +633,6 @@ export const DESIGNED_BLOCKS = [
   'ctaBanner',
   'form',
   'destinations',
+  'routeList',
+  'imageText',
 ]

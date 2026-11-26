@@ -163,6 +163,21 @@ export const Vehicles: CollectionConfig = {
     },
     { name: 'summary', type: 'textarea' },
     {
+      name: 'specs',
+      label: 'Specs shown on the Fleet page',
+      type: 'group',
+      fields: [
+        { name: 'bestFor', label: 'Best for', type: 'text' },
+        {
+          name: 'guests',
+          type: 'text',
+          admin: { description: 'As guests read it, like "2, plus 1 in front".' },
+        },
+        { name: 'luggage', type: 'text', admin: { description: 'Like "4 to 5 bags".' } },
+        { name: 'colours', type: 'text', admin: { description: 'Like "White, beige interior".' } },
+      ],
+    },
+    {
       name: 'features',
       type: 'array',
       fields: [{ name: 'feature', type: 'text', required: true }],
