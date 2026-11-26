@@ -5,6 +5,7 @@ import { FloatConcierge, SiteFooter, type FooterColumn, type NavLink } from '@ce
 import { getGlobal } from '@/lib/data'
 import { linkProps, resolveLink, whatsappHref, type CmsLink } from '@/lib/links'
 
+import { Analytics } from './Analytics'
 import { Header, type HeaderData } from './Header'
 
 const toNav = (
@@ -22,12 +23,13 @@ const present = <T,>(x: T | null | undefined): x is T => Boolean(x)
  * Footer, Mobile Action Bar, Contact & Business and Site Settings globals.
  */
 export async function SiteChrome({ children }: { children: ReactNode }) {
-  const [header, footer, bar, contact, settings] = await Promise.all([
+  const [header, footer, bar, contact, settings, seo] = await Promise.all([
     getGlobal('header'),
     getGlobal('footer'),
     getGlobal('mobile-action-bar'),
     getGlobal('contact-business'),
     getGlobal('site-settings'),
+    getGlobal('seo-defaults'),
   ])
 
   const nav = (header.navigation ?? []).map((item) => {
@@ -119,6 +121,7 @@ export async function SiteChrome({ children }: { children: ReactNode }) {
             : undefined
         }
       />
+      <Analytics ga4={seo.analytics?.ga4} metaPixel={seo.analytics?.metaPixel} />
       {whatsapp ? <FloatConcierge href={whatsapp} label={cta?.label ?? undefined} /> : null}
     </>
   )

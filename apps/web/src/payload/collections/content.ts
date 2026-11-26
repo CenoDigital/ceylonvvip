@@ -4,6 +4,7 @@ import type { CollectionConfig } from 'payload'
 import { anyone, editors, publishedOrEditors } from '../access'
 import { pageBlocks } from '../blocks'
 import { revalidateDocument, revalidateOnDelete } from '../hooks/revalidate'
+import { redirectOldSlug } from '../hooks/slug-redirect'
 import { LINKABLE } from '../linkable'
 import { RESERVED_PAGE_SLUGS } from '../paths'
 import { previewAdmin } from '../preview'
@@ -28,7 +29,7 @@ export const Pages: CollectionConfig = {
   access: editorial,
   versions: drafts,
   hooks: {
-    afterChange: [revalidateDocument('pages', 'pages')],
+    afterChange: [revalidateDocument('pages', 'pages'), redirectOldSlug('pages')],
     afterDelete: [revalidateOnDelete('pages', 'pages')],
   },
   fields: [
@@ -72,7 +73,7 @@ export const Services: CollectionConfig = {
   access: editorial,
   versions: drafts,
   hooks: {
-    afterChange: [revalidateDocument('services', 'services')],
+    afterChange: [revalidateDocument('services', 'services'), redirectOldSlug('services')],
     afterDelete: [revalidateOnDelete('services', 'services')],
   },
   fields: [

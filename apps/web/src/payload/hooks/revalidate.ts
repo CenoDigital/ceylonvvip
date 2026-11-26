@@ -28,6 +28,7 @@ export const revalidateDocument =
     safely(() => {
       revalidateTag(tag, 'max')
       if (collection) {
+        revalidatePath('/sitemap.xml')
         revalidatePath(pathFor(collection, doc?.slug))
         if (previousDoc?.slug && previousDoc.slug !== doc?.slug) {
           revalidatePath(pathFor(collection, previousDoc.slug))
