@@ -2,13 +2,13 @@
  * Seeds the CMS with the content shown in Figma (01 Home and the site chrome), so the
  * site can be compared with the design and the e2e tests have real pages.
  *
- *   pnpm --filter web seed
+ *   pnpm --filter web seed        (src/seed/run.ts)
+ *   SEED_ON_EMPTY=true            (staging: once, when the database has no pages)
  *
  * Idempotent: documents are matched by slug and updated. All copy is taken word for
  * word from the Figma file; nothing here is invented. Never run it against production.
  */
-import config from '@payload-config'
-import { getPayload, type Payload } from 'payload'
+import type { Payload } from 'payload'
 
 import { seedPages } from './pages'
 
@@ -337,8 +337,3 @@ export async function seedFigma(payload: Payload) {
   )
   payload.logger.info('Seeded the Figma pages 01 to 10 and the site chrome.')
 }
-
-// `pnpm --filter web seed` runs this file through `payload run`.
-const payload = await getPayload({ config })
-await seedFigma(payload)
-process.exit(0)
