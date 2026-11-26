@@ -20,6 +20,23 @@ export default defineConfig({
   use: {
     baseURL,
     trace: 'retain-on-failure',
+    // Motion off, so screenshots and accessibility checks see the finished page.
+    // motion.e2e.spec.ts clears this to test the animations themselves.
+    storageState: {
+      cookies: [
+        {
+          name: 'cvvip-motion',
+          value: 'off',
+          domain: new URL(baseURL).hostname,
+          path: '/',
+          expires: -1,
+          httpOnly: false,
+          secure: false,
+          sameSite: 'Lax',
+        },
+      ],
+      origins: [],
+    },
   },
   // The two widths the site is checked against in Figma.
   projects: [

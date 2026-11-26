@@ -34,3 +34,56 @@
     outline-color: var(--ring);
   }
 }
+
+/*
+ * Motion presets (task 149). `html.motion` is set before the first paint by the boot
+ * script in the layout. Animated sections keep their space but hide their content
+ * (visibility, so no layout shift) until GSAP has set the starting state.
+ */
+html.motion [data-animate]:not([data-animate='hero-intro']) > * {
+  visibility: hidden;
+}
+
+/* Hero intro: label, heading, text and buttons rise in turn; the photo settles from 1.08. */
+/* Text starts at 0.01, not 0: it looks the same, but the browser counts the first
+   paint, so the hero text stays the Largest Contentful Paint at first paint. */
+@keyframes hero-rise {
+  from {
+    opacity: 0.01;
+    transform: translateY(var(--motion-hero-rise, 40px));
+  }
+}
+@keyframes hero-settle {
+  from {
+    transform: scale(1.08);
+  }
+}
+@keyframes hero-fade {
+  from {
+    opacity: 0.01;
+  }
+}
+html.motion [data-animate='hero-intro'] :is(.text-label-caps, h1, h2, p, [data-hero-action]) {
+  animation: hero-rise var(--motion-hero-intro-text-duration) var(--ease-power3-out) both;
+}
+html.motion [data-animate='hero-intro'] :is(h1, h2) {
+  animation-delay: var(--motion-hero-intro-stagger);
+}
+html.motion [data-animate='hero-intro'] p:not(.text-label-caps) {
+  animation-delay: calc(2 * var(--motion-hero-intro-stagger));
+}
+html.motion [data-animate='hero-intro'] [data-hero-action] {
+  animation-delay: calc(3 * var(--motion-hero-intro-stagger));
+}
+html.motion [data-animate='hero-intro'] img {
+  animation: hero-settle var(--motion-hero-intro-image-duration) var(--ease-power3-out) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  html.motion [data-animate='hero-intro'] :is(.text-label-caps, h1, h2, p, [data-hero-action]) {
+    animation-name: hero-fade;
+    animation-delay: 0s;
+  }
+  html.motion [data-animate='hero-intro'] img {
+    animation: none;
+  }
+}
