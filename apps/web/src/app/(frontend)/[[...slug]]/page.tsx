@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
-import { notFound } from 'next/navigation'
 
 import { RenderBlocks } from '@/blocks'
 import { SiteChrome } from '@/components/site/SiteChrome'
-import { getPage, getSlugs } from '@/lib/data'
-import { HOME_SLUG } from '@/payload/paths'
+import { PageSchema } from '@/components/seo/PageSchema'
+import { getGlobal, getPage, getSlugs } from '@/lib/data'
+import { redirectOrNotFound } from '@/lib/redirects'
+import { buildMetadata } from '@/lib/seo'
+import { HOME_SLUG, pathFor } from '@/payload/paths'
 
 type Props = { params: Promise<{ slug?: string[] }> }
 
@@ -20,23 +22,36 @@ export async function generateStaticParams() {
 const slugFrom = (parts?: string[]) => (parts?.length ? parts.join('/') : HOME_SLUG)
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const page = await getPage(slugFrom((await params).slug))
-  // Full SEO metadata (templates, canonical, Open Graph, schema) arrives with task 148.
-  return page
-    ? { title: page.seo?.title || page.title, description: page.seo?.description ?? undefined }
-    : {}
+  const slug = slugFrom((await params).slug)
+  const [page, defaults, settings] = await Promise.all([
+    getPage(slug),
+    getGlobal('seo-defaults'),
+    getGlobal('site-settings'),
+  ])
+  if (!page) return {}
+  return buildMetadata({
+    title: page.title,
+    path: pathFor('pages', page.slug),
+    seo: page.seo,
+    fallbackImage: page.image,
+    defaults,
+    settings,
+    isHome: slug === HOME_SLUG,
+  })
 }
 
 export default async function CmsPage({ params }: Props) {
-  const slug = slugFrom((await params).slug)
+  const parts = (await params).slug
+  const slug = slugFrom(parts)
   const page = await getPage(slug)
-  if (!page) notFound()
+  if (!page) return redirectOrNotFound(`/${parts?.join('/') ?? ''}`)
   const { isEnabled: draft } = await draftMode()
   return (
     <SiteChrome>
       <main id="main" data-draft={draft || undefined}>
         <RenderBlocks blocks={page.layout as never} />
       </main>
+      <PageSchema doc={page} kind="page" path={pathFor('pages', page.slug)} />
     </SiteChrome>
   )
 }

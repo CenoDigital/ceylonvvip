@@ -1,10 +1,13 @@
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
 
 import { RenderBlocks } from '@/blocks'
 import { RichText, Section } from '@/blocks/shared'
 import { SiteChrome } from '@/components/site/SiteChrome'
-import { getService, getSlugs } from '@/lib/data'
+import { PageSchema } from '@/components/seo/PageSchema'
+import { getGlobal, getService, getSlugs } from '@/lib/data'
+import { redirectOrNotFound } from '@/lib/redirects'
+import { buildMetadata } from '@/lib/seo'
+import { pathFor } from '@/payload/paths'
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -16,19 +19,28 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const service = await getService((await params).slug)
-  return service
-    ? {
-        title: service.seo?.title || service.title,
-        description: service.seo?.description ?? service.summary ?? undefined,
-      }
-    : {}
+  const [service, defaults, settings] = await Promise.all([
+    getService((await params).slug),
+    getGlobal('seo-defaults'),
+    getGlobal('site-settings'),
+  ])
+  if (!service) return {}
+  return buildMetadata({
+    title: service.title,
+    path: pathFor('services', service.slug),
+    seo: service.seo,
+    fallbackDescription: service.summary,
+    fallbackImage: service.image,
+    defaults,
+    settings,
+  })
 }
 
 /** A service sales page: its sections, with the body text as a fallback when it has none. */
 export default async function ServicePage({ params }: Props) {
-  const service = await getService((await params).slug)
-  if (!service) notFound()
+  const { slug } = await params
+  const service = await getService(slug)
+  if (!service) return redirectOrNotFound(`/services/${slug}`)
   const hasSections = Boolean(service.layout?.length)
   return (
     <SiteChrome>
@@ -42,6 +54,7 @@ export default async function ServicePage({ params }: Props) {
           </Section>
         )}
       </main>
+      <PageSchema doc={service} kind="service" path={pathFor('services', service.slug)} />
     </SiteChrome>
   )
 }
