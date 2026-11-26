@@ -10,6 +10,8 @@
 import config from '@payload-config'
 import { getPayload, type Payload } from 'payload'
 
+import { seedPages } from './pages'
+
 const p = (text: string) => ({
   type: 'paragraph',
   version: 1,
@@ -308,6 +310,7 @@ export async function seedFigma(payload: Payload) {
     data: {
       whatsapp: WHATSAPP,
       phones: [{ number: WHATSAPP }],
+      emails: [{ email: 'bookings@ceylonvvip.com' }],
       availability: 'Available 24 hours',
       address: {
         street: '133/A, Warapitiya',
@@ -326,7 +329,13 @@ export async function seedFigma(payload: Payload) {
       ],
     } as never,
   })
-  payload.logger.info('Seeded the Figma Home page, services, fleet and site chrome.')
+  await seedPages(
+    payload,
+    (c, slug, data) => upsert(payload, c, slug, data),
+    whatsappLink,
+    WHATSAPP,
+  )
+  payload.logger.info('Seeded the Figma pages 01 to 10 and the site chrome.')
 }
 
 // `pnpm --filter web seed` runs this file through `payload run`.

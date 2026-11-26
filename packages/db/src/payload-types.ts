@@ -186,6 +186,7 @@ export interface Page {
         | MapBlock
         | LogoStripBlock
         | DestinationsBlock
+        | RouteListBlock
         | SpacerBlock
       )[]
     | null;
@@ -443,6 +444,7 @@ export interface Service {
         | MapBlock
         | LogoStripBlock
         | DestinationsBlock
+        | RouteListBlock
         | SpacerBlock
       )[]
     | null;
@@ -508,6 +510,11 @@ export interface RichTextBlock {
     };
     [k: string]: unknown;
   };
+  /**
+   * Small line above the questions, like "Questions guests ask".
+   */
+  faqLabel?: string | null;
+  faqs?: (number | Faq)[] | null;
   settings?: {
     bg?: ('default' | 'card') | null;
     pt?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
@@ -522,6 +529,36 @@ export interface RichTextBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'richText';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs".
+ */
+export interface Faq {
+  id: number;
+  question: string;
+  answer: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * FAQs with the same topic are grouped.
+   */
+  topic?: string | null;
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -663,6 +700,21 @@ export interface Vehicle {
   seats: number;
   luggage?: number | null;
   summary?: string | null;
+  specs?: {
+    bestFor?: string | null;
+    /**
+     * As guests read it, like "2, plus 1 in front".
+     */
+    guests?: string | null;
+    /**
+     * Like "4 to 5 bags".
+     */
+    luggage?: string | null;
+    /**
+     * Like "White, beige interior".
+     */
+    colours?: string | null;
+  };
   features?:
     | {
         feature: string;
@@ -905,7 +957,7 @@ export interface StatsBlock {
  * via the `definition` "ImageTextBlock".
  */
 export interface ImageTextBlock {
-  variant: 'default';
+  variant: 'bleed' | 'inset';
   header?: {
     /**
      * Small line above, like "Services".
@@ -929,7 +981,20 @@ export interface ImageTextBlock {
     };
     [k: string]: unknown;
   } | null;
-  image: number | Media;
+  /**
+   * Optional rows under a line, like Address, Hours, Email.
+   */
+  details?:
+    | {
+        title: string;
+        text?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Until a photo is added, the parchment placeholder shows.
+   */
+  image?: (number | null) | Media;
   imagePosition?: ('left' | 'right') | null;
   cta: {
     label?: string | null;
@@ -1113,36 +1178,6 @@ export interface FaqBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'faq';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "faqs".
- */
-export interface Faq {
-  id: number;
-  question: string;
-  answer: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  /**
-   * FAQs with the same topic are grouped.
-   */
-  topic?: string | null;
-  order?: number | null;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1508,6 +1543,49 @@ export interface DestinationsBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RouteListBlock".
+ */
+export interface RouteListBlock {
+  variant: 'rows';
+  header?: {
+    /**
+     * Small line above, like "Services".
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    intro?: string | null;
+  };
+  items?:
+    | {
+        name: string;
+        /**
+         * Shown at the right, like "Price on request".
+         */
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Small line under the rows.
+   */
+  footnote?: string | null;
+  settings?: {
+    bg?: ('default' | 'card') | null;
+    pt?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    pb?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    anim?:
+      ('none' | 'fade-up' | 'stagger-children' | 'reveal-mask' | 'image-parallax' | 'counter' | 'line-draw') | null;
+    /**
+     * Optional id for links to this section, like #booking.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'routeList';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "SpacerBlock".
  */
 export interface SpacerBlock {
@@ -1804,6 +1882,7 @@ export interface PagesSelect<T extends boolean = true> {
         map?: T | MapBlockSelect<T>;
         logoStrip?: T | LogoStripBlockSelect<T>;
         destinations?: T | DestinationsBlockSelect<T>;
+        routeList?: T | RouteListBlockSelect<T>;
         spacer?: T | SpacerBlockSelect<T>;
       };
   image?: T;
@@ -1886,6 +1965,8 @@ export interface RichTextBlockSelect<T extends boolean = true> {
         intro?: T;
       };
   content?: T;
+  faqLabel?: T;
+  faqs?: T;
   settings?:
     | T
     | {
@@ -2099,6 +2180,13 @@ export interface ImageTextBlockSelect<T extends boolean = true> {
         intro?: T;
       };
   content?: T;
+  details?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        id?: T;
+      };
   image?: T;
   imagePosition?: T;
   cta?:
@@ -2462,6 +2550,39 @@ export interface DestinationsBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RouteListBlock_select".
+ */
+export interface RouteListBlockSelect<T extends boolean = true> {
+  variant?: T;
+  header?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+      };
+  items?:
+    | T
+    | {
+        name?: T;
+        note?: T;
+        id?: T;
+      };
+  footnote?: T;
+  settings?:
+    | T
+    | {
+        bg?: T;
+        pt?: T;
+        pb?: T;
+        anim?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "SpacerBlock_select".
  */
 export interface SpacerBlockSelect<T extends boolean = true> {
@@ -2502,6 +2623,7 @@ export interface ServicesSelect<T extends boolean = true> {
         map?: T | MapBlockSelect<T>;
         logoStrip?: T | LogoStripBlockSelect<T>;
         destinations?: T | DestinationsBlockSelect<T>;
+        routeList?: T | RouteListBlockSelect<T>;
         spacer?: T | SpacerBlockSelect<T>;
       };
   vehicles?: T;
@@ -2536,6 +2658,14 @@ export interface VehiclesSelect<T extends boolean = true> {
   seats?: T;
   luggage?: T;
   summary?: T;
+  specs?:
+    | T
+    | {
+        bestFor?: T;
+        guests?: T;
+        luggage?: T;
+        colours?: T;
+      };
   features?:
     | T
     | {

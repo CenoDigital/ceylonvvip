@@ -4,6 +4,7 @@ import * as migration_20261126_193044_media_and_globals from './20261126_193044_
 import * as migration_20261126_193302_content_collections from './20261126_193302_content_collections'
 import * as migration_20261126_195225_page_blocks from './20261126_195225_page_blocks'
 import * as migration_20261126_213209_site_chrome_and_destinations from './20261126_213209_site_chrome_and_destinations'
+import * as migration_20261126_215840_remaining_pages from './20261126_215840_remaining_pages'
 
 export const migrations = [
   {
@@ -35,5 +36,10 @@ export const migrations = [
     up: migration_20261126_213209_site_chrome_and_destinations.up,
     down: migration_20261126_213209_site_chrome_and_destinations.down,
     name: '20261126_213209_site_chrome_and_destinations',
+  },
+  {
+    up: migration_20261126_215840_remaining_pages.up,
+    down: migration_20261126_215840_remaining_pages.down,
+    name: '20261126_215840_remaining_pages',
   },
 ]

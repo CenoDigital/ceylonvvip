@@ -7,6 +7,7 @@ import {
   IndexRow,
   NextLink,
   PageHero,
+  RouteRow,
   Spec,
   Step,
   cn,
@@ -116,16 +117,57 @@ function RichTextView({ block }: { block: Block }) {
       </Section>
     )
   }
+  // Figma "In detail" and "Story": header in a 420px column, lead text beside it, and
+  // optionally "Questions guests ask" with open FAQ rows under the text.
+  const faqs = docs<Faq>(block.faqs)
+  return (
+    <Section settings={block.settings as never} className="border-t border-border">
+      <div className="flex flex-col gap-32 lg:flex-row lg:items-start lg:gap-96">
+        <Header header={header} className="lg:w-420 lg:shrink-0" />
+        <div className="flex min-w-0 flex-1 flex-col gap-32 lg:gap-40">
+          <RichText
+            data={block.content}
+            className="max-w-none text-body lg:text-lead [&_p+p]:mt-16"
+          />
+          {faqs.length ? (
+            <div className="flex flex-col gap-8">
+              {block.faqLabel ? (
+                <p className="text-label-caps text-brand">{String(block.faqLabel)}</p>
+              ) : null}
+              <div>
+                {faqs.map((f) => (
+                  <FaqRow
+                    key={f.id}
+                    question={f.question}
+                    answer={<RichText data={f.answer} />}
+                    open
+                  />
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </Section>
+  )
+}
+
+function RouteListView({ block }: { block: Block }) {
+  const rows = docs<{ id?: string; name: string; note?: string | null }>(block.items)
   return (
     <Section settings={block.settings as never}>
-      <div
-        className={cn(
-          'flex flex-col gap-24 lg:flex-row lg:gap-96',
-          block.variant === 'story' && 'lg:items-start',
-        )}
-      >
-        <Header header={header} className="lg:w-520 lg:shrink-0" />
-        <RichText data={block.content} className="lg:flex-1" />
+      <div className="flex flex-col gap-32 lg:flex-row lg:items-start lg:gap-96">
+        <Header header={block.header as BlockHeader} className="lg:w-420 lg:shrink-0" />
+        <div className="min-w-0 flex-1">
+          <ul className="border-b border-border">
+            {rows.map((r, i) => (
+              <RouteRow key={r.id ?? i} route={r.name} note={r.note ?? undefined} />
+            ))}
+          </ul>
+          {block.footnote ? (
+            <p className="mt-8 text-small text-muted-foreground">{String(block.footnote)}</p>
+          ) : null}
+        </div>
       </div>
     </Section>
   )
@@ -184,54 +226,44 @@ async function VehicleShowcaseView({ block }: { block: Block }) {
       </Section>
     )
   }
+  // Figma 08 Fleet / Vehicles: per vehicle a 680px photo, then "01 of 05" and the name in
+  // a 420px column beside four specs, then the block's enquiry link.
+  const SPEC_LABELS = [
+    ['bestFor', 'Best for'],
+    ['guests', 'Guests'],
+    ['luggage', 'Luggage'],
+    ['colours', 'Colours'],
+  ] as const
   return (
-    <Section settings={block.settings as never}>
-      <Header header={block.header as BlockHeader} className="mb-28 lg:mb-48" />
-      <div className={cn('grid gap-48', specs ? 'lg:gap-120' : 'lg:grid-cols-3 lg:gap-32')}>
-        {vehicles.map((v) => {
-          const photo = docs<unknown>(v.gallery)[0]
-          return (
-            <article
-              key={v.id}
-              className={cn('flex flex-col gap-20', specs && 'lg:flex-row lg:gap-96')}
-            >
-              {photo ? (
-                <div
-                  className={cn(
-                    'relative aspect-[4/3] w-full overflow-hidden bg-placeholder',
-                    specs && 'lg:w-720 lg:shrink-0',
-                  )}
-                >
-                  <CmsImage
-                    media={photo}
-                    sizes={
-                      specs ? '(min-width: 1024px) 720px, 100vw' : '(min-width: 1024px) 33vw, 100vw'
-                    }
-                  />
-                </div>
-              ) : null}
-              <div className="flex flex-1 flex-col gap-16">
-                {v.class ? <p className="text-label-caps text-brand">{v.class}</p> : null}
-                <h3 className="font-display text-h3 text-foreground">{v.name}</h3>
-                {v.summary ? <p className="text-body text-muted-foreground">{v.summary}</p> : null}
-                {specs ? (
-                  <dl className="mt-12 grid grid-cols-2 gap-24">
-                    <Spec label="Guests" value={`Up to ${v.seats}`} />
-                    {v.luggage != null ? <Spec label="Bags" value={String(v.luggage)} /> : null}
-                    {(v.features ?? []).length ? (
-                      <Spec
-                        label="On board"
-                        value={(v.features ?? []).map((f) => f.feature).join(', ')}
-                      />
-                    ) : null}
-                  </dl>
-                ) : null}
+    <Section settings={block.settings as never} className="flex flex-col gap-96 lg:gap-120">
+      <Header header={block.header as BlockHeader} />
+      {vehicles.map((v, i) => {
+        const photo = docs<unknown>(v.gallery)[0]
+        const specList = SPEC_LABELS.filter(([key]) => v.specs?.[key])
+        return (
+          <article key={v.id} className="flex flex-col gap-28 lg:gap-36">
+            <div className="relative aspect-[342/260] w-full overflow-hidden bg-placeholder lg:aspect-auto lg:h-680">
+              <CmsImage media={photo} sizes="(min-width: 1024px) 1312px, 100vw" />
+            </div>
+            <div className="flex flex-col gap-28 lg:flex-row lg:gap-48">
+              <div className="flex flex-col gap-12 lg:w-420 lg:shrink-0">
+                <p className="text-small text-brand">
+                  {String(i + 1).padStart(2, '0')} of {String(vehicles.length).padStart(2, '0')}
+                </p>
+                <h3 className="font-display text-h2 text-foreground">{v.name}</h3>
               </div>
-            </article>
-          )
-        })}
-      </div>
-      <Cta cta={block.cta as never} className="mt-48" />
+              {specList.length ? (
+                <dl className="grid flex-1 grid-cols-2 gap-24 lg:grid-cols-4 lg:gap-32">
+                  {specList.map(([key, label]) => (
+                    <Spec key={key} label={label} value={v.specs?.[key] ?? ''} />
+                  ))}
+                </dl>
+              ) : null}
+            </div>
+            <Cta cta={block.cta as never} className="self-start" />
+          </article>
+        )
+      })}
     </Section>
   )
 }
@@ -391,20 +423,51 @@ function StatsView({ block }: { block: Block }) {
 }
 
 function ImageTextView({ block }: { block: Block }) {
+  // Figma Wedding cars / Travel manager (bleed: photo to the page edge, 720 by 820) and
+  // Contact Visit (inset: photo within the margins, 760 by 560, with detail rows).
+  const bleed = block.variant !== 'inset'
+  const right = block.imagePosition === 'right'
+  const details = docs<{ id?: string; title: string; text?: string | null }>(block.details)
   return (
-    <Section settings={block.settings as never}>
+    <Section settings={block.settings as never} bleed={bleed}>
       <div
         className={cn(
-          'flex flex-col gap-40 lg:flex-row lg:items-center lg:gap-96',
-          block.imagePosition === 'right' && 'lg:flex-row-reverse',
+          'flex flex-col gap-40 lg:flex-row lg:items-center',
+          bleed ? 'lg:gap-120' : 'lg:gap-96',
+          right && 'lg:flex-row-reverse',
+          bleed && (right ? 'lg:pl-64' : 'lg:pr-64'),
         )}
       >
-        <div className="relative aspect-[4/5] w-full overflow-hidden bg-placeholder lg:w-1/2">
+        <div
+          className={cn(
+            'relative w-full shrink-0 overflow-hidden bg-placeholder',
+            bleed
+              ? 'aspect-[390/440] lg:aspect-auto lg:h-820 lg:w-1/2'
+              : 'aspect-[4/3] lg:aspect-auto lg:h-560 lg:w-760',
+          )}
+        >
           <CmsImage media={block.image} sizes="(min-width: 1024px) 50vw, 100vw" />
         </div>
-        <div className="flex flex-1 flex-col items-start gap-28">
+        <div
+          className={cn(
+            'flex min-w-0 flex-1 flex-col items-start gap-24',
+            bleed && 'px-24 lg:px-0',
+          )}
+        >
           <Header header={block.header as BlockHeader} />
           <RichText data={block.content} />
+          {details.length ? (
+            <div className="mt-8 flex w-full flex-col gap-32">
+              {details.map((d, i) => (
+                <Feature
+                  key={d.id ?? i}
+                  variant="small"
+                  title={d.title}
+                  text={d.text ?? undefined}
+                />
+              ))}
+            </div>
+          ) : null}
           <Cta cta={block.cta as never} />
         </div>
       </div>
@@ -654,6 +717,8 @@ export async function RenderBlocks({ blocks }: { blocks?: Block[] | null }) {
             return <MapView key={key} block={block} />
           case 'logoStrip':
             return <LogoStripView key={key} block={block} />
+          case 'routeList':
+            return <RouteListView key={key} block={block} />
           case 'destinations':
             return <DestinationsView key={key} block={block} />
           case 'spacer':
