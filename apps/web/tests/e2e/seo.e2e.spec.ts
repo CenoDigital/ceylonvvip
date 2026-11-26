@@ -43,6 +43,13 @@ test('a service page has Service, FAQPage and breadcrumbs', async ({ page }) => 
   expect(crumbs.itemListElement.map((i) => i.name)).toEqual(['CeylonVVIP', 'Airport Transfers'])
 })
 
+test('canonical links use SITE_URL, read when the server runs', async ({ page }) => {
+  const origin = process.env.SITE_URL
+  test.skip(!origin, 'SITE_URL is set for the server in CI.')
+  await page.goto('/fleet')
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `${origin}/fleet`)
+})
+
 test('sitemap lists every published page and service', async ({ request }) => {
   test.skip(!isProduction, 'The sitemap is empty outside production.')
   const xml = await (await request.get('/sitemap.xml')).text()

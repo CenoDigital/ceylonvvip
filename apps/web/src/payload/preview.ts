@@ -1,13 +1,12 @@
 import type { CollectionConfig } from 'payload'
 
+import { getSiteUrl } from '../lib/site-url'
 import { pathFor, type RoutableCollection } from './paths'
-
-const serverURL = process.env.NEXT_PUBLIC_SERVER_URL ?? ''
 
 /** URL the admin opens for Preview and Live Preview: switches on draft mode, then shows the page. */
 export function previewURL(collection: RoutableCollection, slug?: string | null): string {
   const params = new URLSearchParams({ path: pathFor(collection, slug) })
-  return `${serverURL}/next/preview?${params}`
+  return `${getSiteUrl()}/next/preview?${params}`
 }
 
 /** Admin options that give a collection Preview and Live Preview at phone and desktop widths. */

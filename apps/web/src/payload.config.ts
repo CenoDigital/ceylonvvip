@@ -48,7 +48,9 @@ const email = smtpHost
   : undefined
 
 export default buildConfig({
-  serverURL: process.env.NEXT_PUBLIC_SERVER_URL ?? '',
+  // The public origin, read at runtime (lib/site-url.ts); empty locally so the admin
+  // works on any port.
+  serverURL: process.env.SITE_URL?.replace(/\/+$/, '') ?? '',
   admin: {
     user: Users.slug,
     importMap: { baseDir: path.resolve(dirname) },

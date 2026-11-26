@@ -2,16 +2,11 @@ import type { Metadata } from 'next'
 
 import type { Media, SeoDefault, SiteSetting } from '@ceylonvvip/db'
 
+import { getSiteUrl } from './site-url'
 import { isProductionSite } from './site-env'
 
-/** The public origin, from NEXT_PUBLIC_SERVER_URL (set per environment in Coolify). */
-export const siteUrl = (process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000').replace(
-  /\/$/,
-  '',
-)
-
 export const absolute = (path: string) =>
-  /^https?:\/\//.test(path) ? path : `${siteUrl}${path.startsWith('/') ? '' : '/'}${path}`
+  /^https?:\/\//.test(path) ? path : `${getSiteUrl()}${path.startsWith('/') ? '' : '/'}${path}`
 
 export interface SeoFields {
   title?: string | null
@@ -81,7 +76,7 @@ export function buildMetadata({
   const indexable = isProductionSite() && !seo?.noindex
 
   return {
-    metadataBase: new URL(siteUrl),
+    metadataBase: new URL(getSiteUrl()),
     title: { absolute: fullTitle },
     description,
     alternates: { canonical },
