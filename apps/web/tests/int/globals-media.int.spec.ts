@@ -1,6 +1,5 @@
 import { randomUUID } from 'node:crypto'
 
-import { CreateBucketCommand, HeadBucketCommand, S3Client } from '@aws-sdk/client-s3'
 import { migrations } from '@/migrations'
 import config from '@payload-config'
 import { getPayload, type Migration, type Payload } from 'payload'
@@ -22,30 +21,10 @@ const PNG = Buffer.from(
   'base64',
 )
 
-async function ensureBucket() {
-  const bucket = process.env.S3_BUCKET
-  if (!bucket) return
-  const s3 = new S3Client({
-    endpoint: process.env.S3_ENDPOINT,
-    region: process.env.S3_REGION ?? 'us-east-1',
-    forcePathStyle: true,
-    credentials: {
-      accessKeyId: process.env.S3_ACCESS_KEY_ID ?? '',
-      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY ?? '',
-    },
-  })
-  try {
-    await s3.send(new HeadBucketCommand({ Bucket: bucket }))
-  } catch {
-    await s3.send(new CreateBucketCommand({ Bucket: bucket }))
-  }
-}
-
 describe('globals and media', () => {
   beforeAll(async () => {
     payload = await getPayload({ config })
     await payload.db.migrate({ migrations: migrations as unknown as Migration[] })
-    await ensureBucket()
     admin = await payload.create({
       collection: 'users',
       data: { email: `admin-${suffix}@test.ceylonvvip.local`, password, role: 'admin' },

@@ -18,6 +18,7 @@ export default defineConfig({
           // One database: files run one after another so migrations and data never race.
           fileParallelism: false,
           setupFiles: ['dotenv/config'],
+          globalSetup: ['tests/int/global-setup.ts'],
           testTimeout: 60_000,
           hookTimeout: 60_000,
         },
