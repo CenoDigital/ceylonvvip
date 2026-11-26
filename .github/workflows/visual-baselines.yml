@@ -33,6 +33,9 @@ jobs:
       CI: 'true'
       DATABASE_URI: postgres://ceylonvvip:ceylonvvip@postgres:5432/ceylonvvip
       PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
+      # Same as the CI browser job, so baselines match what CI compares.
+      SITE_ENV: production
+      UI_GALLERY: 'true'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

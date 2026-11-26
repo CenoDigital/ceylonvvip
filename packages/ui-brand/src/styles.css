@@ -1,0 +1,22 @@
+/*
+ * Import after tailwindcss and the tokens:
+ *   @import 'tailwindcss';
+ *   @import '@ceylonvvip/tokens/tokens.css';
+ *   @import '@ceylonvvip/tokens/theme.css';
+ *   @import '@ceylonvvip/ui-brand/styles.css';
+ */
+@source './';
+
+@theme {
+  /* Link underline redraws from the left (motion spec: Link, 300ms power2.out). */
+  --animate-line-draw: line-draw var(--motion-link-duration, 300ms) var(--ease-power2-out) both;
+}
+
+@keyframes line-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}

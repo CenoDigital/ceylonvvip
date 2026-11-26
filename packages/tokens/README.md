@@ -14,7 +14,7 @@ Design tokens from the Figma file `bIUkCC5TtQezAqa4RwLPI3`: the Primitives and T
 @import '@ceylonvvip/tokens/theme.css';
 ```
 
-- Type is fluid between the two Figma widths, 390px and 1440px, using each mobile and desktop pair (`M/H1` and `D/H1` become `text-h1`). Styles without a mobile pair are fixed. Uppercase styles have a `-caps` utility, such as `text-label-caps`.
+- Type is fluid between the two Figma widths, 390px and 1440px, using each mobile and desktop pair (`M/H1` and `D/H1` become `text-h1`). Styles without a mobile pair are fixed. D/Title pairs with M/Hero (44px) on phones. Uppercase styles have a `-caps` utility, such as `text-label-caps`.
 - Spacing is 1px per step, so `p-16` is Figma's `space/16`.
 - Motion durations and easings are CSS variables (`--motion-fade-up-duration`, `--ease-power2-out`) and TypeScript values (`motion.fadeUp`, `ease['power2-out'].gsap`). With reduced motion, every duration becomes 300ms.
 - Not exported, on purpose: the Theme mode "White (previous)" and the "Gold foil" style. Gold is always the flat gold and bronze.

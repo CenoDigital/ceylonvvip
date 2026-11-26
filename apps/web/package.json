@@ -24,6 +24,7 @@
     "@ceylonvvip/core": "workspace:*",
     "@ceylonvvip/db": "workspace:*",
     "@ceylonvvip/tokens": "workspace:*",
+    "@ceylonvvip/ui-brand": "workspace:*",
     "@payloadcms/db-postgres": "3.94.2",
     "@payloadcms/next": "3.94.2",
     "@payloadcms/plugin-seo": "3.94.2",
