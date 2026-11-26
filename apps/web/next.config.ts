@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
     '@ceylonvvip/core',
     '@ceylonvvip/db',
     '@ceylonvvip/tokens',
+    '@ceylonvvip/ui-brand',
   ],
   poweredByHeader: false,
   images: {

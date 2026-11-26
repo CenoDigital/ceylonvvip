@@ -11,3 +11,16 @@ for (const { name, path } of pages) {
     await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true })
   })
 }
+
+// Task 145 acceptance: every Prestige component at the five widths it is checked at.
+const WIDTHS = [360, 390, 768, 1024, 1440]
+
+test('component gallery matches the approved baselines at every width', async ({ page }, info) => {
+  test.skip(info.project.name !== 'desktop', 'Widths are set explicitly, so one project is enough.')
+  for (const width of WIDTHS) {
+    await page.setViewportSize({ width, height: 900 })
+    await page.goto('/next/ui')
+    await page.evaluate(() => document.fonts.ready)
+    await expect(page).toHaveScreenshot(`components-${width}.png`, { fullPage: true })
+  }
+})

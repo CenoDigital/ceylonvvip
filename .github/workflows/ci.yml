@@ -151,6 +151,8 @@ jobs:
       PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
       # Test the build as production serves it (indexable), so Lighthouse SEO is meaningful.
       SITE_ENV: production
+      # The component gallery (/next/ui) for the visual tests; never set on the live site.
+      UI_GALLERY: 'true'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

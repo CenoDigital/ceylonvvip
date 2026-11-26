@@ -5,7 +5,8 @@
   "description": "Front-end design system: themed components and GSAP motion presets",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./styles.css": "./src/styles.css"
   },
   "scripts": {
     "lint": "eslint .",

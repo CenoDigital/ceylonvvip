@@ -157,11 +157,12 @@ export const text = {
     desktop: { size: 20, lineHeight: 32, tracking: 0 },
     mobile: { size: 17, lineHeight: 27, tracking: 0 },
   },
-  // D/Title has no mobile style in Figma yet, so it is fixed at its desktop size.
+  // D/Title pairs with M/Hero on phones (Prestige/Hero/Page Mobile).
   title: {
     font: 'display',
     weight: 300,
     desktop: { size: 96, lineHeight: 103.68, tracking: -0.02 },
+    mobile: { size: 44, lineHeight: 49.28, tracking: -0.02 },
   },
   h4: { font: 'text', weight: 300, desktop: { size: 22, lineHeight: 30, tracking: -0.01 } },
   body: { font: 'text', weight: 400, desktop: { size: 17, lineHeight: 28, tracking: 0 } },
