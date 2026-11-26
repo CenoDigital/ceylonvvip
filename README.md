@@ -25,17 +25,50 @@ Turborepo monorepo: Next.js + Payload CMS on PostgreSQL, media on Cloudflare R2,
 
 Apps import from packages; packages never import from apps.
 
+## Local setup
+
+```sh
+corepack enable
+pnpm install
+cp apps/web/.env.example apps/web/.env   # then set PAYLOAD_SECRET (openssl rand -hex 32)
+pnpm services:up                          # Postgres 16 on :54320, S3 storage (RustFS) on :9000, console :9001
+pnpm --filter web migrate                 # apply migrations
+pnpm dev                                  # http://localhost:3000, admin at /admin
+```
+
 ## Commands
 
 ```sh
-pnpm install
-pnpm dev          # run the app
 pnpm lint         # ESLint everywhere
 pnpm typecheck    # TypeScript strict everywhere
 pnpm test         # unit tests
+pnpm --filter web test:int                # integration tests (needs services:up)
 pnpm build        # production build
 pnpm format       # Prettier
-pnpm --filter web generate:types   # regenerate packages/db/src/payload-types.ts
+pnpm --filter web generate:types          # regenerate packages/db/src/payload-types.ts
+pnpm --filter web migrate:create <name>   # new migration after a schema change
+pnpm services:app # build and run the production image on :3000 against local Postgres
+pnpm services:down
 ```
 
-Local Postgres via Docker and the full CI pipeline arrive in the next pull requests (tasks 137 and 138).
+## Docker
+
+`docker/web.Dockerfile` builds the production image: turbo prune, pnpm install, Next.js standalone output, running as the unprivileged `node` user, with a health check on `/api/health`. Payload applies pending migrations when the server starts (`prodMigrations`); schema push is off everywhere.
+
+`docker/compose.yml` is for local development only. Staging and production run on Coolify from images that already passed CI.
+
+## Deploys
+
+Coolify (cenocloud.cc, project CeylonVVIP) only hosts. GitHub Actions tests and builds the
+image, pushes it to `ghcr.io/cenodigital/ceylonvvip-web`, then asks Coolify to deploy.
+
+| Environment | URL                            | How it deploys                                               |
+| ----------- | ------------------------------ | ------------------------------------------------------------ |
+| Staging     | https://staging.ceylonvvip.com | Automatically after every green push to `main`               |
+| Production  | https://ceylonvvip.com         | Manually: Actions, "Deploy to production", type `production` |
+
+Staging sits behind basic auth, and every environment except production sends
+`X-Robots-Tag: noindex` (set by `SITE_ENV` in Coolify). Each environment has its own
+Postgres 16; migrations run when the app starts. Runtime secrets (`DATABASE_URI`,
+`PAYLOAD_SECRET`, storage keys) live only in Coolify. The one GitHub secret is
+`COOLIFY_TOKEN`, a deploy-only token.

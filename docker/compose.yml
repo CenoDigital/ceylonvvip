@@ -1,0 +1,75 @@
+# Local development services. Run from the repo root:
+#   pnpm services:up      Postgres + S3 storage (then `pnpm dev`)
+#   pnpm services:app     also builds and runs the production web image on :3000 (reads apps/web/.env)
+# Credentials below are local-only defaults. Real values live in Coolify, never in git.
+name: ceylonvvip
+
+services:
+  postgres:
+    image: postgres:16.16-alpine
+    environment:
+      POSTGRES_USER: ceylonvvip
+      POSTGRES_PASSWORD: ceylonvvip
+      POSTGRES_DB: ceylonvvip
+    ports:
+      - '127.0.0.1:54320:5432' # 54320 avoids clashing with a local Postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ceylonvvip -d ceylonvvip']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # S3-compatible stand-in for Cloudflare R2 (MinIO no longer ships container images).
+  storage:
+    image: rustfs/rustfs:1.0.6
+    environment:
+      RUSTFS_ACCESS_KEY: ceylonvvip
+      RUSTFS_SECRET_KEY: ceylonvvip-local
+      RUSTFS_CONSOLE_ENABLE: 'true'
+    ports:
+      - '127.0.0.1:9000:9000' # S3 API
+      - '127.0.0.1:9001:9001' # web console
+    volumes:
+      - storage-data:/data
+
+  # Creates the media bucket once storage is reachable, then exits.
+  storage-init:
+    image: amazon/aws-cli:2.42.4
+    depends_on:
+      - storage
+    environment:
+      AWS_ACCESS_KEY_ID: ceylonvvip
+      AWS_SECRET_ACCESS_KEY: ceylonvvip-local
+      AWS_DEFAULT_REGION: us-east-1
+    entrypoint: ['/bin/sh', '-c']
+    command:
+      - |
+        for i in $$(seq 1 30); do
+          aws --endpoint-url http://storage:9000 s3api head-bucket --bucket ceylonvvip-media 2>/dev/null && exit 0
+          aws --endpoint-url http://storage:9000 s3 mb s3://ceylonvvip-media && exit 0
+          sleep 2
+        done
+        exit 1
+
+  web:
+    profiles: ['app']
+    build:
+      context: ..
+      dockerfile: docker/web.Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # PAYLOAD_SECRET and the rest come from apps/web/.env; the database host is the compose service.
+    env_file:
+      - path: ../apps/web/.env
+        required: false
+    environment:
+      DATABASE_URI: postgres://ceylonvvip:ceylonvvip@postgres:5432/ceylonvvip
+    ports:
+      - '127.0.0.1:3000:3000'
+
+volumes:
+  postgres-data:
+  storage-data:

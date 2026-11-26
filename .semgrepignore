@@ -1,0 +1,11 @@
+node_modules/
+.next/
+.turbo/
+coverage/
+playwright-report/
+lighthouse-report/
+.lighthouseci/
+pnpm-lock.yaml
+packages/db/src/payload-types.ts
+apps/web/src/migrations/
+apps/web/src/app/(payload)/

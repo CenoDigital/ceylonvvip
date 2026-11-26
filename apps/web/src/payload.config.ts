@@ -5,6 +5,7 @@ import { buildConfig } from 'payload'
 import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
+import { migrations } from './migrations'
 import { Users } from './payload/collections/Users'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -26,6 +27,8 @@ export default buildConfig({
     // Schema changes ship as migrations, so local dev matches production.
     push: false,
     migrationDir: path.resolve(dirname, 'migrations'),
+    // Pending migrations run when the production server starts; the image needs no Payload CLI.
+    prodMigrations: migrations,
   }),
   sharp,
 })
