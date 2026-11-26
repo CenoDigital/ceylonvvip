@@ -1,0 +1,64 @@
+# OWASP ZAP baseline (passive DAST) against a temporary copy of the app inside the runner.
+# Runs at sprint end (manually) and weekly. Never touches staging or production.
+name: ZAP baseline
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  zap:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16.16-alpine
+        env:
+          POSTGRES_USER: ceylonvvip
+          POSTGRES_PASSWORD: ceylonvvip
+          POSTGRES_DB: ceylonvvip
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U ceylonvvip -d ceylonvvip"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: docker/web.Dockerfile
+          load: true
+          tags: ceylonvvip-web:zap
+          cache-from: type=gha
+      - name: Start the app image
+        run: |
+          docker run -d --name web --network host \
+            -e DATABASE_URI=postgres://ceylonvvip:ceylonvvip@127.0.0.1:5432/ceylonvvip \
+            -e PAYLOAD_SECRET="$(openssl rand -hex 32)" \
+            -e HOSTNAME=127.0.0.1 \
+            ceylonvvip-web:zap
+          for _ in $(seq 1 60); do
+            curl -fsS http://127.0.0.1:3000/api/health && exit 0
+            sleep 2
+          done
+          docker logs web
+          exit 1
+      - name: ZAP baseline scan
+        run: |
+          mkdir -p zap && chmod 777 zap
+          docker run --rm --network host -v "$PWD/zap:/zap/wrk" ghcr.io/zaproxy/zaproxy:2.17.0 \
+            zap-baseline.py -t http://127.0.0.1:3000 -r report.html -J report.json -I
+      - name: Upload report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: zap-report
+          path: zap
+          retention-days: 30
