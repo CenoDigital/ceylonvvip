@@ -1,7 +1,7 @@
 import * as migration_20261126_104023_initial from './20261126_104023_initial'
 import * as migration_20261126_190954_users_roles from './20261126_190954_users_roles'
 import * as migration_20261126_193044_media_and_globals from './20261126_193044_media_and_globals'
-import * as migration_20261126_193137_content_collections from './20261126_193137_content_collections'
+import * as migration_20261126_193302_content_collections from './20261126_193302_content_collections'
 
 export const migrations = [
   {
@@ -20,8 +20,8 @@ export const migrations = [
     name: '20261126_193044_media_and_globals',
   },
   {
-    up: migration_20261126_193137_content_collections.up,
-    down: migration_20261126_193137_content_collections.down,
-    name: '20261126_193137_content_collections',
+    up: migration_20261126_193302_content_collections.up,
+    down: migration_20261126_193302_content_collections.down,
+    name: '20261126_193302_content_collections',
   },
 ]

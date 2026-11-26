@@ -165,7 +165,7 @@ export interface Page {
   /**
    * The address of this page. Filled in from the title if left empty.
    */
-  slug: string;
+  slug?: string | null;
   /**
    * Used for sharing and listings.
    */
@@ -272,7 +272,7 @@ export interface Service {
   /**
    * The address of this page. Filled in from the title if left empty.
    */
-  slug: string;
+  slug?: string | null;
   /**
    * Lower numbers show first.
    */
@@ -342,7 +342,7 @@ export interface Vehicle {
   /**
    * The address of this page. Filled in from the title if left empty.
    */
-  slug: string;
+  slug?: string | null;
   /**
    * Lower numbers show first.
    */

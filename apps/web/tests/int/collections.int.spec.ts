@@ -121,7 +121,8 @@ describe('content collections', () => {
   it('defaults prices to On request and needs an amount and currency otherwise', async () => {
     const onRequest = await payload.create({
       collection: 'pricing',
-      data: { label: `Transfer ${suffix}` },
+      // No displayMode on purpose: the default must apply.
+      data: { label: `Transfer ${suffix}` } as never,
       ...as(editor),
     })
     expect(onRequest.displayMode).toBe('onRequest')

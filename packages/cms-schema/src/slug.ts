@@ -13,7 +13,6 @@ export function slugField({ from = 'title', reserved = [] }: SlugOptions = {}): 
   return {
     name: 'slug',
     type: 'text',
-    required: true,
     unique: true,
     index: true,
     admin: {
