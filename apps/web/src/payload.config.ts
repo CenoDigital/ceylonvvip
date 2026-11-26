@@ -8,6 +8,15 @@ import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
 import { migrations } from './migrations'
+import {
+  Faqs,
+  Pages,
+  Pricing,
+  Redirects,
+  Services,
+  Testimonials,
+  Vehicles,
+} from './payload/collections/content'
 import { Media } from './payload/collections/Media'
 import { Users } from './payload/collections/Users'
 import { globals } from './payload/globals'
@@ -19,11 +28,12 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
 const s3Bucket = process.env.S3_BUCKET
 
 export default buildConfig({
+  serverURL: process.env.NEXT_PUBLIC_SERVER_URL ?? '',
   admin: {
     user: Users.slug,
     importMap: { baseDir: path.resolve(dirname) },
   },
-  collections: [Users, Media],
+  collections: [Pages, Services, Vehicles, Pricing, Faqs, Testimonials, Media, Redirects, Users],
   globals,
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET ?? '',

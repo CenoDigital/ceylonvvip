@@ -2,6 +2,7 @@ import { cta, iconOptions, link, media } from '@ceylonvvip/cms-schema'
 import type { Field, GlobalConfig, TextFieldSingleValidation } from 'payload'
 
 import { admins, anyone, editors } from '../access'
+import { revalidateGlobal } from '../hooks/revalidate'
 import { LINKABLE } from '../linkable'
 
 // Every global is public to read (the site renders from it). Editors change content
@@ -395,7 +396,8 @@ export const BookingSettings: GlobalConfig = {
   ],
 }
 
-export const globals = [
+// Every global shows on many pages, so a change revalidates everything tagged with it.
+export const globals: GlobalConfig[] = [
   SiteSettings,
   ContactBusiness,
   Header,
@@ -403,4 +405,10 @@ export const globals = [
   MobileActionBar,
   SeoDefaults,
   BookingSettings,
-]
+].map((g) => ({
+  ...g,
+  hooks: {
+    ...g.hooks,
+    afterChange: [...(g.hooks?.afterChange ?? []), revalidateGlobal(`global:${g.slug}`)],
+  },
+}))

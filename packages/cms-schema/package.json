@@ -13,6 +13,7 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
+    "@ceylonvvip/core": "workspace:*",
     "@payloadcms/plugin-seo": "3.94.2"
   },
   "devDependencies": {
