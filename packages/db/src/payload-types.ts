@@ -73,6 +73,8 @@ export interface Config {
     pricing: Pricing;
     faqs: Faq;
     testimonials: Testimonial;
+    forms: Form;
+    'form-submissions': FormSubmission;
     media: Media;
     redirects: Redirect;
     users: User;
@@ -90,6 +92,8 @@ export interface Config {
     pricing: PricingSelect<false> | PricingSelect<true>;
     faqs: FaqsSelect<false> | FaqsSelect<true>;
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
+    forms: FormsSelect<false> | FormsSelect<true>;
+    'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
@@ -400,6 +404,10 @@ export interface Service {
    * The address of this page. Filled in from the title if left empty.
    */
   slug?: string | null;
+  /**
+   * Used on the booking form chips, like "Wedding".
+   */
+  shortLabel?: string | null;
   /**
    * Lower numbers show first.
    */
@@ -1359,6 +1367,10 @@ export interface FormBlock {
     intro?: string | null;
   };
   /**
+   * Which form to show. Empty uses the first booking form.
+   */
+  form?: (number | null) | Form;
+  /**
    * Leave empty on general pages. On a service page, choose that service.
    */
   service?: (number | null) | Service;
@@ -1376,6 +1388,73 @@ export interface FormBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'form';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "forms".
+ */
+export interface Form {
+  id: number;
+  title: string;
+  serviceLabel: string;
+  /**
+   * Leave empty to hide the vehicle choice.
+   */
+  vehicleLabel?: string | null;
+  noPreferenceLabel?: string | null;
+  noPreferenceDetail?: string | null;
+  dateLabel: string;
+  /**
+   * Leave empty to ask for the date only.
+   */
+  timeLabel?: string | null;
+  dateTimeLabel?: string | null;
+  adultsLabel: string;
+  adultsHint?: string | null;
+  /**
+   * Leave empty to hide.
+   */
+  childrenLabel?: string | null;
+  childrenHint?: string | null;
+  details?:
+    | {
+        /**
+         * Used in the WhatsApp template as {name}. Letters only.
+         */
+        name: string;
+        label: string;
+        type: 'text' | 'email' | 'tel' | 'number' | 'textarea';
+        placeholder?: string | null;
+        required?: boolean | null;
+        width?: ('full' | 'half') | null;
+        /**
+         * Empty means every service, like "Flight number" only for Airport Transfers.
+         */
+        services?: (number | Service)[] | null;
+        id?: string | null;
+      }[]
+    | null;
+  submitLabel: string;
+  detailsToggleLabel?: string | null;
+  /**
+   * Small line under the button.
+   */
+  note?: string | null;
+  /**
+   * If set, guests must tick this box (for example, agreeing to the privacy policy).
+   */
+  consentLabel?: string | null;
+  /**
+   * Each request is emailed here. Sent only when the mail server is set up.
+   */
+  notify?:
+    | {
+        email: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1596,6 +1675,38 @@ export interface SpacerBlock {
   blockType: 'spacer';
 }
 /**
+ * Requests from the booking forms. Only the site itself can create them.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "form-submissions".
+ */
+export interface FormSubmission {
+  id: number;
+  summary?: string | null;
+  status?: ('new' | 'contacted' | 'confirmed' | 'closed') | null;
+  form?: (number | null) | Form;
+  service?: (number | null) | Service;
+  vehicle?: (number | null) | Vehicle;
+  date?: string | null;
+  time?: string | null;
+  adults?: number | null;
+  children?: number | null;
+  details?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  message?: string | null;
+  page?: string | null;
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
@@ -1799,6 +1910,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'testimonials';
         value: number | Testimonial;
+      } | null)
+    | ({
+        relationTo: 'forms';
+        value: number | Form;
+      } | null)
+    | ({
+        relationTo: 'form-submissions';
+        value: number | FormSubmission;
       } | null)
     | ({
         relationTo: 'media';
@@ -2422,6 +2541,7 @@ export interface FormBlockSelect<T extends boolean = true> {
         heading?: T;
         intro?: T;
       };
+  form?: T;
   service?: T;
   settings?:
     | T
@@ -2598,6 +2718,7 @@ export interface SpacerBlockSelect<T extends boolean = true> {
 export interface ServicesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
+  shortLabel?: T;
   order?: T;
   summary?: T;
   image?: T;
@@ -2716,6 +2837,69 @@ export interface TestimonialsSelect<T extends boolean = true> {
   rating?: T;
   photo?: T;
   verified?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "forms_select".
+ */
+export interface FormsSelect<T extends boolean = true> {
+  title?: T;
+  serviceLabel?: T;
+  vehicleLabel?: T;
+  noPreferenceLabel?: T;
+  noPreferenceDetail?: T;
+  dateLabel?: T;
+  timeLabel?: T;
+  dateTimeLabel?: T;
+  adultsLabel?: T;
+  adultsHint?: T;
+  childrenLabel?: T;
+  childrenHint?: T;
+  details?:
+    | T
+    | {
+        name?: T;
+        label?: T;
+        type?: T;
+        placeholder?: T;
+        required?: T;
+        width?: T;
+        services?: T;
+        id?: T;
+      };
+  submitLabel?: T;
+  detailsToggleLabel?: T;
+  note?: T;
+  consentLabel?: T;
+  notify?:
+    | T
+    | {
+        email?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "form-submissions_select".
+ */
+export interface FormSubmissionsSelect<T extends boolean = true> {
+  summary?: T;
+  status?: T;
+  form?: T;
+  service?: T;
+  vehicle?: T;
+  date?: T;
+  time?: T;
+  adults?: T;
+  children?: T;
+  details?: T;
+  message?: T;
+  page?: T;
+  notes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -3349,47 +3533,13 @@ export interface SeoDefault {
 export interface BookingSetting {
   id: number;
   /**
-   * Placeholders: {service}, {vehicle}, {date}, {time}, {pickup}, {dropoff}, {passengers}, {luggage}, {flightNumber}, {name}, {email}, {phone}, {notes}.
+   * Placeholders: {service}, {vehicle}, {date}, {time}, {adults}, {children}, {page}, plus the name of any extra question in the form (like {flightNumber}). Put optional details on their own line: a line whose placeholders are all empty is left out.
    */
   whatsappTemplate?: string | null;
   /**
    * Shown after the form is sent, while WhatsApp opens.
    */
   successMessage?: string | null;
-  visibleFields?:
-    | (
-        | 'service'
-        | 'vehicle'
-        | 'date'
-        | 'time'
-        | 'pickup'
-        | 'dropoff'
-        | 'passengers'
-        | 'luggage'
-        | 'flightNumber'
-        | 'name'
-        | 'email'
-        | 'phone'
-        | 'notes'
-      )[]
-    | null;
-  requiredFields?:
-    | (
-        | 'service'
-        | 'vehicle'
-        | 'date'
-        | 'time'
-        | 'pickup'
-        | 'dropoff'
-        | 'passengers'
-        | 'luggage'
-        | 'flightNumber'
-        | 'name'
-        | 'email'
-        | 'phone'
-        | 'notes'
-      )[]
-    | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -3694,8 +3844,6 @@ export interface SeoDefaultsSelect<T extends boolean = true> {
 export interface BookingSettingsSelect<T extends boolean = true> {
   whatsappTemplate?: T;
   successMessage?: T;
-  visibleFields?: T;
-  requiredFields?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

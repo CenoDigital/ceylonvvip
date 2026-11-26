@@ -473,6 +473,12 @@ export const FormBlock: Block = {
     variant(['booking'], { booking: 'Booking form' }),
     header,
     {
+      name: 'form',
+      type: 'relationship',
+      relationTo: 'forms',
+      admin: { description: 'Which form to show. Empty uses the first booking form.' },
+    },
+    {
       name: 'service',
       label: 'Pre-select a service',
       type: 'relationship',

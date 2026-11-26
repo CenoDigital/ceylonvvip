@@ -12,6 +12,8 @@
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
+    /* Keep anything scrolled into view (focus, #anchors) clear of the mobile thumb bar. */
+    scroll-padding-bottom: 104px;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
   }
@@ -20,6 +22,12 @@
     background-color: var(--background);
     color: var(--foreground);
     font-family: var(--font-text);
+  }
+
+  @media (min-width: 64rem) {
+    html {
+      scroll-padding-bottom: 0;
+    }
   }
 
   :focus-visible {

@@ -79,6 +79,15 @@ export const Services: CollectionConfig = {
     { name: 'title', type: 'text', required: true },
     slugField(),
     {
+      name: 'shortLabel',
+      label: 'Short label',
+      type: 'text',
+      admin: {
+        position: 'sidebar',
+        description: 'Used on the booking form chips, like "Wedding".',
+      },
+    },
+    {
       name: 'order',
       type: 'number',
       admin: { position: 'sidebar', description: 'Lower numbers show first.' },

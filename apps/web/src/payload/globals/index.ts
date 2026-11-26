@@ -391,20 +391,15 @@ export const SeoDefaults: GlobalConfig = {
   ],
 }
 
-export const BOOKING_FIELDS = [
+// Placeholders every booking form provides; extra questions add their own names.
+export const BOOKING_PLACEHOLDERS = [
   'service',
   'vehicle',
   'date',
   'time',
-  'pickup',
-  'dropoff',
-  'passengers',
-  'luggage',
-  'flightNumber',
-  'name',
-  'email',
-  'phone',
-  'notes',
+  'adults',
+  'children',
+  'page',
 ] as const
 
 export const BookingSettings: GlobalConfig = {
@@ -417,26 +412,14 @@ export const BookingSettings: GlobalConfig = {
       name: 'whatsappTemplate',
       label: 'WhatsApp message template',
       type: 'textarea',
-      admin: { description: `Placeholders: ${BOOKING_FIELDS.map((f) => `{${f}}`).join(', ')}.` },
+      admin: {
+        description: `Placeholders: ${BOOKING_PLACEHOLDERS.map((f) => `{${f}}`).join(', ')}, plus the name of any extra question in the form (like {flightNumber}). Put optional details on their own line: a line whose placeholders are all empty is left out.`,
+      },
     },
     {
       name: 'successMessage',
       type: 'textarea',
       admin: { description: 'Shown after the form is sent, while WhatsApp opens.' },
-    },
-    {
-      name: 'visibleFields',
-      type: 'select',
-      hasMany: true,
-      defaultValue: [...BOOKING_FIELDS],
-      options: BOOKING_FIELDS.map((value) => ({ value, label: value })),
-    },
-    {
-      name: 'requiredFields',
-      type: 'select',
-      hasMany: true,
-      defaultValue: ['service', 'date', 'name', 'phone'],
-      options: BOOKING_FIELDS.map((value) => ({ value, label: value })),
     },
   ],
 }

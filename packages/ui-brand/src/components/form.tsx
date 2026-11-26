@@ -271,7 +271,7 @@ export function VehicleOption({ vehicle, detail, className, ...input }: VehicleO
   return (
     <label
       className={cn(
-        'group/vehicle flex cursor-pointer flex-col gap-4 border border-border bg-background p-20',
+        'group/vehicle relative flex cursor-pointer flex-col gap-4 border border-border bg-background p-20',
         'transition-colors duration-150 hover:border-foreground',
         'has-[:checked]:border-foreground has-[:checked]:bg-card',
         'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-ring',

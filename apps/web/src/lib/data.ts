@@ -59,7 +59,7 @@ async function findBySlug<C extends 'pages' | 'services'>(
 export async function getPage(slug: string = HOME_SLUG): Promise<Page | null> {
   if (await isDraft()) return findBySlug('pages', slug, true)
   return unstable_cache(() => findBySlug('pages', slug, false), ['page', slug], {
-    tags: ['pages', 'vehicles', 'services', 'faqs', 'testimonials', 'pricing'],
+    tags: ['pages', 'vehicles', 'services', 'faqs', 'testimonials', 'pricing', 'forms'],
   })()
 }
 
@@ -109,5 +109,17 @@ export const getCollection = unstable_cache(
     return docs
   },
   ['collection'],
-  { tags: ['services', 'vehicles', 'testimonials', 'faqs'] },
+  { tags: ['services', 'vehicles', 'testimonials', 'faqs', 'forms'] },
+)
+
+/** The first booking form, used when a Form block does not name one. */
+export const getFirstForm = unstable_cache(
+  async () => {
+    const { docs } = await (
+      await payload()
+    ).find({ collection: 'forms', sort: 'createdAt', limit: 1, depth: 0 })
+    return docs[0] ?? null
+  },
+  ['first-form'],
+  { tags: ['forms'] },
 )
