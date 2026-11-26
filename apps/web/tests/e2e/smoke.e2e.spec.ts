@@ -22,3 +22,10 @@ test('unknown routes return 404', async ({ page }) => {
   const response = await page.goto('/this-page-does-not-exist')
   expect(response?.status()).toBe(404)
 })
+
+test('only production is open to search engines', async ({ request }) => {
+  const response = await request.get('/')
+  const robots = response.headers()['x-robots-tag']
+  if (process.env.SITE_ENV === 'production') expect(robots).toBeUndefined()
+  else expect(robots).toContain('noindex')
+})

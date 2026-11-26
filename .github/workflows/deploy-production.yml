@@ -1,0 +1,33 @@
+# Production deploys are manual: run this from the Actions tab once staging has been checked.
+# It deploys the image CI last pushed as ghcr.io/cenodigital/ceylonvvip-web:main.
+name: Deploy to production
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type "production" to deploy the current main image
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    if: github.ref == 'refs/heads/main' && inputs.confirm == 'production'
+    env:
+      COOLIFY_URL: https://cenocloud.cc
+      COOLIFY_PRODUCTION_APP: cy3xrjqs8g3t5gl5dlkskkf1
+    steps:
+      - name: Ask Coolify to pull the main image
+        env:
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+        run: |
+          curl -fsS --max-time 60 -H "Authorization: Bearer $COOLIFY_TOKEN" \
+            "$COOLIFY_URL/api/v1/deploy?uuid=$COOLIFY_PRODUCTION_APP&force=false"

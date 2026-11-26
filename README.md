@@ -56,3 +56,19 @@ pnpm services:down
 `docker/web.Dockerfile` builds the production image: turbo prune, pnpm install, Next.js standalone output, running as the unprivileged `node` user, with a health check on `/api/health`. Payload applies pending migrations when the server starts (`prodMigrations`); schema push is off everywhere.
 
 `docker/compose.yml` is for local development only. Staging and production run on Coolify from images that already passed CI.
+
+## Deploys
+
+Coolify (cenocloud.cc, project CeylonVVIP) only hosts. GitHub Actions tests and builds the
+image, pushes it to `ghcr.io/cenodigital/ceylonvvip-web`, then asks Coolify to deploy.
+
+| Environment | URL                            | How it deploys                                               |
+| ----------- | ------------------------------ | ------------------------------------------------------------ |
+| Staging     | https://staging.ceylonvvip.com | Automatically after every green push to `main`               |
+| Production  | https://ceylonvvip.com         | Manually: Actions, "Deploy to production", type `production` |
+
+Staging sits behind basic auth, and every environment except production sends
+`X-Robots-Tag: noindex` (set by `SITE_ENV` in Coolify). Each environment has its own
+Postgres 16; migrations run when the app starts. Runtime secrets (`DATABASE_URI`,
+`PAYLOAD_SECRET`, storage keys) live only in Coolify. The one GitHub secret is
+`COOLIFY_TOKEN`, a deploy-only token.
