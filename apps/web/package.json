@@ -18,7 +18,7 @@
     "migrate:create": "cross-env NODE_OPTIONS=--no-deprecation payload migrate:create",
     "test:e2e": "playwright test",
     "test:e2e:update": "playwright test --update-snapshots",
-    "seed": "cross-env NODE_OPTIONS=--no-deprecation payload run src/seed/figma.ts"
+    "seed": "cross-env NODE_OPTIONS=--no-deprecation payload run src/seed/run.ts"
   },
   "dependencies": {
     "@ceylonvvip/cms-schema": "workspace:*",

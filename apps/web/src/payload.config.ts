@@ -102,4 +102,9 @@ export default buildConfig({
     seoPlugin({ collections: [], uploadsCollection: 'media' }),
   ],
   sharp,
+  // Staging: fill an empty database with the Figma content (SEED_ON_EMPTY, see seed/on-empty.ts).
+  onInit: async (payload) => {
+    const { seedIfEmpty } = await import('./seed/on-empty')
+    await seedIfEmpty(payload)
+  },
 })
