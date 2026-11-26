@@ -18,7 +18,10 @@ const types = (g: Array<Record<string, unknown>>) => g.flatMap((t) => [t['@type'
 test('home has title, description, canonical and business schema', async ({ page }) => {
   await page.goto('/')
   await expect(page).toHaveTitle(/CeylonVVIP/)
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/$/)
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    /^https?:\/\/[^/]+\/?$/,
+  )
   const g = await graphOf(page)
   expect(types(g)).toEqual(
     expect.arrayContaining(['Organization', 'TravelAgency', 'WebSite', 'BreadcrumbList']),
