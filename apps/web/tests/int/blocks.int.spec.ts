@@ -55,6 +55,7 @@ const minimal: Record<string, Record<string, unknown>> = {
   form: {},
   map: {},
   logoStrip: {},
+  destinations: { items: [{ name: 'Sigiriya' }] },
   spacer: {},
 }
 
@@ -103,7 +104,7 @@ describe('page blocks', () => {
     await payload.delete({ collection: 'users', where: { email: { contains: suffix } } })
   })
 
-  it('has all 18 blocks from the plan', () => {
+  it('has the 18 blocks from the plan plus Destinations', () => {
     expect(pageBlocks.map((b) => b.slug)).toEqual(Object.keys(minimal))
   })
 

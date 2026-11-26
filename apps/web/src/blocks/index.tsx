@@ -13,10 +13,11 @@ import {
 } from '@ceylonvvip/ui-brand'
 
 import { getCollection, getGlobal } from '@/lib/data'
-import { resolveLink, whatsappHref } from '@/lib/links'
+import { resolveLink } from '@/lib/links'
 import { pathFor } from '@/payload/paths'
 
 import { BookingBlock } from './BookingBlock'
+import { FleetCarousel } from './FleetCarousel'
 import { CmsImage, Cta, Header, RichText, Section, asMedia, type BlockHeader } from './shared'
 
 /* One renderer per CMS block (see src/payload/blocks). Variants follow Figma. */
@@ -150,9 +151,39 @@ async function ServicesGridView({ block }: { block: Block }) {
   )
 }
 
+/** Figma section header with its action link at the right (Fleet, Destinations). */
+function HeaderRow({ block }: { block: Block }) {
+  return (
+    <div className="flex flex-col items-start gap-24 lg:flex-row lg:items-end lg:justify-between">
+      <Header header={block.header as BlockHeader} />
+      <Cta cta={block.cta as never} />
+    </div>
+  )
+}
+
 async function VehicleShowcaseView({ block }: { block: Block }) {
   const vehicles = await itemsFor<Vehicle>(block, 'vehicles')
   const specs = block.variant === 'specs'
+  if (!specs) {
+    // Figma 01 Home / Fleet: one vehicle at a time.
+    const slides = vehicles.map((v) => {
+      const m = asMedia(docs<unknown>(v.gallery)[0])
+      return {
+        id: v.id,
+        name: v.name,
+        summary: v.summary,
+        image: m?.url
+          ? { url: m.url, alt: m.alt ?? v.name, focalX: m.focalX, focalY: m.focalY }
+          : null,
+      }
+    })
+    return (
+      <Section settings={block.settings as never} className="flex flex-col gap-28 lg:gap-48">
+        <HeaderRow block={block} />
+        <FleetCarousel vehicles={slides} />
+      </Section>
+    )
+  }
   return (
     <Section settings={block.settings as never}>
       <Header header={block.header as BlockHeader} className="mb-28 lg:mb-48" />
@@ -304,6 +335,30 @@ function FeatureListView({ block }: { block: Block }) {
           />
         ))}
       </div>
+    </Section>
+  )
+}
+
+function DestinationsView({ block }: { block: Block }) {
+  const items = docs<{ id?: string; name: string; line?: string | null; photo?: unknown }>(
+    block.items,
+  )
+  return (
+    <Section settings={block.settings as never} className="flex flex-col gap-32 lg:gap-80">
+      <HeaderRow block={block} />
+      <ul className="grid gap-32 lg:grid-cols-3 lg:gap-48">
+        {items.map((place, i) => (
+          <li key={place.id ?? i} className="flex flex-col gap-20">
+            <div className="relative h-420 w-full overflow-hidden bg-placeholder lg:h-560">
+              <CmsImage media={place.photo} sizes="(min-width: 1024px) 33vw, 100vw" />
+            </div>
+            <div className="flex flex-col gap-6">
+              <h3 className="text-h4 text-foreground">{place.name}</h3>
+              {place.line ? <p className="text-small text-muted-foreground">{place.line}</p> : null}
+            </div>
+          </li>
+        ))}
+      </ul>
     </Section>
   )
 }
@@ -599,6 +654,8 @@ export async function RenderBlocks({ blocks }: { blocks?: Block[] | null }) {
             return <MapView key={key} block={block} />
           case 'logoStrip':
             return <LogoStripView key={key} block={block} />
+          case 'destinations':
+            return <DestinationsView key={key} block={block} />
           case 'spacer':
             return <SpacerView key={key} block={block} />
           default:

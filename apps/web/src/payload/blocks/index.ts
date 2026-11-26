@@ -502,6 +502,33 @@ export const LogoStrip: Block = {
   ],
 }
 
+// Figma 01 Home / Destinations: places guests ask for, three to a row with photos.
+export const Destinations: Block = {
+  slug: 'destinations',
+  interfaceName: 'DestinationsBlock',
+  fields: [
+    variant(['columns'], { columns: 'Photo columns' }),
+    header,
+    ctaField(),
+    {
+      name: 'items',
+      label: 'Places',
+      type: 'array',
+      minRows: 1,
+      fields: [
+        { name: 'name', type: 'text', required: true },
+        {
+          name: 'line',
+          type: 'text',
+          admin: { description: 'One short line, like "Tea country and cool hills".' },
+        },
+        media({ name: 'photo' }),
+      ],
+    },
+    settings(),
+  ],
+}
+
 export const Spacer: Block = {
   slug: 'spacer',
   interfaceName: 'SpacerBlock',
@@ -534,6 +561,7 @@ export const pageBlocks: Block[] = [
   FormBlock,
   MapBlock,
   LogoStrip,
+  Destinations,
   Spacer,
 ]
 
@@ -548,4 +576,5 @@ export const DESIGNED_BLOCKS = [
   'processSteps',
   'ctaBanner',
   'form',
+  'destinations',
 ]

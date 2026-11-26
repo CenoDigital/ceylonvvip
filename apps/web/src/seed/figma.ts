@@ -209,6 +209,22 @@ export async function seedFigma(payload: Payload) {
         settings: { bg: 'card' },
       },
       {
+        blockType: 'destinations',
+        variant: 'columns',
+        header: { eyebrow: 'Island-wide', heading: 'Where our guests ask to go.' },
+        cta: {
+          label: 'Plan an island tour',
+          appearance: 'link',
+          link: internal('services', servicesBySlug['island-tours']!),
+        },
+        settings: { pt: 'xl' },
+        items: [
+          { name: 'Sigiriya', line: 'The rock fortress, at first light' },
+          { name: 'Ella', line: 'Tea country and cool hills' },
+          { name: 'Galle', line: 'The old Dutch fort by the sea' },
+        ],
+      },
+      {
         blockType: 'featureList',
         variant: 'small',
         header: { eyebrow: 'Included for every guest' },

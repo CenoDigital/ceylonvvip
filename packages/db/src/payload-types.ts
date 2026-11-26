@@ -185,6 +185,7 @@ export interface Page {
         | FormBlock
         | MapBlock
         | LogoStripBlock
+        | DestinationsBlock
         | SpacerBlock
       )[]
     | null;
@@ -441,6 +442,7 @@ export interface Service {
         | FormBlock
         | MapBlock
         | LogoStripBlock
+        | DestinationsBlock
         | SpacerBlock
       )[]
     | null;
@@ -1412,6 +1414,100 @@ export interface LogoStripBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DestinationsBlock".
+ */
+export interface DestinationsBlock {
+  variant: 'columns';
+  header?: {
+    /**
+     * Small line above, like "Services".
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    intro?: string | null;
+  };
+  cta: {
+    label?: string | null;
+    appearance?: ('button' | 'link') | null;
+    icon?:
+      | (
+          | 'arrow-left'
+          | 'arrow-right'
+          | 'arrow-up-right'
+          | 'bed'
+          | 'calendar'
+          | 'car'
+          | 'check'
+          | 'chevron-down'
+          | 'clock'
+          | 'compass'
+          | 'droplet'
+          | 'gem'
+          | 'glass-water'
+          | 'globe'
+          | 'heart'
+          | 'home'
+          | 'map-pin'
+          | 'menu'
+          | 'phone'
+          | 'plane'
+          | 'shield'
+          | 'square'
+          | 'square-check'
+          | 'whatsapp'
+          | 'wifi'
+          | 'x'
+        )
+      | null;
+    link: {
+      type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: number | Page;
+          } | null)
+        | ({
+            relationTo: 'services';
+            value: number | Service;
+          } | null);
+      url?: string | null;
+      /**
+       * International format, for example +94 77 123 4567.
+       */
+      phone?: string | null;
+      message?: string | null;
+      email?: string | null;
+      newTab?: boolean | null;
+    };
+  };
+  items?:
+    | {
+        name: string;
+        /**
+         * One short line, like "Tea country and cool hills".
+         */
+        line?: string | null;
+        photo?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  settings?: {
+    bg?: ('default' | 'card') | null;
+    pt?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    pb?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+    anim?:
+      ('none' | 'fade-up' | 'stagger-children' | 'reveal-mask' | 'image-parallax' | 'counter' | 'line-draw') | null;
+    /**
+     * Optional id for links to this section, like #booking.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'destinations';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "SpacerBlock".
  */
 export interface SpacerBlock {
@@ -1707,6 +1803,7 @@ export interface PagesSelect<T extends boolean = true> {
         form?: T | FormBlockSelect<T>;
         map?: T | MapBlockSelect<T>;
         logoStrip?: T | LogoStripBlockSelect<T>;
+        destinations?: T | DestinationsBlockSelect<T>;
         spacer?: T | SpacerBlockSelect<T>;
       };
   image?: T;
@@ -2314,6 +2411,57 @@ export interface LogoStripBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DestinationsBlock_select".
+ */
+export interface DestinationsBlockSelect<T extends boolean = true> {
+  variant?: T;
+  header?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+      };
+  cta?:
+    | T
+    | {
+        label?: T;
+        appearance?: T;
+        icon?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              reference?: T;
+              url?: T;
+              phone?: T;
+              message?: T;
+              email?: T;
+              newTab?: T;
+            };
+      };
+  items?:
+    | T
+    | {
+        name?: T;
+        line?: T;
+        photo?: T;
+        id?: T;
+      };
+  settings?:
+    | T
+    | {
+        bg?: T;
+        pt?: T;
+        pb?: T;
+        anim?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "SpacerBlock_select".
  */
 export interface SpacerBlockSelect<T extends boolean = true> {
@@ -2353,6 +2501,7 @@ export interface ServicesSelect<T extends boolean = true> {
         form?: T | FormBlockSelect<T>;
         map?: T | MapBlockSelect<T>;
         logoStrip?: T | LogoStripBlockSelect<T>;
+        destinations?: T | DestinationsBlockSelect<T>;
         spacer?: T | SpacerBlockSelect<T>;
       };
   vehicles?: T;
