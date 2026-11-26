@@ -12,7 +12,10 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "services:up": "docker compose -f docker/compose.yml up -d",
+    "services:app": "docker compose -f docker/compose.yml --profile app up -d --build",
+    "services:down": "docker compose -f docker/compose.yml --profile app down"
   },
   "devDependencies": {
     "prettier": "3.10.1",
