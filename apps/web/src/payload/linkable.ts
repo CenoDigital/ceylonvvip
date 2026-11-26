@@ -1,5 +1,5 @@
 /**
- * Collections an internal link can point to. Pages, Services and Vehicles are added
- * with their collections (task 143); until then internal links are hidden.
+ * Collections an internal link can point to. Vehicles have no pages of their own
+ * (they appear on the Fleet page), so they are not linkable.
  */
-export const LINKABLE: string[] = []
+export const LINKABLE: string[] = ['pages', 'services']

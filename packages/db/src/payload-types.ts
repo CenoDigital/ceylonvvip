@@ -67,18 +67,34 @@ export interface Config {
   };
   blocks: {};
   collections: {
-    users: User;
+    pages: Page;
+    services: Service;
+    vehicles: Vehicle;
+    pricing: Pricing;
+    faqs: Faq;
+    testimonials: Testimonial;
     media: Media;
+    redirects: Redirect;
+    users: User;
     'payload-kv': PayloadKv;
+    'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
   collectionsJoins: {};
   collectionsSelect: {
-    users: UsersSelect<false> | UsersSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
+    services: ServicesSelect<false> | ServicesSelect<true>;
+    vehicles: VehiclesSelect<false> | VehiclesSelect<true>;
+    pricing: PricingSelect<false> | PricingSelect<true>;
+    faqs: FaqsSelect<false> | FaqsSelect<true>;
+    testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
+    'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -111,7 +127,13 @@ export interface Config {
   };
   user: User;
   jobs: {
-    tasks: unknown;
+    tasks: {
+      schedulePublish: TaskSchedulePublish;
+      inline: {
+        input: unknown;
+        output: unknown;
+      };
+    };
     workflows: unknown;
   };
 }
@@ -135,34 +157,48 @@ export interface UserAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
+ * via the `definition` "pages".
  */
-export interface User {
+export interface Page {
   id: number;
-  name?: string | null;
+  title: string;
   /**
-   * Admins also manage users and settings. Editors manage content.
+   * The address of this page. Filled in from the title if left empty.
    */
-  role: 'admin' | 'editor';
+  slug: string;
+  /**
+   * Used for sharing and listings.
+   */
+  image?: (number | null) | Media;
+  seo?: {
+    /**
+     * Shown in Google results. About 50 to 60 characters. Leave empty to use the page title.
+     */
+    title?: string | null;
+    /**
+     * About 100 to 150 characters. Leave empty to use the site default.
+     */
+    description?: string | null;
+    /**
+     * For social sharing, 1200 by 630. Falls back to the main image, then the site default.
+     */
+    image?: (number | null) | Media;
+    /**
+     * Only if this content officially lives at another address.
+     */
+    canonical?: string | null;
+    noindex?: boolean | null;
+    nofollow?: boolean | null;
+    excludeFromSitemap?: boolean | null;
+    /**
+     * For your reference only; not shown on the site.
+     */
+    focusKeyword?: string | null;
+    schemaType?: ('WebPage' | 'AboutPage' | 'ContactPage' | 'Service' | 'Product' | 'TouristTrip' | 'Article') | null;
+  };
   updatedAt: string;
   createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  resetPasswordRequestedAt?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
-    | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
-      }[]
-    | null;
-  password?: string | null;
-  collection: 'users';
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -228,6 +264,250 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services".
+ */
+export interface Service {
+  id: number;
+  title: string;
+  /**
+   * The address of this page. Filled in from the title if left empty.
+   */
+  slug: string;
+  /**
+   * Lower numbers show first.
+   */
+  order?: number | null;
+  /**
+   * One or two lines for cards and menus.
+   */
+  summary?: string | null;
+  image?: (number | null) | Media;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  vehicles?: (number | Vehicle)[] | null;
+  pricing?: (number | Pricing)[] | null;
+  faqs?: (number | Faq)[] | null;
+  seo?: {
+    /**
+     * Shown in Google results. About 50 to 60 characters. Leave empty to use the page title.
+     */
+    title?: string | null;
+    /**
+     * About 100 to 150 characters. Leave empty to use the site default.
+     */
+    description?: string | null;
+    /**
+     * For social sharing, 1200 by 630. Falls back to the main image, then the site default.
+     */
+    image?: (number | null) | Media;
+    /**
+     * Only if this content officially lives at another address.
+     */
+    canonical?: string | null;
+    noindex?: boolean | null;
+    nofollow?: boolean | null;
+    excludeFromSitemap?: boolean | null;
+    /**
+     * For your reference only; not shown on the site.
+     */
+    focusKeyword?: string | null;
+    schemaType?: ('WebPage' | 'AboutPage' | 'ContactPage' | 'Service' | 'Product' | 'TouristTrip' | 'Article') | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Shown on the Fleet page and in booking forms. Vehicles have no page of their own.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vehicles".
+ */
+export interface Vehicle {
+  id: number;
+  name: string;
+  /**
+   * The address of this page. Filled in from the title if left empty.
+   */
+  slug: string;
+  /**
+   * Lower numbers show first.
+   */
+  order?: number | null;
+  /**
+   * For example: Executive sedan, Luxury SUV, Van.
+   */
+  class?: string | null;
+  seats: number;
+  luggage?: number | null;
+  summary?: string | null;
+  features?:
+    | {
+        feature: string;
+        id?: string | null;
+      }[]
+    | null;
+  gallery?: (number | Media)[] | null;
+  services?: (number | Service)[] | null;
+  pricing?: (number | Pricing)[] | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Prices are not confirmed yet, so every item defaults to On request.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pricing".
+ */
+export interface Pricing {
+  id: number;
+  /**
+   * For example: Airport transfer, sedan.
+   */
+  label: string;
+  displayMode: 'onRequest' | 'from' | 'exact';
+  amount?: number | null;
+  currency?: ('USD' | 'EUR' | 'GBP' | 'LKR') | null;
+  /**
+   * For example: per transfer, per day.
+   */
+  unit?: string | null;
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs".
+ */
+export interface Faq {
+  id: number;
+  question: string;
+  answer: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * FAQs with the same topic are grouped.
+   */
+  topic?: string | null;
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "testimonials".
+ */
+export interface Testimonial {
+  id: number;
+  quote: string;
+  name: string;
+  /**
+   * For example: Honeymoon guest, UK.
+   */
+  role?: string | null;
+  rating?: number | null;
+  photo?: (number | null) | Media;
+  /**
+   * Only real reviews may be shown with review stars in Google (schema).
+   */
+  verified?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects".
+ */
+export interface Redirect {
+  id: number;
+  /**
+   * Old address on this site, starting with /.
+   */
+  from: string;
+  to: {
+    type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'services';
+          value: number | Service;
+        } | null);
+    url?: string | null;
+    /**
+     * International format, for example +94 77 123 4567.
+     */
+    phone?: string | null;
+    message?: string | null;
+    email?: string | null;
+    newTab?: boolean | null;
+  };
+  type?: ('301' | '302') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users".
+ */
+export interface User {
+  id: number;
+  name?: string | null;
+  /**
+   * Admins also manage users and settings. Editors manage content.
+   */
+  role: 'admin' | 'editor';
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'users';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -245,18 +525,138 @@ export interface PayloadKv {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs".
+ */
+export interface PayloadJob {
+  id: number;
+  /**
+   * Input data provided to the job
+   */
+  input?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  taskStatus?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  completedAt?: string | null;
+  totalTried?: number | null;
+  /**
+   * If hasError is true this job will not be retried
+   */
+  hasError?: boolean | null;
+  /**
+   * If hasError is true, this is the error that caused it
+   */
+  error?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Task execution log
+   */
+  log?:
+    | {
+        executedAt: string;
+        completedAt: string;
+        taskSlug: 'inline' | 'schedulePublish';
+        taskID: string;
+        input?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        output?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        state: 'failed' | 'succeeded';
+        error?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  taskSlug?: ('inline' | 'schedulePublish') | null;
+  queue?: string | null;
+  waitUntil?: string | null;
+  processing?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: 'users';
-        value: number | User;
+        relationTo: 'pages';
+        value: number | Page;
+      } | null)
+    | ({
+        relationTo: 'services';
+        value: number | Service;
+      } | null)
+    | ({
+        relationTo: 'vehicles';
+        value: number | Vehicle;
+      } | null)
+    | ({
+        relationTo: 'pricing';
+        value: number | Pricing;
+      } | null)
+    | ({
+        relationTo: 'faqs';
+        value: number | Faq;
+      } | null)
+    | ({
+        relationTo: 'testimonials';
+        value: number | Testimonial;
       } | null)
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'redirects';
+        value: number | Redirect;
+      } | null)
+    | ({
+        relationTo: 'users';
+        value: number | User;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -302,28 +702,124 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
+ * via the `definition` "pages_select".
  */
-export interface UsersSelect<T extends boolean = true> {
-  name?: T;
-  role?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  resetPasswordRequestedAt?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
-  sessions?:
+export interface PagesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  image?: T;
+  seo?:
     | T
     | {
-        id?: T;
-        createdAt?: T;
-        expiresAt?: T;
+        title?: T;
+        description?: T;
+        image?: T;
+        canonical?: T;
+        noindex?: T;
+        nofollow?: T;
+        excludeFromSitemap?: T;
+        focusKeyword?: T;
+        schemaType?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services_select".
+ */
+export interface ServicesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  order?: T;
+  summary?: T;
+  image?: T;
+  body?: T;
+  vehicles?: T;
+  pricing?: T;
+  faqs?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        canonical?: T;
+        noindex?: T;
+        nofollow?: T;
+        excludeFromSitemap?: T;
+        focusKeyword?: T;
+        schemaType?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vehicles_select".
+ */
+export interface VehiclesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  order?: T;
+  class?: T;
+  seats?: T;
+  luggage?: T;
+  summary?: T;
+  features?:
+    | T
+    | {
+        feature?: T;
+        id?: T;
+      };
+  gallery?: T;
+  services?: T;
+  pricing?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pricing_select".
+ */
+export interface PricingSelect<T extends boolean = true> {
+  label?: T;
+  displayMode?: T;
+  amount?: T;
+  currency?: T;
+  unit?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs_select".
+ */
+export interface FaqsSelect<T extends boolean = true> {
+  question?: T;
+  answer?: T;
+  topic?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "testimonials_select".
+ */
+export interface TestimonialsSelect<T extends boolean = true> {
+  quote?: T;
+  name?: T;
+  role?: T;
+  rating?: T;
+  photo?: T;
+  verified?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -392,11 +888,88 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects_select".
+ */
+export interface RedirectsSelect<T extends boolean = true> {
+  from?: T;
+  to?:
+    | T
+    | {
+        type?: T;
+        reference?: T;
+        url?: T;
+        phone?: T;
+        message?: T;
+        email?: T;
+        newTab?: T;
+      };
+  type?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users_select".
+ */
+export interface UsersSelect<T extends boolean = true> {
+  name?: T;
+  role?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  resetPasswordRequestedAt?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
   key?: T;
   data?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs_select".
+ */
+export interface PayloadJobsSelect<T extends boolean = true> {
+  input?: T;
+  taskStatus?: T;
+  completedAt?: T;
+  totalTried?: T;
+  hasError?: T;
+  error?: T;
+  log?:
+    | T
+    | {
+        executedAt?: T;
+        completedAt?: T;
+        taskSlug?: T;
+        taskID?: T;
+        input?: T;
+        output?: T;
+        state?: T;
+        error?: T;
+        id?: T;
+      };
+  taskSlug?: T;
+  queue?: T;
+  waitUntil?: T;
+  processing?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -538,6 +1111,15 @@ export interface Header {
         link?: {
           label?: string | null;
           type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'services';
+                value: number | Service;
+              } | null);
           url?: string | null;
           /**
            * International format, for example +94 77 123 4567.
@@ -552,6 +1134,15 @@ export interface Header {
               link: {
                 label?: string | null;
                 type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
+                reference?:
+                  | ({
+                      relationTo: 'pages';
+                      value: number | Page;
+                    } | null)
+                  | ({
+                      relationTo: 'services';
+                      value: number | Service;
+                    } | null);
                 url?: string | null;
                 /**
                  * International format, for example +94 77 123 4567.
@@ -608,6 +1199,15 @@ export interface Header {
             | null;
           link: {
             type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
+            reference?:
+              | ({
+                  relationTo: 'pages';
+                  value: number | Page;
+                } | null)
+              | ({
+                  relationTo: 'services';
+                  value: number | Service;
+                } | null);
             url?: string | null;
             /**
              * International format, for example +94 77 123 4567.
@@ -627,6 +1227,15 @@ export interface Header {
     link?: {
       label?: string | null;
       type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: number | Page;
+          } | null)
+        | ({
+            relationTo: 'services';
+            value: number | Service;
+          } | null);
       url?: string | null;
       /**
        * International format, for example +94 77 123 4567.
@@ -654,6 +1263,15 @@ export interface Footer {
               link: {
                 label?: string | null;
                 type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
+                reference?:
+                  | ({
+                      relationTo: 'pages';
+                      value: number | Page;
+                    } | null)
+                  | ({
+                      relationTo: 'services';
+                      value: number | Service;
+                    } | null);
                 url?: string | null;
                 /**
                  * International format, for example +94 77 123 4567.
@@ -674,6 +1292,15 @@ export interface Footer {
         link: {
           label?: string | null;
           type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'services';
+                value: number | Service;
+              } | null);
           url?: string | null;
           /**
            * International format, for example +94 77 123 4567.
@@ -740,6 +1367,15 @@ export interface MobileActionBar {
         link?: {
           label?: string | null;
           type: 'internal' | 'url' | 'phone' | 'whatsapp' | 'email';
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'services';
+                value: number | Service;
+              } | null);
           url?: string | null;
           /**
            * International format, for example +94 77 123 4567.
@@ -938,6 +1574,7 @@ export interface HeaderSelect<T extends boolean = true> {
           | {
               label?: T;
               type?: T;
+              reference?: T;
               url?: T;
               phone?: T;
               message?: T;
@@ -952,6 +1589,7 @@ export interface HeaderSelect<T extends boolean = true> {
                 | {
                     label?: T;
                     type?: T;
+                    reference?: T;
                     url?: T;
                     phone?: T;
                     message?: T;
@@ -976,6 +1614,7 @@ export interface HeaderSelect<T extends boolean = true> {
                 | T
                 | {
                     type?: T;
+                    reference?: T;
                     url?: T;
                     phone?: T;
                     message?: T;
@@ -995,6 +1634,7 @@ export interface HeaderSelect<T extends boolean = true> {
           | {
               label?: T;
               type?: T;
+              reference?: T;
               url?: T;
               phone?: T;
               message?: T;
@@ -1023,6 +1663,7 @@ export interface FooterSelect<T extends boolean = true> {
                 | {
                     label?: T;
                     type?: T;
+                    reference?: T;
                     url?: T;
                     phone?: T;
                     message?: T;
@@ -1041,6 +1682,7 @@ export interface FooterSelect<T extends boolean = true> {
           | {
               label?: T;
               type?: T;
+              reference?: T;
               url?: T;
               phone?: T;
               message?: T;
@@ -1071,6 +1713,7 @@ export interface MobileActionBarSelect<T extends boolean = true> {
           | {
               label?: T;
               type?: T;
+              reference?: T;
               url?: T;
               phone?: T;
               message?: T;
@@ -1135,6 +1778,35 @@ export interface CollectionsWidget {
     [k: string]: unknown;
   };
   width: 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskSchedulePublish".
+ */
+export interface TaskSchedulePublish {
+  input: {
+    type?: ('publish' | 'unpublish') | null;
+    locale?: string | null;
+    doc?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'services';
+          value: number | Service;
+        } | null)
+      | ({
+          relationTo: 'vehicles';
+          value: number | Vehicle;
+        } | null);
+    global?: string | null;
+    user?: {
+      relationTo: 'users';
+      value: number | User;
+    } | null;
+  };
+  output?: unknown;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
