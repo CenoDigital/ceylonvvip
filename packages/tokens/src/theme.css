@@ -1,0 +1,186 @@
+/* Generated from src/tokens.ts by `pnpm --filter @ceylonvvip/tokens generate`. Do not edit. */
+@theme inline {
+  --color-*: initial;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-brand: var(--brand);
+  --color-placeholder: var(--placeholder);
+  --color-whatsapp: var(--whatsapp);
+  --color-ivory-25: var(--palette-ivory-25);
+  --color-ivory-50: var(--palette-ivory-50);
+  --color-ivory-75: var(--palette-ivory-75);
+  --color-ivory-100: var(--palette-ivory-100);
+  --color-ivory-200: var(--palette-ivory-200);
+  --color-ivory-300: var(--palette-ivory-300);
+  --color-parchment-100: var(--palette-parchment-100);
+  --color-gold-100: var(--palette-gold-100);
+  --color-gold-200: var(--palette-gold-200);
+  --color-gold-500: var(--palette-gold-500);
+  --color-bronze-300: var(--palette-bronze-300);
+  --color-bronze-600: var(--palette-bronze-600);
+  --color-stone-300: var(--palette-stone-300);
+  --color-stone-600: var(--palette-stone-600);
+  --color-ink-800: var(--palette-ink-800);
+  --color-ink-900: var(--palette-ink-900);
+  --color-ink-950: var(--palette-ink-950);
+  --color-espresso-900: var(--palette-espresso-900);
+  --color-red-700: var(--palette-red-700);
+  --color-white: var(--palette-white);
+  --color-whatsapp: var(--palette-whatsapp);
+}
+
+@theme {
+  --spacing: 1px;
+  --radius-*: initial;
+  --radius-none: 0;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+  --font-*: initial;
+  --font-display: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --font-text: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --text-*: initial;
+  --text-hero: clamp(2.75rem, 0.9857rem + 7.2381vw, 7.5rem);
+  --text-hero--line-height: clamp(3.08rem, 1.2154rem + 7.6495vw, 8.1rem);
+  --text-hero--letter-spacing: clamp(-3px, -0.093px + -0.2019vw, -0.88px);
+  --text-hero--font-weight: 300;
+  --text-display: clamp(2.625rem, 1.65rem + 4vw, 5.25rem);
+  --text-display--line-height: clamp(3rem, 2.025rem + 4vw, 5.625rem);
+  --text-display--letter-spacing: clamp(-2.94px, -0.636px + -0.16vw, -1.26px);
+  --text-display--font-weight: 300;
+  --text-h1: clamp(2.375rem, 1.7714rem + 2.4762vw, 4rem);
+  --text-h1--line-height: clamp(2.75rem, 2.1rem + 2.6667vw, 4.5rem);
+  --text-h1--letter-spacing: clamp(-1.92px, -0.59px + -0.0924vw, -0.95px);
+  --text-h1--font-weight: 300;
+  --text-h2: clamp(2rem, 1.675rem + 1.3333vw, 2.875rem);
+  --text-h2--line-height: clamp(2.375rem, 2.0036rem + 1.5238vw, 3.375rem);
+  --text-h2--letter-spacing: clamp(-1.15px, -0.451px + -0.0486vw, -0.64px);
+  --text-h2--font-weight: 300;
+  --text-h3: clamp(1.5rem, 1.3607rem + 0.5714vw, 1.875rem);
+  --text-h3--line-height: clamp(1.875rem, 1.6893rem + 0.7619vw, 2.375rem);
+  --text-h3--letter-spacing: clamp(-0.45px, -0.162px + -0.02vw, -0.24px);
+  --text-h3--font-weight: 300;
+  --text-quote: clamp(1.625rem, 1.3rem + 1.3333vw, 2.5rem);
+  --text-quote--line-height: clamp(2.25rem, 1.8321rem + 1.7143vw, 3.375rem);
+  --text-quote--letter-spacing: clamp(-0.8px, -0.238px + -0.039vw, -0.39px);
+  --text-quote--font-weight: 300;
+  --text-lead: clamp(1.0625rem, 0.9929rem + 0.2857vw, 1.25rem);
+  --text-lead--line-height: clamp(1.6875rem, 1.5714rem + 0.4762vw, 2rem);
+  --text-lead--letter-spacing: 0px;
+  --text-lead--font-weight: 400;
+  --text-title: 6rem;
+  --text-title--line-height: 6.48rem;
+  --text-title--letter-spacing: -1.92px;
+  --text-title--font-weight: 300;
+  --text-h4: 1.375rem;
+  --text-h4--line-height: 1.875rem;
+  --text-h4--letter-spacing: -0.22px;
+  --text-h4--font-weight: 300;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.75rem;
+  --text-body--letter-spacing: 0px;
+  --text-body--font-weight: 400;
+  --text-small: 0.9375rem;
+  --text-small--line-height: 1.5rem;
+  --text-small--letter-spacing: 0px;
+  --text-small--font-weight: 400;
+  --text-numeral: 1.25rem;
+  --text-numeral--line-height: 1.625rem;
+  --text-numeral--letter-spacing: 0.4px;
+  --text-numeral--font-weight: 300;
+  --text-label: 0.75rem;
+  --text-label--line-height: 1rem;
+  --text-label--letter-spacing: 2.16px;
+  --text-label--font-weight: 500;
+  --text-button: 0.8125rem;
+  --text-button--line-height: 1.25rem;
+  --text-button--letter-spacing: 1.82px;
+  --text-button--font-weight: 500;
+  --text-nav: 0.8125rem;
+  --text-nav--line-height: 1.25rem;
+  --text-nav--letter-spacing: 1.56px;
+  --text-nav--font-weight: 400;
+  --text-roman: 0.8125rem;
+  --text-roman--line-height: 1.25rem;
+  --text-roman--letter-spacing: 2.34px;
+  --text-roman--font-weight: 400;
+  --text-tab: 0.625rem;
+  --text-tab--line-height: 0.875rem;
+  --text-tab--letter-spacing: 1px;
+  --text-tab--font-weight: 500;
+  --text-wordmark: 1rem;
+  --text-wordmark--line-height: 1.5rem;
+  --text-wordmark--letter-spacing: 5.12px;
+  --text-wordmark--font-weight: 400;
+  --ease-*: initial;
+  --ease-power1-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-power2-out: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --ease-power2-in: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  --ease-power3-out: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-power4-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-out: ease-out;
+}
+
+/* Styles that are uppercase in Figma: text-label-caps, text-button-caps, ... */
+@utility text-label-caps {
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+  letter-spacing: var(--text-label--letter-spacing);
+  font-weight: var(--text-label--font-weight);
+  text-transform: uppercase;
+}
+
+@utility text-button-caps {
+  font-size: var(--text-button);
+  line-height: var(--text-button--line-height);
+  letter-spacing: var(--text-button--letter-spacing);
+  font-weight: var(--text-button--font-weight);
+  text-transform: uppercase;
+}
+
+@utility text-nav-caps {
+  font-size: var(--text-nav);
+  line-height: var(--text-nav--line-height);
+  letter-spacing: var(--text-nav--letter-spacing);
+  font-weight: var(--text-nav--font-weight);
+  text-transform: uppercase;
+}
+
+@utility text-roman-caps {
+  font-size: var(--text-roman);
+  line-height: var(--text-roman--line-height);
+  letter-spacing: var(--text-roman--letter-spacing);
+  font-weight: var(--text-roman--font-weight);
+  text-transform: uppercase;
+}
+
+@utility text-tab-caps {
+  font-size: var(--text-tab);
+  line-height: var(--text-tab--line-height);
+  letter-spacing: var(--text-tab--letter-spacing);
+  font-weight: var(--text-tab--font-weight);
+  text-transform: uppercase;
+}
+
+@utility text-wordmark-caps {
+  font-size: var(--text-wordmark);
+  line-height: var(--text-wordmark--line-height);
+  letter-spacing: var(--text-wordmark--letter-spacing);
+  font-weight: var(--text-wordmark--font-weight);
+  text-transform: uppercase;
+}

@@ -1,0 +1,223 @@
+/* Generated from src/tokens.ts by `pnpm --filter @ceylonvvip/tokens generate`. Do not edit. */
+:root {
+  /* Palette */
+  --palette-ivory-25: #faf7f0;
+  --palette-ivory-50: #f8f6f1;
+  --palette-ivory-75: #f6f3ec;
+  --palette-ivory-100: #f0ede6;
+  --palette-ivory-200: #e2ded6;
+  --palette-ivory-300: #e3ded4;
+  --palette-parchment-100: #f1ebdf;
+  --palette-gold-100: #efe5d1;
+  --palette-gold-200: #e3d3b3;
+  --palette-gold-500: #b08d57;
+  --palette-bronze-300: #cdae6a;
+  --palette-bronze-600: #846429;
+  --palette-stone-300: #b0aa9e;
+  --palette-stone-600: #57534c;
+  --palette-ink-800: #2e2b25;
+  --palette-ink-900: #1c1a16;
+  --palette-ink-950: #0e0d0b;
+  --palette-espresso-900: #1c1a17;
+  --palette-red-700: #b3261e;
+  --palette-white: #ffffff;
+  --palette-whatsapp: #25d366;
+
+  /* Theme colours, light (default). shadcn/ui names. */
+  --background: var(--palette-ivory-25);
+  --foreground: var(--palette-espresso-900);
+  --card: var(--palette-parchment-100);
+  --card-foreground: var(--palette-espresso-900);
+  --popover: var(--palette-ivory-25);
+  --popover-foreground: var(--palette-espresso-900);
+  --primary: var(--palette-espresso-900);
+  --primary-foreground: var(--palette-ivory-25);
+  --secondary: var(--palette-parchment-100);
+  --secondary-foreground: var(--palette-espresso-900);
+  --muted: var(--palette-parchment-100);
+  --muted-foreground: var(--palette-stone-600);
+  --accent: var(--palette-gold-100);
+  --accent-foreground: var(--palette-espresso-900);
+  --destructive: var(--palette-red-700);
+  --border: var(--palette-gold-200);
+  --input: var(--palette-gold-200);
+  --ring: var(--palette-gold-500);
+  --brand: var(--palette-bronze-600);
+  --placeholder: var(--palette-gold-100);
+  --whatsapp: var(--palette-whatsapp);
+
+  /* Space */
+  --space-4: 0.25rem;
+  --space-8: 0.5rem;
+  --space-12: 0.75rem;
+  --space-16: 1rem;
+  --space-20: 1.25rem;
+  --space-24: 1.5rem;
+  --space-32: 2rem;
+  --space-40: 2.5rem;
+  --space-48: 3rem;
+  --space-56: 3.5rem;
+  --space-64: 4rem;
+  --space-80: 5rem;
+  --space-96: 6rem;
+  --space-120: 7.5rem;
+  --space-160: 10rem;
+
+  /* Radius */
+  --radius-none: 0;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+  --radius: var(--radius-lg);
+
+  /* Fonts */
+  --font-display: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --font-text: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+
+  /* Type, fluid from 390px to 1440px wide */
+  --text-hero: clamp(2.75rem, 0.9857rem + 7.2381vw, 7.5rem);
+  --text-hero--line-height: clamp(3.08rem, 1.2154rem + 7.6495vw, 8.1rem);
+  --text-hero--letter-spacing: clamp(-3px, -0.093px + -0.2019vw, -0.88px);
+  --text-hero--font-weight: 300;
+  --text-display: clamp(2.625rem, 1.65rem + 4vw, 5.25rem);
+  --text-display--line-height: clamp(3rem, 2.025rem + 4vw, 5.625rem);
+  --text-display--letter-spacing: clamp(-2.94px, -0.636px + -0.16vw, -1.26px);
+  --text-display--font-weight: 300;
+  --text-h1: clamp(2.375rem, 1.7714rem + 2.4762vw, 4rem);
+  --text-h1--line-height: clamp(2.75rem, 2.1rem + 2.6667vw, 4.5rem);
+  --text-h1--letter-spacing: clamp(-1.92px, -0.59px + -0.0924vw, -0.95px);
+  --text-h1--font-weight: 300;
+  --text-h2: clamp(2rem, 1.675rem + 1.3333vw, 2.875rem);
+  --text-h2--line-height: clamp(2.375rem, 2.0036rem + 1.5238vw, 3.375rem);
+  --text-h2--letter-spacing: clamp(-1.15px, -0.451px + -0.0486vw, -0.64px);
+  --text-h2--font-weight: 300;
+  --text-h3: clamp(1.5rem, 1.3607rem + 0.5714vw, 1.875rem);
+  --text-h3--line-height: clamp(1.875rem, 1.6893rem + 0.7619vw, 2.375rem);
+  --text-h3--letter-spacing: clamp(-0.45px, -0.162px + -0.02vw, -0.24px);
+  --text-h3--font-weight: 300;
+  --text-quote: clamp(1.625rem, 1.3rem + 1.3333vw, 2.5rem);
+  --text-quote--line-height: clamp(2.25rem, 1.8321rem + 1.7143vw, 3.375rem);
+  --text-quote--letter-spacing: clamp(-0.8px, -0.238px + -0.039vw, -0.39px);
+  --text-quote--font-weight: 300;
+  --text-lead: clamp(1.0625rem, 0.9929rem + 0.2857vw, 1.25rem);
+  --text-lead--line-height: clamp(1.6875rem, 1.5714rem + 0.4762vw, 2rem);
+  --text-lead--letter-spacing: 0px;
+  --text-lead--font-weight: 400;
+  --text-title: 6rem;
+  --text-title--line-height: 6.48rem;
+  --text-title--letter-spacing: -1.92px;
+  --text-title--font-weight: 300;
+  --text-h4: 1.375rem;
+  --text-h4--line-height: 1.875rem;
+  --text-h4--letter-spacing: -0.22px;
+  --text-h4--font-weight: 300;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.75rem;
+  --text-body--letter-spacing: 0px;
+  --text-body--font-weight: 400;
+  --text-small: 0.9375rem;
+  --text-small--line-height: 1.5rem;
+  --text-small--letter-spacing: 0px;
+  --text-small--font-weight: 400;
+  --text-numeral: 1.25rem;
+  --text-numeral--line-height: 1.625rem;
+  --text-numeral--letter-spacing: 0.4px;
+  --text-numeral--font-weight: 300;
+  --text-label: 0.75rem;
+  --text-label--line-height: 1rem;
+  --text-label--letter-spacing: 2.16px;
+  --text-label--font-weight: 500;
+  --text-button: 0.8125rem;
+  --text-button--line-height: 1.25rem;
+  --text-button--letter-spacing: 1.82px;
+  --text-button--font-weight: 500;
+  --text-nav: 0.8125rem;
+  --text-nav--line-height: 1.25rem;
+  --text-nav--letter-spacing: 1.56px;
+  --text-nav--font-weight: 400;
+  --text-roman: 0.8125rem;
+  --text-roman--line-height: 1.25rem;
+  --text-roman--letter-spacing: 2.34px;
+  --text-roman--font-weight: 400;
+  --text-tab: 0.625rem;
+  --text-tab--line-height: 0.875rem;
+  --text-tab--letter-spacing: 1px;
+  --text-tab--font-weight: 500;
+  --text-wordmark: 1rem;
+  --text-wordmark--line-height: 1.5rem;
+  --text-wordmark--letter-spacing: 5.12px;
+  --text-wordmark--font-weight: 400;
+
+  /* Motion */
+  --ease-power1-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-power2-out: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --ease-power2-in: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  --ease-power3-out: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-power4-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-out: ease-out;
+  --motion-hero-intro-text-duration: 900ms;
+  --motion-hero-intro-stagger: 120ms;
+  --motion-hero-intro-image-duration: 1400ms;
+  --motion-fade-up-duration: 700ms;
+  --motion-stagger-children-duration: 600ms;
+  --motion-stagger-children-stagger: 80ms;
+  --motion-reveal-mask-duration: 1100ms;
+  --motion-counter-duration: 1400ms;
+  --motion-line-draw-duration: 600ms;
+  --motion-button-duration: 200ms;
+  --motion-link-duration: 300ms;
+  --motion-field-duration: 150ms;
+  --motion-field-fill-duration: 200ms;
+  --motion-mobile-menu-open-duration: 450ms;
+  --motion-mobile-menu-open-stagger: 50ms;
+  --motion-mobile-menu-close-duration: 300ms;
+  --motion-toast-in-duration: 300ms;
+  --motion-toast-out-duration: 200ms;
+  --motion-toast-hold: 4000ms;
+}
+
+/* Theme colours, dark. Opt in with class="dark" (shadcn) or data-theme="dark". */
+.dark,
+[data-theme='dark'] {
+  --background: var(--palette-ink-950);
+  --foreground: var(--palette-ivory-50);
+  --card: var(--palette-ink-900);
+  --card-foreground: var(--palette-ivory-50);
+  --popover: var(--palette-ink-900);
+  --popover-foreground: var(--palette-ivory-50);
+  --primary: var(--palette-ivory-50);
+  --primary-foreground: var(--palette-ink-950);
+  --secondary: var(--palette-ink-900);
+  --secondary-foreground: var(--palette-ivory-50);
+  --muted: var(--palette-ink-900);
+  --muted-foreground: var(--palette-stone-300);
+  --accent: var(--palette-ink-800);
+  --accent-foreground: var(--palette-ivory-50);
+  --destructive: var(--palette-red-700);
+  --border: var(--palette-ink-800);
+  --input: var(--palette-ink-800);
+  --ring: var(--palette-bronze-300);
+  --brand: var(--palette-bronze-300);
+  --placeholder: var(--palette-ink-900);
+  --whatsapp: var(--palette-whatsapp);
+}
+
+/* Reduced motion: every preset becomes a short fade (see the Figma motion spec). */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-hero-intro-text-duration: 300ms;
+    --motion-hero-intro-image-duration: 300ms;
+    --motion-fade-up-duration: 300ms;
+    --motion-stagger-children-duration: 300ms;
+    --motion-reveal-mask-duration: 300ms;
+    --motion-counter-duration: 300ms;
+    --motion-line-draw-duration: 300ms;
+    --motion-button-duration: 300ms;
+    --motion-link-duration: 300ms;
+    --motion-field-duration: 300ms;
+    --motion-field-fill-duration: 300ms;
+    --motion-mobile-menu-open-duration: 300ms;
+    --motion-mobile-menu-close-duration: 300ms;
+    --motion-toast-in-duration: 300ms;
+    --motion-toast-out-duration: 300ms;
+  }
+}

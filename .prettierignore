@@ -6,3 +6,6 @@ coverage
 **/payload-types.ts
 **/migrations/*.json
 **/importMap.js
+
+# Generated from packages/tokens/src/tokens.ts
+packages/tokens/src/*.css

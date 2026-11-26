@@ -2,10 +2,24 @@
   "name": "@ceylonvvip/tokens",
   "version": "0.0.0",
   "private": true,
-  "description": "Design tokens exported from Figma: CSS variables and a TypeScript mirror",
+  "description": "Design tokens exported from Figma: CSS variables, a Tailwind v4 theme and a TypeScript mirror",
   "type": "module",
   "exports": {
+    ".": "./src/tokens.ts",
     "./tokens.css": "./src/tokens.css",
-    ".": "./src/tokens.ts"
+    "./theme.css": "./src/theme.css"
+  },
+  "scripts": {
+    "generate": "node scripts/build.ts",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@ceylonvvip/config": "workspace:*",
+    "@types/node": "24.19.2",
+    "eslint": "9.39.5",
+    "typescript": "6.0.3",
+    "vitest": "5.1.1"
   }
 }
