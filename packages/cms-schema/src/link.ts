@@ -71,7 +71,10 @@ export function link({
       admin: { condition: show('url'), placeholder: 'https://' },
       validate: (value: unknown, { siblingData }: { siblingData: { type?: string } }) => {
         if (siblingData?.type !== 'url' || !value) return true
-        return /^(https?:\/\/|\/)/.test(String(value)) || 'Start with https:// or /'
+        return (
+          /^(https?:\/\/|\/|#)/.test(String(value)) ||
+          'Start with https://, / or # (a section on this page)'
+        )
       },
     },
     {

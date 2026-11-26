@@ -20,3 +20,30 @@
     transform: scaleX(1);
   }
 }
+
+/* Mobile menu (motion spec: open 450ms power3.out, links stagger 50ms). */
+@theme {
+  --animate-menu-in: menu-in var(--motion-mobile-menu-open-duration, 450ms) var(--ease-power3-out)
+    both;
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+dialog[open] .open-stagger {
+  animation: menu-in var(--motion-mobile-menu-open-duration, 450ms) var(--ease-power3-out) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  dialog[open] .open-stagger {
+    animation: none;
+  }
+}

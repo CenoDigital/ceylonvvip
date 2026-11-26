@@ -745,6 +745,10 @@ export interface FeatureListBlock {
   };
   items?:
     | {
+        /**
+         * Small bronze line above the title (Signature variant), like "Signature experience".
+         */
+        label?: string | null;
         title: string;
         text?: string | null;
         icon?:
@@ -1913,6 +1917,7 @@ export interface FeatureListBlockSelect<T extends boolean = true> {
   items?:
     | T
     | {
+        label?: T;
         title?: T;
         text?: T;
         icon?: T;
@@ -2708,6 +2713,10 @@ export interface ContactBusiness {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Short line shown with the phone number, like "Available 24 hours".
+   */
+  availability?: string | null;
   registeredName?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -2718,8 +2727,12 @@ export interface ContactBusiness {
  */
 export interface Header {
   id: number;
+  /**
+   * Desktop shows links either side of the wordmark; the mobile menu lists them all in order.
+   */
   navigation?:
     | {
+        side?: ('left' | 'right') | null;
         kind?: ('link' | 'dropdown') | null;
         label: string;
         link?: {
@@ -2869,6 +2882,13 @@ export interface Header {
  */
 export interface Footer {
   id: number;
+  /**
+   * Large line at the top left of the footer.
+   */
+  tagline?: string | null;
+  /**
+   * Link columns. A Contact column is added automatically from Contact & Business.
+   */
   columns?:
     | {
         heading: string;
@@ -2901,6 +2921,10 @@ export interface Footer {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Heading of the contact column (address and phone from Contact & Business).
+   */
+  contactHeading?: string | null;
   legalLinks?:
     | {
         link: {
@@ -2928,6 +2952,10 @@ export interface Footer {
       }[]
     | null;
   newsletterText?: string | null;
+  credit?: {
+    label?: string | null;
+    url?: string | null;
+  };
   /**
    * {year} becomes the current year.
    */
@@ -3168,6 +3196,7 @@ export interface ContactBusinessSelect<T extends boolean = true> {
         url?: T;
         id?: T;
       };
+  availability?: T;
   registeredName?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -3181,6 +3210,7 @@ export interface HeaderSelect<T extends boolean = true> {
   navigation?:
     | T
     | {
+        side?: T;
         kind?: T;
         label?: T;
         link?:
@@ -3265,6 +3295,7 @@ export interface HeaderSelect<T extends boolean = true> {
  * via the `definition` "footer_select".
  */
 export interface FooterSelect<T extends boolean = true> {
+  tagline?: T;
   columns?:
     | T
     | {
@@ -3288,6 +3319,7 @@ export interface FooterSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  contactHeading?: T;
   legalLinks?:
     | T
     | {
@@ -3306,6 +3338,12 @@ export interface FooterSelect<T extends boolean = true> {
         id?: T;
       };
   newsletterText?: T;
+  credit?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+      };
   copyright?: T;
   updatedAt?: T;
   createdAt?: T;

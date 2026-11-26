@@ -187,6 +187,11 @@ export const ContactBusiness: GlobalConfig = {
       ],
     },
     {
+      name: 'availability',
+      type: 'text',
+      admin: { description: 'Short line shown with the phone number, like "Available 24 hours".' },
+    },
+    {
       name: 'registeredName',
       label: 'Registered business name',
       type: 'text',
@@ -208,7 +213,22 @@ export const Header: GlobalConfig = {
     {
       name: 'navigation',
       type: 'array',
+      admin: {
+        description:
+          'Desktop shows links either side of the wordmark; the mobile menu lists them all in order.',
+      },
       fields: [
+        {
+          name: 'side',
+          label: 'Desktop position',
+          type: 'radio',
+          defaultValue: 'left',
+          options: [
+            { value: 'left', label: 'Left of the wordmark' },
+            { value: 'right', label: 'Right of the wordmark' },
+          ],
+          admin: { layout: 'horizontal' },
+        },
         {
           name: 'kind',
           type: 'radio',
@@ -249,7 +269,16 @@ export const Footer: GlobalConfig = {
   access: contentAccess,
   fields: [
     {
+      name: 'tagline',
+      type: 'textarea',
+      admin: { description: 'Large line at the top left of the footer.' },
+    },
+    {
       name: 'columns',
+      admin: {
+        description:
+          'Link columns. A Contact column is added automatically from Contact & Business.',
+      },
       type: 'array',
       maxRows: 5,
       fields: [
@@ -257,8 +286,24 @@ export const Footer: GlobalConfig = {
         { name: 'links', type: 'array', fields: [linkField()] },
       ],
     },
+    {
+      name: 'contactHeading',
+      type: 'text',
+      defaultValue: 'Contact',
+      admin: {
+        description: 'Heading of the contact column (address and phone from Contact & Business).',
+      },
+    },
     { name: 'legalLinks', type: 'array', fields: [linkField()] },
     { name: 'newsletterText', type: 'textarea' },
+    {
+      name: 'credit',
+      type: 'group',
+      fields: [
+        { name: 'label', type: 'text', defaultValue: 'Designed and developed by CenoDigital' },
+        { name: 'url', type: 'text', defaultValue: 'https://cenodigital.com' },
+      ],
+    },
     {
       name: 'copyright',
       type: 'text',

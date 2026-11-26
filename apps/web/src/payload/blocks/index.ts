@@ -191,7 +191,8 @@ export const RichText: Block = {
   fields: [
     variant(['detail', 'statement', 'story'], {
       detail: 'In detail (section header and text)',
-      statement: 'Statement (large text, like the Manifesto)',
+      statement:
+        'Statement (large centred text; the eyebrow shows below, separate words with commas)',
       story: 'Story (About)',
     }),
     header,
@@ -257,6 +258,14 @@ export const FeatureList: Block = {
       type: 'array',
       minRows: 1,
       fields: [
+        {
+          name: 'label',
+          type: 'text',
+          admin: {
+            description:
+              'Small bronze line above the title (Signature variant), like "Signature experience".',
+          },
+        },
         { name: 'title', type: 'text', required: true },
         { name: 'text', type: 'textarea' },
         { name: 'icon', type: 'select', options: iconOptions },
