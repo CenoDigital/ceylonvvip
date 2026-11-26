@@ -42,6 +42,8 @@ interface ServicePage {
   slug: string
   number: string
   title: string
+  /** Booking form chip label, from Figma Prestige/Booking/Form. */
+  chip: string
   heading: string
   intro: string
   features: Array<[string, string]>
@@ -59,6 +61,7 @@ interface ServicePage {
 const SERVICE_PAGES: ServicePage[] = [
   {
     slug: 'airport-transfers',
+    chip: 'Airport Transfer',
     number: '01',
     title: 'Airport Transfers',
     heading: 'Airport transfers, island-wide.',
@@ -134,6 +137,7 @@ const SERVICE_PAGES: ServicePage[] = [
   },
   {
     slug: 'island-tours',
+    chip: 'Island Tour',
     number: '02',
     title: 'Island Tours',
     heading: 'Island tours, made around you.',
@@ -185,6 +189,7 @@ const SERVICE_PAGES: ServicePage[] = [
   },
   {
     slug: 'wedding-honeymoon',
+    chip: 'Wedding',
     number: '03',
     title: 'Wedding and Honeymoon',
     heading: 'Weddings and honeymoons.',
@@ -220,6 +225,7 @@ const SERVICE_PAGES: ServicePage[] = [
   },
   {
     slug: 'activities',
+    chip: 'Activity',
     number: '04',
     title: 'Activities',
     heading: 'Activities, arranged privately.',
@@ -244,6 +250,7 @@ const SERVICE_PAGES: ServicePage[] = [
   },
   {
     slug: 'security-bodyguards',
+    chip: 'Security',
     number: '05',
     title: 'Security and Bodyguards',
     heading: 'Discreet protection.',
@@ -264,6 +271,7 @@ const SERVICE_PAGES: ServicePage[] = [
   },
   {
     slug: 'elder-care',
+    chip: 'Elder Care',
     number: '06',
     title: 'Elder Care',
     heading: 'Care on the journey.',
@@ -386,7 +394,34 @@ export async function seedPages(
 
   const services: Record<string, Ref> = {}
   for (const s of SERVICE_PAGES)
-    services[s.slug] = await upsert('services', s.slug, { title: s.title })
+    services[s.slug] = await upsert('services', s.slug, { title: s.title, shortLabel: s.chip })
+
+  // Figma Prestige/Booking/Form ("Booking v2"), labels word for word.
+  const { docs: forms } = await payload.find({
+    collection: 'forms',
+    where: { title: { equals: 'Booking' } },
+    limit: 1,
+  })
+  const formData = {
+    title: 'Booking',
+    serviceLabel: 'Service',
+    vehicleLabel: 'Vehicle',
+    noPreferenceLabel: 'No preference',
+    noPreferenceDetail: 'We suggest the best fit for your group',
+    dateLabel: 'Date',
+    timeLabel: 'Time',
+    dateTimeLabel: 'Date and time',
+    adultsLabel: 'Adults',
+    adultsHint: 'Age 12 and over',
+    childrenLabel: 'Children',
+    childrenHint: 'Under 12',
+    submitLabel: 'Continue on WhatsApp',
+    detailsToggleLabel: 'Add details, optional',
+    note: 'Your request opens in WhatsApp, ready to send. No payment is taken here.',
+  } as never
+  const bookingForm = forms[0]
+    ? await payload.update({ collection: 'forms', id: forms[0].id, data: formData })
+    : await payload.create({ collection: 'forms', data: formData })
   const internal = (relationTo: 'pages' | 'services', value: Ref) => ({
     type: 'internal',
     reference: { relationTo, value: value.id },
@@ -448,6 +483,7 @@ export async function seedPages(
         {
           blockType: 'form',
           variant: 'booking',
+          form: bookingForm.id,
           service: services[s.slug]!.id,
           settings: { bg: 'card', anchor: 'booking', anim: 'none' },
         },
@@ -640,6 +676,7 @@ export async function seedPages(
       {
         blockType: 'form',
         variant: 'booking',
+        form: bookingForm.id,
         settings: { bg: 'card', pt: 'md', anchor: 'booking', anim: 'none' },
       },
       {

@@ -1,4 +1,5 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
@@ -17,6 +18,7 @@ import {
   Testimonials,
   Vehicles,
 } from './payload/collections/content'
+import { Forms, FormSubmissions } from './payload/collections/forms'
 import { Media } from './payload/collections/Media'
 import { Users } from './payload/collections/Users'
 import { globals } from './payload/globals'
@@ -27,14 +29,45 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
 // build, unit tests) uploads fall back to local disk.
 const s3Bucket = process.env.S3_BUCKET
 
+// Mail (booking alerts, password resets) through Google Workspace SMTP once SMTP_* is set in
+// Coolify. Without it, mail is only logged.
+const smtpHost = process.env.SMTP_HOST
+const email = smtpHost
+  ? nodemailerAdapter({
+      defaultFromAddress: process.env.SMTP_FROM ?? '',
+      defaultFromName: process.env.SMTP_FROM_NAME ?? 'CeylonVVIP',
+      transportOptions: {
+        host: smtpHost,
+        port: Number(process.env.SMTP_PORT ?? 587),
+        secure: process.env.SMTP_PORT === '465',
+        auth: process.env.SMTP_USER
+          ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+          : undefined,
+      },
+    })
+  : undefined
+
 export default buildConfig({
   serverURL: process.env.NEXT_PUBLIC_SERVER_URL ?? '',
   admin: {
     user: Users.slug,
     importMap: { baseDir: path.resolve(dirname) },
   },
-  collections: [Pages, Services, Vehicles, Pricing, Faqs, Testimonials, Media, Redirects, Users],
+  collections: [
+    Pages,
+    Services,
+    Vehicles,
+    Pricing,
+    Faqs,
+    Testimonials,
+    Forms,
+    FormSubmissions,
+    Media,
+    Redirects,
+    Users,
+  ],
   globals,
+  email,
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET ?? '',
   typescript: {
