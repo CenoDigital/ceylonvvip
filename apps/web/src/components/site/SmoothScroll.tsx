@@ -5,9 +5,9 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 
 /*
- * Smooth scrolling (Lenis) on desktop with a mouse or trackpad, for the premium feel
- * the client asked for (task 161). Phones keep their own native scrolling, and it is
- * off with reduced motion or when motion is off (the test cookie). It moves the real
+ * Smooth scrolling (Lenis) with any mouse or trackpad, at any window width, for the
+ * premium feel the client asked for (tasks 161 and 170). Phones keep their own native
+ * scrolling; it is off only when motion is off (the test cookie). It moves the real
  * page scroll, so anchors, IntersectionObservers and ScrollTrigger keep working.
  */
 export function SmoothScroll() {
@@ -18,7 +18,8 @@ export function SmoothScroll() {
     const wanted =
       document.documentElement.classList.contains('motion') &&
       // Full motion for everyone, whatever the system setting (task 169).
-      matchMedia('(pointer: fine) and (min-width: 1024px)').matches
+      // Any mouse or trackpad, at any window width (task 170: narrow desktop windows too).
+      matchMedia('(pointer: fine)').matches
     if (!wanted) return
     let cancelled = false
     void import('lenis').then(({ default: LenisClass }) => {

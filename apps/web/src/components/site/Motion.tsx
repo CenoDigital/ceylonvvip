@@ -269,7 +269,9 @@ export function Motion() {
       // Full motion for every visitor, whatever their system's reduced-motion setting
       // (client decision, task 169: Windows "Animation effects" off turned it all off).
       const reduced = false
-      const desktop = matchMedia('(min-width: 1024px)').matches
+      // Desktop effects for any mouse or trackpad, at any window width (task 170).
+      const desktop =
+        matchMedia('(pointer: fine)').matches || matchMedia('(min-width: 1024px)').matches
       const sections = Array.from(
         document.querySelectorAll<HTMLElement>('[data-animate]:not([data-animate="hero-intro"])'),
       )
