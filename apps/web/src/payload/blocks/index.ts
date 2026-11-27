@@ -218,7 +218,10 @@ export const ServicesGrid: Block = {
   slug: 'servicesGrid',
   interfaceName: 'ServicesGridBlock',
   fields: [
-    variant(['index'], { index: 'Numbered index rows' }),
+    variant(['index', 'cards'], {
+      index: 'Numbered index rows',
+      cards: 'Photo cards (services page)',
+    }),
     header,
     ...pick('services', 'services'),
     settings({ animation: 'stagger-children' }),

@@ -7,6 +7,7 @@ import * as migration_20261126_213209_site_chrome_and_destinations from './20261
 import * as migration_20261126_215840_remaining_pages from './20261126_215840_remaining_pages'
 import * as migration_20261126_222445_booking_forms from './20261126_222445_booking_forms'
 import * as migration_20261126_222453_drop_old_booking_fields from './20261126_222453_drop_old_booking_fields'
+import * as migration_20261127_064853_services_grid_cards from './20261127_064853_services_grid_cards'
 
 export const migrations = [
   {
@@ -53,5 +54,10 @@ export const migrations = [
     up: migration_20261126_222453_drop_old_booking_fields.up,
     down: migration_20261126_222453_drop_old_booking_fields.down,
     name: '20261126_222453_drop_old_booking_fields',
+  },
+  {
+    up: migration_20261127_064853_services_grid_cards.up,
+    down: migration_20261127_064853_services_grid_cards.down,
+    name: '20261127_064853_services_grid_cards',
   },
 ]

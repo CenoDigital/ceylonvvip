@@ -55,6 +55,7 @@ test('sitemap lists every published page and service', async ({ request }) => {
   const xml = await (await request.get('/sitemap.xml')).text()
   for (const path of [
     '/</loc>',
+    '/services</loc>',
     '/fleet</loc>',
     '/about</loc>',
     '/contact</loc>',

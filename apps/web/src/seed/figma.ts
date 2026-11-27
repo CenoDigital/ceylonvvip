@@ -99,6 +99,8 @@ export async function seedFigma(payload: Payload) {
   const fleet = await upsert(payload, 'pages', 'fleet', { title: 'Fleet' })
   const contact = await upsert(payload, 'pages', 'contact', { title: 'Contact' })
   const about = await upsert(payload, 'pages', 'about', { title: 'About' })
+  // The services index (task 160); its sections are filled in by seedPages.
+  const servicesPage = await upsert(payload, 'pages', 'services', { title: 'Services' })
 
   const internal = (relationTo: 'pages' | 'services', value: { id: number }) => ({
     type: 'internal' as const,
@@ -276,7 +278,7 @@ export async function seedFigma(payload: Payload) {
     context: { disableRevalidate: true },
     data: {
       navigation: [
-        { side: 'left', kind: 'dropdown', label: 'Services', children: serviceLinks },
+        { side: 'left', kind: 'link', label: 'Services', link: internal('pages', servicesPage) },
         { side: 'left', kind: 'link', label: 'Fleet', link: internal('pages', fleet) },
         { side: 'right', kind: 'link', label: 'About', link: internal('pages', about) },
         { side: 'right', kind: 'link', label: 'Contact', link: internal('pages', contact) },

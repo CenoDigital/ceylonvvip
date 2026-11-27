@@ -517,6 +517,30 @@ export async function seedPages(
     })
   }
 
+  // Services index (task 160). Figma has no frame for it, so the hero reuses the Home
+  // Services header word for word; each card opens its service page.
+  await upsert('pages', 'services', {
+    title: 'Services',
+    layout: [
+      {
+        blockType: 'hero',
+        variant: 'page',
+        eyebrow: 'Services',
+        heading: 'Every journey, arranged privately.',
+        intro:
+          'Seven private services, one point of contact. Tell your travel manager what you need and the rest is taken care of.',
+        mediaType: 'none',
+      },
+      {
+        blockType: 'servicesGrid',
+        variant: 'cards',
+        source: 'all',
+        settings: { pt: 'sm', anim: 'stagger-children' },
+      },
+      enquiry(whatsapp),
+    ],
+  })
+
   await upsert('pages', 'fleet', {
     title: 'Fleet',
     layout: [
