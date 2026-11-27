@@ -44,6 +44,25 @@ html.motion [data-animate]:not([data-animate='hero-intro']) > * {
   visibility: hidden;
 }
 
+/* Headings reveal line by line (Motion.tsx REVEAL_SELECTOR); hidden until split. */
+html.motion
+  main
+  :is(h1, h2, h3):not([data-animate='hero-intro'] *):not(form *):not([data-no-reveal] *) {
+  visibility: hidden;
+}
+
+/* Lenis smooth scrolling (desktop). */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+.lenis [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
 /* Hero intro: label, heading, text and buttons rise in turn; the photo settles from 1.08. */
 /* Text starts at 0.01, not 0: it looks the same, but the browser counts the first
    paint, so the hero text stays the Largest Contentful Paint at first paint. */
