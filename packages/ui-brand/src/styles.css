@@ -42,12 +42,6 @@ dialog[open] .open-stagger {
   animation: menu-in var(--motion-mobile-menu-open-duration, 450ms) var(--ease-power3-out) both;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  dialog[open] .open-stagger {
-    animation: none;
-  }
-}
-
 /* Date and time picker panels open with a short fade and rise. */
 @keyframes picker-in {
   from {

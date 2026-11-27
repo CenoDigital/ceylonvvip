@@ -59,9 +59,12 @@ test('stats count up to their real values', async ({ page }) => {
   }
 })
 
-test('reduced motion still shows every section', async ({ page }) => {
+// Task 169 (client decision): a system asking for reduced motion (Windows "Animation
+// effects" off) still gets the full motion, and every section still ends up shown.
+test('reduced motion setting: full motion still plays, every section shows', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/')
+  await expect(page.locator('[data-hscroll]')).toHaveAttribute('data-hscroll-active', '')
   await scrollAndMeasureCls(page)
   const hidden = await page.$$eval(
     '[data-animate] > *',

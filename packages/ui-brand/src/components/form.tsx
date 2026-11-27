@@ -282,7 +282,7 @@ export function VehicleOption({ vehicle, detail, image, className, ...input }: V
     >
       {image ? (
         <span className="relative -mx-20 -mt-20 mb-12 block aspect-[16/10] overflow-hidden bg-placeholder">
-          <span className="absolute inset-0 block transition-transform duration-700 ease-out group-hover/vehicle:scale-105 motion-reduce:transition-none">
+          <span className="absolute inset-0 block transition-transform duration-700 ease-out group-hover/vehicle:scale-105">
             {image}
           </span>
         </span>

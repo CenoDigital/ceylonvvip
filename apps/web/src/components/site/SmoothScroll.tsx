@@ -17,8 +17,8 @@ export function SmoothScroll() {
   useEffect(() => {
     const wanted =
       document.documentElement.classList.contains('motion') &&
-      matchMedia('(pointer: fine) and (min-width: 1024px)').matches &&
-      !matchMedia('(prefers-reduced-motion: reduce)').matches
+      // Full motion for everyone, whatever the system setting (task 169).
+      matchMedia('(pointer: fine) and (min-width: 1024px)').matches
     if (!wanted) return
     let cancelled = false
     void import('lenis').then(({ default: LenisClass }) => {

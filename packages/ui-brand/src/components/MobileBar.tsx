@@ -58,7 +58,7 @@ export function MobileBar({ items, onOpenMenu, className }: MobileBarProps) {
       className={cn(
         'fixed inset-x-0 bottom-0 z-40 flex gap-12 border-t border-border bg-background px-16 pt-12 lg:hidden',
         'pb-[max(28px,env(safe-area-inset-bottom))] drop-shadow-[0_-4px_8px_rgb(0_0_0/0.06)]',
-        'transition-transform duration-300 ease-power2-out motion-reduce:transition-none',
+        'transition-transform duration-300 ease-power2-out',
         hidden && 'translate-y-full',
         className,
       )}

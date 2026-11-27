@@ -50,8 +50,8 @@ export function CursorPreview({
       if (!el || !c || !images.length) return
       // Any mouse or trackpad, at any window width (not touch screens).
       const fine = matchMedia('(hover: hover) and (pointer: fine)').matches
-      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
-      if (!fine || reduced) return
+      // Shown whatever the system's reduced-motion setting (task 169).
+      if (!fine) return
 
       // The card sits up and to the right of the cursor, so it never covers the row's name.
       gsap.set(c, { xPercent: 12, yPercent: -85, scale: 0.7, autoAlpha: 0 })

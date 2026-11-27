@@ -266,7 +266,9 @@ export function Motion() {
     (_context, contextSafe) => {
       window.__motion = true
       if (!document.documentElement.classList.contains('motion') || !contextSafe) return
-      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
+      // Full motion for every visitor, whatever their system's reduced-motion setting
+      // (client decision, task 169: Windows "Animation effects" off turned it all off).
+      const reduced = false
       const desktop = matchMedia('(min-width: 1024px)').matches
       const sections = Array.from(
         document.querySelectorAll<HTMLElement>('[data-animate]:not([data-animate="hero-intro"])'),

@@ -289,7 +289,7 @@ async function ServicesGridView({ block }: { block: Block }) {
                     <CmsImage
                       media={s.image}
                       sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                      className="transition-transform duration-700 ease-out group-hover:scale-[1.04] motion-reduce:transition-none"
+                      className="transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                     />
                   </div>
                   <div className="flex items-start gap-20">
@@ -305,7 +305,7 @@ async function ServicesGridView({ block }: { block: Block }) {
                     <Icon
                       name="arrow-up-right"
                       size={20}
-                      className="mt-4 shrink-0 transition-transform duration-300 group-hover:translate-x-2 group-hover:-translate-y-2 motion-reduce:transition-none"
+                      className="mt-4 shrink-0 transition-transform duration-300 group-hover:translate-x-2 group-hover:-translate-y-2"
                     />
                   </div>
                 </Link>

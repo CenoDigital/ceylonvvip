@@ -111,9 +111,8 @@ export function buildTokensCss(): string {
     HEADER +
     `:root {\n${root}\n}\n\n` +
     `/* Theme colours, dark. Opt in with class="dark" (shadcn) or data-theme="dark". */\n` +
-    `.dark,\n[data-theme='dark'] {\n${block(colorEntries('dark'))}\n}\n\n` +
-    `/* Reduced motion: every preset becomes a short fade (see the Figma motion spec). */\n` +
-    `@media (prefers-reduced-motion: reduce) {\n  :root {\n${block(durationEntries(motion.reducedMotion.duration), '    ')}\n  }\n}\n`
+    // No reduced-motion override (task 169): the client chose full motion for everyone.
+    `.dark,\n[data-theme='dark'] {\n${block(colorEntries('dark'))}\n}\n`
   )
 }
 

@@ -25,7 +25,7 @@ export function LinkUnderline({
       {children}
       <span
         aria-hidden
-        className="absolute inset-x-0 bottom-0 h-px origin-left bg-current group-hover:animate-line-draw motion-reduce:group-hover:animate-none"
+        className="absolute inset-x-0 bottom-0 h-px origin-left bg-current group-hover:animate-line-draw"
       />
     </a>
   )

@@ -112,9 +112,8 @@ export function HorizontalScroll({
         row.removeEventListener('scroll', onScroll)
       }
 
-      const wanted =
-        document.documentElement.classList.contains('motion') &&
-        !matchMedia('(prefers-reduced-motion: reduce)').matches
+      // Full motion for everyone, whatever the system setting (task 169).
+      const wanted = document.documentElement.classList.contains('motion')
       if (!wanted) return unlisten
       let live = true
       let unsize: (() => void) | undefined
