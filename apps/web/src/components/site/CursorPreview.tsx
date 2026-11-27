@@ -20,7 +20,7 @@ export interface PreviewImage {
  * Cursor-following photo preview (client feedback 2026-11-27; Figma Home Services
  * "hover preview"). Rows inside carry data-preview="<key>"; hovering one shows its
  * photo in a 220 by 280 card that trails the cursor with a slight tilt, and fades
- * between photos as the cursor moves down the list. Desktop with a mouse only, and off
+ * between photos as the cursor moves down the list. Any screen with a mouse, and off
  * with reduced motion. The card lives in a portal on <body> so section transforms
  * cannot trap it.
  */
@@ -48,11 +48,13 @@ export function CursorPreview({
       const el = root.current
       const c = card.current
       if (!el || !c || !images.length) return
-      const fine = matchMedia('(pointer: fine) and (min-width: 1024px)').matches
+      // Any mouse or trackpad, at any window width (not touch screens).
+      const fine = matchMedia('(hover: hover) and (pointer: fine)').matches
       const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
       if (!fine || reduced) return
 
-      gsap.set(c, { xPercent: -50, yPercent: -60, scale: 0.7, autoAlpha: 0 })
+      // The card sits up and to the right of the cursor, so it never covers the row's name.
+      gsap.set(c, { xPercent: 12, yPercent: -85, scale: 0.7, autoAlpha: 0 })
       const xTo = gsap.quickTo(c, 'x', { duration: 0.55, ease: 'power3' })
       const yTo = gsap.quickTo(c, 'y', { duration: 0.55, ease: 'power3' })
       const tilt = gsap.quickTo(c, 'rotation', { duration: 0.9, ease: 'power3' })
@@ -62,7 +64,7 @@ export function CursorPreview({
       const show = () => {
         if (shown) return
         shown = true
-        gsap.to(c, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'power3.out' })
+        gsap.to(c, { autoAlpha: 1, scale: 1, duration: 0.6, ease: 'back.out(1.6)' })
       }
       const hide = () => {
         shown = false

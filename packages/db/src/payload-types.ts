@@ -348,6 +348,7 @@ export interface Media {
    */
   alt: string;
   caption?: string | null;
+  blurDataURL?: string | null;
   /**
    * Photographer or source, if it must be credited.
    */
@@ -2950,6 +2951,7 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
+  blurDataURL?: T;
   credit?: T;
   _objectKey?: T;
   updatedAt?: T;

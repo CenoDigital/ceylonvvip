@@ -11,6 +11,7 @@ import * as migration_20261127_064853_services_grid_cards from './20261127_06485
 import * as migration_20261127_072320_hero_caption_steps_image from './20261127_072320_hero_caption_steps_image'
 import * as migration_20261127_075437_route_row_photo from './20261127_075437_route_row_photo'
 import * as migration_20261127_080532_translations from './20261127_080532_translations'
+import * as migration_20261127_150212_media_blur from './20261127_150212_media_blur'
 
 export const migrations = [
   {
@@ -77,5 +78,10 @@ export const migrations = [
     up: migration_20261127_080532_translations.up,
     down: migration_20261127_080532_translations.down,
     name: '20261127_080532_translations',
+  },
+  {
+    up: migration_20261127_150212_media_blur.up,
+    down: migration_20261127_150212_media_blur.down,
+    name: '20261127_150212_media_blur',
   },
 ]

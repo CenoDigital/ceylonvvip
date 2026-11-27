@@ -2,6 +2,7 @@
 
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
+import type { ScrollTrigger as ScrollTriggerPlugin } from 'gsap/ScrollTrigger'
 import type { SplitText as SplitTextPlugin } from 'gsap/SplitText'
 import { usePathname } from 'next/navigation'
 
@@ -212,21 +213,44 @@ function scrubPhoto(img: HTMLElement) {
 }
 
 /*
- * Statement text (client feedback 2026-11-27): the words start faded and turn to ink
- * one after another as the text scrolls up through the view, scrubbed to the scroll.
- * globals.css shows the faded colour before this runs, so nothing flashes.
+ * Statement text (tasks 165 and 166): the words start faded and turn to ink one after
+ * another, scrubbed to the scroll, and fade back when scrolling up. The statement is
+ * held on screen while it fills: its wrapper ([data-fill-pin]) is made taller and the
+ * panel inside is sticky (CSS), so the fill gets a full screen of scrolling. globals.css
+ * shows the faded colour before this runs, so nothing flashes.
  */
-function scrollFill(el: HTMLElement, SplitText: typeof SplitTextPlugin) {
+function scrollFill(
+  el: HTMLElement,
+  SplitText: typeof SplitTextPlugin,
+  ScrollTrigger: typeof ScrollTriggerPlugin,
+) {
+  const pin = el.closest<HTMLElement>('[data-fill-pin]')
   const split = SplitText.create(el, { type: 'words' })
   gsap.set(el, { color: 'var(--color-foreground)' })
+  let trigger: Element = el
+  if (pin) {
+    pin.dataset.fillActive = ''
+    const size = () => void (pin.style.height = `${Math.round(window.innerHeight * 2.2)}px`)
+    size()
+    ScrollTrigger.addEventListener('refreshInit', size)
+    cleanups.push(() => {
+      ScrollTrigger.removeEventListener('refreshInit', size)
+      delete pin.dataset.fillActive
+      pin.style.height = ''
+    })
+    trigger = pin
+  }
   gsap.fromTo(
     split.words,
-    { opacity: 0.16 },
+    { opacity: 0.14 },
     {
       opacity: 1,
+      duration: 1,
       ease: 'none',
-      stagger: 0.1,
-      scrollTrigger: { trigger: el, start: 'top 85%', end: 'bottom 45%', scrub: 0.5 },
+      stagger: 0.6,
+      scrollTrigger: pin
+        ? { trigger, start: 'top 55%', end: 'bottom bottom', scrub: 0.4 }
+        : { trigger, start: 'top 85%', end: 'bottom 35%', scrub: 0.4 },
     },
   )
 }
@@ -352,7 +376,21 @@ export function Motion() {
               for (const e of entries) {
                 if (!e.isIntersecting && e.boundingClientRect.bottom >= 0) continue
                 io.unobserve(e.target)
-                revealPhoto(e.target as HTMLElement)
+                // Wipe in once the photo has loaded (or after 1.5 s at most), so the
+                // reveal shows the photo, not its loading state (task 166).
+                const img = e.target as HTMLImageElement
+                if (img.complete) revealPhoto(img)
+                else {
+                  let done = false
+                  const go = () => {
+                    if (done) return
+                    done = true
+                    revealPhoto(img)
+                  }
+                  img.addEventListener('load', go, { once: true })
+                  img.addEventListener('error', go, { once: true })
+                  setTimeout(go, 1500)
+                }
               }
             },
             { rootMargin: '0px 0px -12% 0px' },
@@ -366,7 +404,7 @@ export function Motion() {
               if (!live) return
               gsap.registerPlugin(ScrollTrigger, SplitText)
               if (desktop) photos.forEach(scrubPhoto)
-              fills.forEach((el) => scrollFill(el, SplitText))
+              fills.forEach((el) => scrollFill(el, SplitText, ScrollTrigger))
               ScrollTrigger.refresh()
             }),
             () => {
