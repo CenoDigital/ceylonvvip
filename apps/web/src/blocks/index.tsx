@@ -362,7 +362,13 @@ async function VehicleShowcaseView({ block }: { block: Block }) {
         name: v.name,
         summary: v.summary,
         image: m?.url
-          ? { url: m.url, alt: m.alt ?? v.name, focalX: m.focalX, focalY: m.focalY }
+          ? {
+              url: m.url,
+              alt: m.alt ?? v.name,
+              focalX: m.focalX,
+              focalY: m.focalY,
+              blurDataURL: m.blurDataURL,
+            }
           : null,
       }
     })
@@ -375,6 +381,8 @@ async function VehicleShowcaseView({ block }: { block: Block }) {
             of: await t('of'),
             previous: await t('Previous vehicle'),
             next: await t('Next vehicle'),
+            swipe: await t('Swipe'),
+            drag: await t('Drag'),
           }}
         />
       </Section>
@@ -571,14 +579,19 @@ function SignatureMore({
   )
 }
 
-function DestinationsView({ block }: { block: Block }) {
+async function DestinationsView({ block }: { block: Block }) {
   const items = docs<{ id?: string; name: string; line?: string | null; photo?: unknown }>(
     block.items,
   )
-  // Tasks 165 and 166: a sideways row that slides with the scroll on every screen.
+  // Tasks 165, 166 and 168: a sideways row that slides with the scroll on every screen,
+  // and follows a drag or swipe.
   return (
     <Section settings={block.settings as never} className="overflow-x-clip">
-      <HorizontalScroll header={<HeaderRow block={block} />}>
+      <HorizontalScroll
+        header={<HeaderRow block={block} />}
+        count={items.length}
+        labels={{ swipe: await t('Swipe'), drag: await t('Drag') }}
+      >
         {items.map((place, i) => (
           <li
             key={place.id ?? i}
