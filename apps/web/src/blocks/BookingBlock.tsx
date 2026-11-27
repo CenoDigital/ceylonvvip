@@ -1,8 +1,10 @@
 import type { Form } from '@ceylonvvip/db'
+import { cn } from '@ceylonvvip/ui-brand'
 
 import { getCollection, getGlobal, getFirstForm } from '@/lib/data'
 
 import { BookingForm, type BookingFormProps } from './BookingForm'
+
 import { Header, Section, type BlockHeader } from './shared'
 
 /**
@@ -69,11 +71,30 @@ export async function BookingBlock({ block }: { block: Record<string, unknown> }
       }
     : null
 
+  const header = block.header as BlockHeader | undefined
+  const hasHeader = Boolean(header?.eyebrow || header?.heading || header?.intro)
+  // Figma Booking v2 and 10 Contact: heading on the left (420), the form on the right.
+  // On an ivory section the form sits in a parchment card (48 padding); on a parchment
+  // section it sits directly on it. Without a heading the form is centred.
+  const onCard = (block.settings as { bg?: string } | undefined)?.bg === 'card'
   return (
     <Section settings={block.settings as never}>
-      <div className="flex flex-col gap-40 lg:flex-row lg:items-start lg:gap-96">
-        <Header header={block.header as BlockHeader} className="lg:w-420 lg:shrink-0" />
-        <div className="min-w-0 flex-1 lg:max-w-720">
+      <div
+        className={cn(
+          'mx-auto flex w-full max-w-1312 flex-col gap-40',
+          hasHeader ? 'lg:flex-row lg:items-start lg:justify-between lg:gap-96' : 'items-center',
+        )}
+      >
+        {hasHeader ? (
+          <Header header={header} className="lg:sticky lg:top-140 lg:w-420 lg:shrink-0" />
+        ) : null}
+        <div
+          className={cn(
+            'w-full lg:max-w-796',
+            !onCard && '-mx-24 w-[calc(100%+48px)] bg-card px-24 py-40 sm:mx-0 sm:w-full sm:p-48',
+            hasHeader ? 'lg:flex-1' : 'max-w-796',
+          )}
+        >
           {props ? <BookingForm {...props} /> : null}
         </div>
       </div>

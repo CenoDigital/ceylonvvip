@@ -29,7 +29,7 @@ const fieldLabel = cn(
   'text-label-caps text-muted-foreground transition-colors duration-150',
   'group-focus-within/field:text-foreground group-data-[invalid=true]/field:text-destructive',
 )
-const fieldControl = cn(
+export const fieldControl = cn(
   'w-full bg-transparent text-body text-foreground outline-none placeholder:text-muted-foreground',
   'disabled:cursor-not-allowed',
 )
@@ -42,7 +42,7 @@ interface FieldShellProps {
   children: (ids: { id: string; describedBy?: string }) => ReactNode
 }
 
-function FieldShell({ label, error, hint, className, children }: FieldShellProps) {
+export function FieldShell({ label, error, hint, className, children }: FieldShellProps) {
   const id = useId()
   const errorId = error ? `${id}-error` : undefined
   const hintId = hint ? `${id}-hint` : undefined

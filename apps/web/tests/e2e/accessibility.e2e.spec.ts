@@ -2,7 +2,7 @@ import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 
 // Every public route gets added here as it is built.
-const routes = ['/']
+const routes = ['/', '/contact', '/services/airport-transfers', '/fleet', '/about']
 
 for (const route of routes) {
   test(`no WCAG 2.2 AA violations on ${route}`, async ({ page }) => {

@@ -12,6 +12,16 @@ type Upsert = (
   data: Record<string, unknown>,
 ) => Promise<Ref & { slug?: string | null }>
 
+// Booking heading per service page, word for word from Figma.
+const BOOKING_HEADINGS: Record<string, string> = {
+  'airport-transfers': 'Book your transfer.',
+  'island-tours': 'Plan your island tour.',
+  'wedding-honeymoon': 'Plan your wedding car.',
+  activities: 'Plan an activity.',
+  'security-bodyguards': 'Arrange security.',
+  'elder-care': 'Arrange elder care.',
+}
+
 const p = (text: string) => ({
   type: 'paragraph',
   version: 1,
@@ -483,6 +493,15 @@ export async function seedPages(
         {
           blockType: 'form',
           variant: 'booking',
+          // Figma service pages / Booking: same label and intro, one heading per service.
+          header: BOOKING_HEADINGS[s.slug]
+            ? {
+                eyebrow: 'Private quote',
+                heading: BOOKING_HEADINGS[s.slug],
+                intro:
+                  'Three answers are all we need. Your request opens in WhatsApp, ready to send to your travel manager.',
+              }
+            : undefined,
           form: bookingForm.id,
           service: services[s.slug]!.id,
           settings: { bg: 'card', anchor: 'booking', anim: 'none' },
@@ -676,6 +695,13 @@ export async function seedPages(
       {
         blockType: 'form',
         variant: 'booking',
+        // Figma 10 Contact / Booking (82:3484).
+        header: {
+          eyebrow: 'Private quote',
+          heading: 'Tell us about your journey.',
+          intro:
+            'Three steps: fill in what you know, press Continue on WhatsApp, then press Send in WhatsApp.',
+        },
         form: bookingForm.id,
         settings: { bg: 'card', pt: 'md', anchor: 'booking', anim: 'none' },
       },
