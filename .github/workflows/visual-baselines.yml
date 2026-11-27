@@ -14,7 +14,7 @@ permissions:
 jobs:
   update:
     if: github.event_name == 'workflow_dispatch' || github.event.label.name == 'update-visual-baselines'
-    runs-on: ubuntu-24.04
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 30
     container:
       image: mcr.microsoft.com/playwright:v1.65.1-noble
@@ -54,12 +54,14 @@ jobs:
           secret="$(openssl rand -hex 32)"
           echo "::add-mask::$secret"
           echo "PAYLOAD_SECRET=$secret" >> "$GITHUB_ENV"
-      - run: pnpm turbo run build --filter=web
-      - name: Load the Figma content (migrate, then seed)
+      # Migrate before the build (see ci.yml).
+      - name: Database schema (migrate)
         working-directory: apps/web
-        run: |
-          pnpm migrate
-          pnpm seed
+        run: pnpm migrate
+      - run: pnpm turbo run build --filter=web
+      - name: Load the Figma content (seed)
+        working-directory: apps/web
+        run: pnpm seed
       - name: Start the production server
         working-directory: apps/web
         run: |
