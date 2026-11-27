@@ -101,7 +101,7 @@ export async function seedFigma(payload: Payload) {
     seats: 3,
     luggage: 4,
     summary: '2 guests, plus 1 in front. 4 bags. White with beige interior.',
-    gallery: [photos.bmw.id],
+    gallery: [photos.bmw.id].filter(Boolean),
   })
 
   const fleet = await upsert(payload, 'pages', 'fleet', { title: 'Fleet' })

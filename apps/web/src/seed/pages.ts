@@ -516,7 +516,7 @@ export async function seedPages(
       luggage: v.luggage,
       summary: v.summary ?? null,
       specs: { bestFor: v.bestFor, guests: v.guests, luggage: v.bags, colours: v.colours },
-      gallery: [photos[VEHICLE_PHOTOS[v.slug] ?? 'sedanDoorOpen'].id],
+      gallery: [photos[VEHICLE_PHOTOS[v.slug] ?? 'sedanDoorOpen'].id].filter(Boolean),
     })
   }
 
