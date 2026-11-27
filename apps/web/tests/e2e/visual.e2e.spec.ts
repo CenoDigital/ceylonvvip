@@ -8,6 +8,12 @@ for (const { name, path } of pages) {
   test(`${name} matches the approved baseline`, async ({ page }) => {
     await page.goto(path)
     await page.evaluate(() => document.fonts.ready)
+    // Every photo fully loaded first, so the screenshot never catches a blurred preview.
+    await page.evaluate(async () => {
+      const imgs = Array.from(document.images)
+      for (const img of imgs) img.loading = 'eager'
+      await Promise.all(imgs.map((img) => img.decode().catch(() => undefined)))
+    })
     await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true })
   })
 }
