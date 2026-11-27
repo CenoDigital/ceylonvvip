@@ -14,6 +14,10 @@ import { buildMetadata } from '@/lib/seo'
  */
 const SLUG = 'services'
 
+// Rendered on request (data still comes from the tagged cache). Not prerendered: the
+// build has no database, so a build-time render would bake in a 404.
+export const dynamic = 'force-dynamic'
+
 export async function generateMetadata(): Promise<Metadata> {
   const [page, defaults, settings] = await Promise.all([
     getPage(SLUG),
