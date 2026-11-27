@@ -8,17 +8,30 @@ export interface RouteRowProps {
   note?: ReactNode
   /** Active: bronze line and note (linked to the active pin on the route map). */
   active?: boolean
+  /** Hairline above the row (default). Off in grids of places. */
+  ruled?: boolean
   className?: string
+  /** Key of the photo a surrounding CursorPreview shows on hover. */
+  'data-preview'?: string
 }
 
 /** Prestige/Route/Row: a place in a route list, separated by hairlines. */
-export function RouteRow({ route, note, active = false, className }: RouteRowProps) {
+export function RouteRow({
+  route,
+  note,
+  active = false,
+  ruled = true,
+  className,
+  'data-preview': preview,
+}: RouteRowProps) {
   return (
     <li
+      data-preview={preview}
       aria-current={active || undefined}
       className={cn(
-        'flex items-center gap-16 border-t py-18',
-        active ? 'border-b-2 border-brand' : 'border-border',
+        'flex items-center gap-16 py-18',
+        ruled && 'border-t',
+        ruled && (active ? 'border-b-2 border-brand' : 'border-border'),
         className,
       )}
     >

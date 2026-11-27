@@ -99,7 +99,7 @@ export function FleetCarousel({ vehicles }: { vehicles: CarouselVehicle[] }) {
         <div
           role="tablist"
           aria-label="Vehicles"
-          className="flex overflow-x-auto border-t border-border"
+          className="-mx-24 flex gap-32 overflow-x-auto border-t border-border px-24 [scrollbar-width:none] lg:mx-0 lg:gap-0 lg:px-0 [&::-webkit-scrollbar]:hidden"
           onKeyDown={onKey}
         >
           {vehicles.map((item, i) => (
@@ -116,7 +116,7 @@ export function FleetCarousel({ vehicles }: { vehicles: CarouselVehicle[] }) {
               tabIndex={i === index ? 0 : -1}
               onClick={() => go(i)}
               className={cn(
-                '-mt-px min-h-44 min-w-120 flex-1 border-t-2 pt-20 text-left text-nav-caps whitespace-nowrap transition-colors',
+                '-mt-px min-h-44 shrink-0 border-t-2 pt-20 text-left text-nav-caps whitespace-nowrap transition-colors lg:flex-1',
                 'focus-visible:bg-accent focus-visible:outline-none',
                 i === index
                   ? 'border-foreground text-foreground'

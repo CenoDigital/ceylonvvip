@@ -10,13 +10,23 @@ export interface IndexRowProps {
   note?: ReactNode
   href: string
   className?: string
+  /** Key of the photo a surrounding CursorPreview shows on hover. */
+  'data-preview'?: string
 }
 
 /** Prestige/Index/Row: numbered service row with note and arrow, hairline above. */
-export function IndexRow({ number, title, note, href, className }: IndexRowProps) {
+export function IndexRow({
+  number,
+  title,
+  note,
+  href,
+  className,
+  'data-preview': preview,
+}: IndexRowProps) {
   return (
     <a
       href={href}
+      data-preview={preview}
       className={cn(
         'group flex items-center gap-16 border-t border-border py-22 text-foreground',
         'transition-colors duration-300 ease-power2-out focus-visible:bg-accent focus-visible:outline-none',

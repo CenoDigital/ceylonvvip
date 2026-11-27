@@ -264,10 +264,12 @@ export interface VehicleOptionProps extends Omit<InputHTMLAttributes<HTMLInputEl
   name: string
   vehicle: ReactNode
   detail?: ReactNode
+  /** Optional photo across the top of the card (an <img> or next/image with fill). */
+  image?: ReactNode
 }
 
 /** Prestige/Vehicle option: selectable vehicle card in the booking form. */
-export function VehicleOption({ vehicle, detail, className, ...input }: VehicleOptionProps) {
+export function VehicleOption({ vehicle, detail, image, className, ...input }: VehicleOptionProps) {
   return (
     <label
       className={cn(
@@ -278,6 +280,13 @@ export function VehicleOption({ vehicle, detail, className, ...input }: VehicleO
         className,
       )}
     >
+      {image ? (
+        <span className="relative -mx-20 -mt-20 mb-12 block aspect-[16/10] overflow-hidden bg-placeholder">
+          <span className="absolute inset-0 block transition-transform duration-700 ease-out group-hover/vehicle:scale-105 motion-reduce:transition-none">
+            {image}
+          </span>
+        </span>
+      ) : null}
       <span className="flex items-center gap-12">
         <span className="min-w-0 flex-1 text-body text-foreground">{vehicle}</span>
         <input type="radio" className="sr-only" {...input} />

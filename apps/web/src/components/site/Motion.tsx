@@ -168,6 +168,10 @@ function parallax(section: HTMLElement) {
   }
 }
 
+/** Photos that wipe in as they scroll into view (not the hero or image presets). */
+export const IMAGE_REVEAL_SELECTOR =
+  'main img:not([data-animate="hero-intro"] img):not([data-animate="reveal-mask"] img):not([data-animate="image-parallax"] img)'
+
 /** Headings that reveal line by line: everything in <main> except the hero (CSS intro). */
 export const REVEAL_SELECTOR =
   'main :is(h1, h2, h3):not([data-animate="hero-intro"] *):not(form *):not([data-no-reveal] *)'
@@ -280,6 +284,39 @@ export function Motion() {
             }),
             showAll,
           )
+        }
+      }
+
+      // Photos: wipe up from the bottom while settling from a slight zoom.
+      const photos = Array.from(document.querySelectorAll<HTMLElement>(IMAGE_REVEAL_SELECTOR))
+      if (photos.length) {
+        if (reduced) {
+          gsap.set(photos, { clipPath: 'inset(0% 0% 0% 0%)' })
+        } else {
+          const revealPhoto = contextSafe((img: HTMLElement) =>
+            gsap.fromTo(
+              img,
+              { clipPath: 'inset(0% 0% 100% 0%)', scale: 1.18 },
+              {
+                clipPath: 'inset(0% 0% 0% 0%)',
+                scale: 1,
+                duration: seconds(m.revealMask.duration) * 1.2,
+                ease: gsapEase(m.revealMask.ease),
+              },
+            ),
+          )
+          const io = new IntersectionObserver(
+            (entries) => {
+              for (const e of entries) {
+                if (!e.isIntersecting && e.boundingClientRect.bottom >= 0) continue
+                io.unobserve(e.target)
+                revealPhoto(e.target as HTMLElement)
+              }
+            },
+            { rootMargin: '0px 0px -12% 0px' },
+          )
+          photos.forEach((p) => io.observe(p))
+          observers.push(io)
         }
       }
 

@@ -1649,6 +1649,10 @@ export interface RouteListBlock {
          * Shown at the right, like "Price on request".
          */
         note?: string | null;
+        /**
+         * Optional: shown beside the cursor when a visitor hovers this row.
+         */
+        photo?: (number | null) | Media;
         id?: string | null;
       }[]
     | null;
@@ -2696,6 +2700,7 @@ export interface RouteListBlockSelect<T extends boolean = true> {
     | {
         name?: T;
         note?: T;
+        photo?: T;
         id?: T;
       };
   footnote?: T;

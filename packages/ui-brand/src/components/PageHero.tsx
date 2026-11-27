@@ -27,7 +27,7 @@ export function PageHero({ label, title, text, action, className }: PageHeroProp
     >
       {label ? <p className="text-label-caps text-brand">{label}</p> : null}
       <div className="flex w-full flex-col gap-20 lg:flex-row lg:items-end lg:gap-96">
-        <h1 className="min-w-0 flex-1 font-display text-title whitespace-pre-line text-foreground">
+        <h1 className="min-w-0 flex-1 font-display text-title text-balance whitespace-pre-line text-foreground">
           {title}
         </h1>
         {text || action ? (
