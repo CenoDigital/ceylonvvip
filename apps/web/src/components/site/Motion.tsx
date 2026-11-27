@@ -2,6 +2,7 @@
 
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
+import type { SplitText as SplitTextPlugin } from 'gsap/SplitText'
 import { usePathname } from 'next/navigation'
 
 import { motion as m } from '@ceylonvvip/tokens'
@@ -21,7 +22,12 @@ declare global {
  * hero intro is CSS (globals.css) so it starts with the first paint, before any JS.
  * Sections start when they scroll into view (an IntersectionObserver, which costs
  * nothing at load); ScrollTrigger is only loaded for desktop parallax. Only opacity,
- * transform and clip-path move, so nothing shifts layout (CLS stays 0). Reduced motion: every preset becomes a short fade.
+ * transform and clip-path move, so nothing shifts layout (CLS stays 0). Reduced motion:
+ * every preset becomes a short fade.
+ *
+ * On top of the presets, every heading on every page reveals line by line as it scrolls
+ * into view (SplitText, masked lines rising), and section labels fade in, so text moves
+ * the same way across the whole site (task 161).
  */
 
 // Undo steps GSAP cannot revert itself (counter text), run when the presets are reverted.
@@ -162,6 +168,27 @@ function parallax(section: HTMLElement) {
   }
 }
 
+/** Headings that reveal line by line: everything in <main> except the hero (CSS intro). */
+export const REVEAL_SELECTOR =
+  'main :is(h1, h2, h3):not([data-animate="hero-intro"] *):not(form *):not([data-no-reveal] *)'
+
+function revealLines(el: HTMLElement, SplitText: typeof SplitTextPlugin) {
+  SplitText.create(el, {
+    type: 'lines',
+    mask: 'lines',
+    autoSplit: true,
+    onSplit: (self) => {
+      gsap.set(el, { visibility: 'visible' })
+      return gsap.from(self.lines, {
+        yPercent: 110,
+        duration: seconds(m.heroIntro.textDuration),
+        stagger: seconds(m.heroIntro.stagger) * 0.7,
+        ease: gsapEase(m.heroIntro.ease),
+      })
+    },
+  })
+}
+
 /** A ScrollTrigger-style start ("top 85%") as an IntersectionObserver root margin. */
 const rootMargin = (start: string) =>
   `0px 0px -${100 - Number(/(\d+)%/.exec(start)?.[1] ?? 85)}% 0px`
@@ -180,6 +207,7 @@ export function Motion() {
       )
       const observers: IntersectionObserver[] = []
       let live = true
+      const reveal = contextSafe(revealLines)
 
       // globals.css hides animated content until its starting state is set.
       const show = (section: HTMLElement) => gsap.set(kids(section), { visibility: 'visible' })
@@ -224,6 +252,35 @@ export function Motion() {
         )
         io.observe(section)
         observers.push(io)
+      }
+
+      // Headings: split into lines only when they come into view (no work at load).
+      const headings = Array.from(document.querySelectorAll<HTMLElement>(REVEAL_SELECTOR))
+      if (headings.length) {
+        const showAll = () => gsap.set(headings, { visibility: 'visible' })
+        if (reduced) {
+          showAll()
+        } else {
+          void import('gsap/SplitText').then(
+            contextSafe(({ SplitText }) => {
+              if (!live) return
+              gsap.registerPlugin(SplitText)
+              const io = new IntersectionObserver(
+                (entries) => {
+                  for (const e of entries) {
+                    if (!e.isIntersecting && e.boundingClientRect.bottom >= 0) continue
+                    io.unobserve(e.target)
+                    reveal(e.target as HTMLElement, SplitText)
+                  }
+                },
+                { rootMargin: rootMargin(m.fadeUp.start) },
+              )
+              headings.forEach((h) => io.observe(h))
+              observers.push(io)
+            }),
+            showAll,
+          )
+        }
       }
 
       return () => {

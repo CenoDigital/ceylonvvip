@@ -69,3 +69,29 @@ test('reduced motion still shows every section', async ({ page }) => {
   )
   expect(hidden).toBe(0)
 })
+
+// Task 161: smooth scrolling on desktop and line-by-line heading reveals everywhere.
+test('desktop scrolls smoothly; phones keep native scrolling', async ({ page }, info) => {
+  await page.goto('/about')
+  if (info.project.name === 'desktop') {
+    await expect(page.locator('html')).toHaveClass(/lenis/)
+  } else {
+    await expect(page.locator('html')).not.toHaveClass(/lenis/)
+  }
+})
+
+test('every heading reveals line by line and ends fully shown', async ({ page }) => {
+  await page.goto('/about')
+  await scrollAndMeasureCls(page)
+  const headings = page.locator('main h2')
+  expect(await headings.count()).toBeGreaterThan(0)
+  await expect
+    .poll(() =>
+      headings.evaluateAll(
+        (els) => els.filter((el) => getComputedStyle(el).visibility === 'hidden').length,
+      ),
+    )
+    .toBe(0)
+  // SplitText wrapped the lines in masks, so the reveal really ran.
+  expect(await page.locator('main h2 > div').count()).toBeGreaterThan(0)
+})
