@@ -54,12 +54,14 @@ jobs:
           secret="$(openssl rand -hex 32)"
           echo "::add-mask::$secret"
           echo "PAYLOAD_SECRET=$secret" >> "$GITHUB_ENV"
-      - run: pnpm turbo run build --filter=web
-      - name: Load the Figma content (migrate, then seed)
+      # Migrate before the build (see ci.yml).
+      - name: Database schema (migrate)
         working-directory: apps/web
-        run: |
-          pnpm migrate
-          pnpm seed
+        run: pnpm migrate
+      - run: pnpm turbo run build --filter=web
+      - name: Load the Figma content (seed)
+        working-directory: apps/web
+        run: pnpm seed
       - name: Start the production server
         working-directory: apps/web
         run: |

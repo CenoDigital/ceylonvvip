@@ -171,13 +171,16 @@ jobs:
           secret="$(openssl rand -hex 32)"
           echo "::add-mask::$secret"
           echo "PAYLOAD_SECRET=$secret" >> "$GITHUB_ENV"
+      # Migrate first: the build's page workers each start Payload, and on an empty
+      # database they would all run the migrations at once (many cores, like the local runner).
+      - name: Database schema (migrate)
+        working-directory: apps/web
+        run: pnpm migrate
       - name: Production build
         run: pnpm turbo run build --filter=web
-      - name: Load the Figma content (migrate, then seed)
+      - name: Load the Figma content (seed)
         working-directory: apps/web
-        run: |
-          pnpm migrate
-          pnpm seed
+        run: pnpm seed
       - name: Start the production server (runs migrations on boot)
         working-directory: apps/web
         # Set only here, not at build time: proves the URL is read at runtime.
