@@ -6,6 +6,8 @@ export interface FeatureSignatureProps {
   label?: ReactNode
   title: ReactNode
   text?: ReactNode
+  /** An optional second part under the text, like a subheading and paragraphs. */
+  more?: ReactNode
   /** Usually a LinkUnderline. */
   action?: ReactNode
   /** The photo (next/image with fill). Without one, the parchment placeholder shows. */
@@ -23,6 +25,7 @@ export function FeatureSignature({
   label,
   title,
   text,
+  more,
   action,
   image,
   imageSide = 'left',
@@ -43,6 +46,7 @@ export function FeatureSignature({
         {label ? <p className="text-label-caps text-brand">{label}</p> : null}
         <h3 className="font-display text-h1 text-foreground">{title}</h3>
         {text ? <p className="text-body text-muted-foreground lg:text-lead">{text}</p> : null}
+        {more}
         {action}
       </div>
     </article>

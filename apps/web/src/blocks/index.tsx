@@ -488,6 +488,7 @@ function FeatureListView({ block }: { block: Block }) {
     label?: string | null
     title: string
     text?: string | null
+    more?: { heading?: string | null; text?: string | null } | null
     icon?: string | null
     image?: unknown
     cta?: unknown
@@ -504,6 +505,7 @@ function FeatureListView({ block }: { block: Block }) {
             label={item.label ?? undefined}
             title={item.title}
             text={item.text ?? undefined}
+            more={<SignatureMore more={item.more} />}
             image={<CmsImage media={item.image} sizes="(min-width: 1024px) 50vw, 100vw" />}
             action={<Cta cta={item.cta as never} />}
           />
@@ -541,6 +543,31 @@ function FeatureListView({ block }: { block: Block }) {
         ))}
       </div>
     </Section>
+  )
+}
+
+// Task 167: an optional subheading and paragraphs under a signature item's text.
+function SignatureMore({
+  more,
+}: {
+  more?: { heading?: string | null; text?: string | null } | null
+}) {
+  const paragraphs = (more?.text ?? '')
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter(Boolean)
+  if (!more?.heading && !paragraphs.length) return null
+  return (
+    <div className="flex flex-col gap-16 pt-8 lg:gap-20 lg:pt-12">
+      {more?.heading ? (
+        <h4 className="font-display text-h3 text-foreground">{more.heading}</h4>
+      ) : null}
+      {paragraphs.map((p, i) => (
+        <p key={i} className="text-body text-muted-foreground lg:text-lead">
+          {p}
+        </p>
+      ))}
+    </div>
   )
 }
 

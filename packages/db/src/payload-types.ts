@@ -820,6 +820,13 @@ export interface FeatureListBlock {
         label?: string | null;
         title: string;
         text?: string | null;
+        /**
+         * Optional second part under the text (Signature variant), like "Custom jewellery design". Leave a blank line between paragraphs.
+         */
+        more?: {
+          heading?: string | null;
+          text?: string | null;
+        };
         icon?:
           | (
               | 'arrow-left'
@@ -2256,6 +2263,12 @@ export interface FeatureListBlockSelect<T extends boolean = true> {
         label?: T;
         title?: T;
         text?: T;
+        more?:
+          | T
+          | {
+              heading?: T;
+              text?: T;
+            };
         icon?: T;
         image?: T;
         cta?:
