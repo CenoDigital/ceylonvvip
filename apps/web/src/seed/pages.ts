@@ -22,6 +22,8 @@ const BOOKING_HEADINGS: Record<string, string> = {
   activities: 'Plan an activity.',
   'security-bodyguards': 'Arrange security.',
   'elder-care': 'Arrange elder care.',
+  // Draft (task 164).
+  'hotels-ayurveda': 'Plan your stay.',
 }
 
 const p = (text: string) => ({
@@ -249,15 +251,40 @@ const SERVICE_PAGES: ServicePage[] = [
       ['Water sports', 'On the coast near Bentota, arranged around your day.'],
       ['Hiking', 'Walks in the hills, with your driver waiting when you return.'],
     ],
+    // Draft (task 164, for client approval).
+    list: {
+      eyebrow: 'Experiences',
+      heading: 'Days worth remembering.',
+      intro: 'Every activity is private and planned around you.',
+      rows: [
+        ['Bentota River Safari', 'Mangroves, birds and village life'],
+        ['Water sports at Bentota', 'On the coast near Aluthgama'],
+        ['Hikes around Ella', 'Tea country and the Nine Arches Bridge'],
+        ['Sunrise at Sigiriya', 'An early climb, with breakfast after'],
+        ['The ramparts of Galle', 'A slow walk around the old fort'],
+      ],
+      footnote: 'Something else in mind? Your travel manager will arrange it.',
+    },
     detail: {
       heading: 'Activities near Bentota and across Sri Lanka.',
       paras: [
         'Based in Aluthgama, a short drive from Bentota, we arrange the Bentota River Safari, water sports on the coast and hikes in the hills, with private transport there and back. Your travel manager plans each activity around the rest of your day.',
+        // Draft (task 164).
+        'Activities fit around a tour, a hotel stay or a single free afternoon. Tell us the pace you enjoy and who is travelling with you, and we choose the timing, the guide and the vehicle to suit.',
       ],
       faqs: [
         [
           'Do you arrange transport to the activity?',
           'Yes. We arrange private transport to and from each activity.',
+        ],
+        // Drafts (task 164).
+        [
+          'Can activities be added to an island tour?',
+          'Yes. Your travel manager fits them into your route, so you never double back.',
+        ],
+        [
+          'Are activities suitable for families?',
+          'Yes. Tell us the ages of your guests and we suggest the activities and timings that suit them.',
         ],
       ],
     },
@@ -279,8 +306,21 @@ const SERVICE_PAGES: ServicePage[] = [
       heading: 'Private bodyguards and security in Sri Lanka.',
       paras: [
         'For diplomats, business leaders and high-profile guests, CeylonVVIP provides bodyguards and security from our own company. Security travels with your vehicle and driver, from the airport to your hotel and every meeting in between, and your plans stay strictly private.',
+        // Draft (task 164).
+        'Every arrangement starts with a private conversation with your travel manager: who is travelling, where you are going and the level of presence you prefer, from a single discreet escort to a team for the whole stay.',
       ],
-      faqs: [['Are the bodyguards your own staff?', 'Yes. They come from our own company.']],
+      faqs: [
+        ['Are the bodyguards your own staff?', 'Yes. They come from our own company.'],
+        // Drafts (task 164).
+        [
+          'Can security stay with us for the whole trip?',
+          'Yes, for the whole trip or only for the days and meetings you choose.',
+        ],
+        [
+          'Is our itinerary kept private?',
+          'Yes. Your plans, your guests and your details are shared only with the team looking after you.',
+        ],
+      ],
     },
   },
   {
@@ -300,11 +340,67 @@ const SERVICE_PAGES: ServicePage[] = [
       heading: 'Travel in Sri Lanka with elderly family members.',
       paras: [
         'CeylonVVIP provides caregivers who travel with elderly guests throughout the journey, so families can see Sri Lanka together without worry. Routes are planned with rest stops whenever needed, in calm, comfortable vehicles.',
+        // Draft (task 164).
+        'Tell us about any needs before you arrive, from mobility and medication times to meals and rest, and your travel manager plans each day around them.',
       ],
       faqs: [
         [
           'Can a caregiver stay with us for the whole trip?',
           'Yes, for the whole trip or for selected days.',
+        ],
+        // Drafts (task 164).
+        [
+          'Can we stop to rest on long drives?',
+          'Yes. Routes are planned with rest stops whenever you need them.',
+        ],
+        [
+          'Can you help guests who use a wheelchair?',
+          'Yes. Tell us before you arrive and we choose the vehicle and the plan to suit.',
+        ],
+      ],
+    },
+  },
+  // Draft (task 164): Figma has no page for this service; written for client approval.
+  {
+    slug: 'hotels-ayurveda',
+    chip: 'Hotels',
+    number: '07',
+    title: 'Hotels and Ayurveda',
+    heading: 'Your stay, arranged for you.',
+    intro:
+      '5-star hotels and Ayurvedic treatment hotels anywhere on the island, with every transfer timed around your stay.',
+    features: [
+      [
+        'Chosen for you',
+        'Share your dates and the stay you prefer. We suggest and book the right hotel.',
+      ],
+      ['Ayurveda', 'Treatment hotels for a programme of rest, with your transfers arranged.'],
+      ['One plan', 'Hotels, drivers and timings in one itinerary, with one person to call.'],
+    ],
+    list: {
+      eyebrow: 'Stays',
+      heading: 'From the coast to the hills.',
+      rows: [
+        ['Beach hotels on the south-west coast', 'Bentota, Aluthgama and Galle'],
+        ['Ayurvedic treatment hotels', 'Programmes of a week or more'],
+        ['Hill country hotels', 'Tea estates around Nuwara Eliya and Ella'],
+        ['Hotels near the ancient cities', 'For Sigiriya and Dambulla'],
+      ],
+    },
+    detail: {
+      heading: 'Hotels and Ayurveda in Sri Lanka, arranged privately.',
+      paras: [
+        'Your travel manager books 5-star hotels and Ayurvedic treatment hotels anywhere on the island and times every transfer around your stay. Tell us the kind of place you enjoy, and we suggest hotels that match it.',
+        'For Ayurveda, we arrange the treatment hotel, your arrival and your journey home, so nothing interrupts the rest you came for.',
+      ],
+      faqs: [
+        [
+          'Can you book the hotels for our whole trip?',
+          'Yes. Hotels are booked with you directly and confirmed in writing.',
+        ],
+        [
+          'How long is an Ayurvedic stay?',
+          'Most programmes last a week or more. Your travel manager helps you choose.',
         ],
       ],
     },
@@ -374,6 +470,8 @@ const ROW_PHOTOS: Array<[RegExp, PhotoKey]> = [
   [/Ella/, 'ella'],
   [/Bentota/, 'coastRoad'],
   [/Wedding/, 'weddingCar'],
+  [/River Safari/, 'bentotaRiver'],
+  [/Beach hotels|Ayurvedic/, 'hotelSuite'],
   [/Honeymoon|Hotel/, 'hotelSuite'],
 ]
 const rowPhoto = (photos: Photos, name: string) => {
@@ -635,6 +733,8 @@ export async function seedPages(
         header: { eyebrow: 'Our story', heading: 'Travel like royalty, feel like family.' },
         content: rich(
           'CeylonVVIP began in Aluthgama with a simple idea: the most discerning visitors to Sri Lanka deserve one trusted host for the whole journey. Our own drivers, our own vehicles and our own security team keep every detail in our hands, and every guest is treated as family.',
+          // Draft (task 164).
+          'Today we look after diplomats, business travellers and private families from all over the world. Each guest has one travel manager from the first message to the flight home, reachable on WhatsApp at any hour.',
         ),
       },
       {
@@ -730,16 +830,40 @@ export async function seedPages(
     ],
   })
 
-  const contactFaqs = [
-    (
-      await faq(
-        payload,
-        'How do I confirm a booking?',
-        'Pay a 25% deposit of the luxury tour cost. The balance is paid on your first day in Sri Lanka.',
-        'Contact',
-      )
-    ).id,
+  // Figma lists seven questions; the six answers after the first are drafts (task 164)
+  // built from facts stated elsewhere on the site, for client approval.
+  const contactQuestions: Array<[string, string]> = [
+    [
+      'How do I confirm a booking?',
+      'Pay a 25% deposit of the luxury tour cost. The balance is paid on your first day in Sri Lanka.',
+    ],
+    [
+      'What if my flight is delayed?',
+      'We track your flight, so delays and waiting time never cost you anything.',
+    ],
+    [
+      'Can you arrange a trip anywhere in Sri Lanka?',
+      'Yes. Transfers and tours go anywhere on the island, planned around you.',
+    ],
+    [
+      'Do you provide security and bodyguards?',
+      'Yes. Bodyguards come from our own company and travel with you door to door.',
+    ],
+    [
+      'Can you care for elderly guests?',
+      'Yes. A caregiver can travel with elderly guests for the whole journey or selected days.',
+    ],
+    [
+      'Can you arrange hotels and Ayurvedic stays?',
+      'Yes. Your travel manager books 5-star hotels and Ayurvedic treatment hotels anywhere on the island.',
+    ],
+    [
+      'Which currencies do you accept?',
+      'US dollars, Sri Lankan rupees or euros, by bank transfer or cash.',
+    ],
   ]
+  const contactFaqs = []
+  for (const [q, a] of contactQuestions) contactFaqs.push((await faq(payload, q, a, 'Contact')).id)
   await upsert('pages', 'contact', {
     title: 'Contact',
     layout: [

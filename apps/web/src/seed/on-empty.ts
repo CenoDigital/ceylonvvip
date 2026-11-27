@@ -7,7 +7,7 @@ export type SeedOnEmptyResult =
  * Version of the Figma seed content. Bump it whenever the seed changes, so staging
  * (with SEED_REFRESH=true) loads the new content on its next start.
  */
-export const SEED_VERSION = 2
+export const SEED_VERSION = 3
 const VERSION_KEY = 'seed-version'
 
 /**

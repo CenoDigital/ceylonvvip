@@ -100,6 +100,7 @@ export const SERVICE_HERO_PHOTOS: Record<string, PhotoKey> = {
   activities: 'bentotaRiver',
   'security-bodyguards': 'mpvHotel',
   'elder-care': 'chauffeur',
+  'hotels-ayurveda': 'hotelSuite',
 }
 
 export type Photos = Record<PhotoKey, Media>
