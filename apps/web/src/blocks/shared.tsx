@@ -114,6 +114,9 @@ export function CmsImage({
       // The LCP photo (first hero): preloaded at high priority (Next 16: `preload`).
       preload={priority}
       fetchPriority={priority ? 'high' : undefined}
+      // Decode it in the first frame, before the page's scripts start, so it paints with
+      // the text (otherwise Lighthouse counts the script time against LCP).
+      decoding={priority ? 'sync' : undefined}
       className={cn('object-cover', className)}
       style={{ objectPosition: `${m.focalX ?? 50}% ${m.focalY ?? 50}%` }}
     />
