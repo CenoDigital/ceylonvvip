@@ -18,6 +18,7 @@ import {
 
 import { getCollection, getGlobal } from '@/lib/data'
 import { resolveLink } from '@/lib/links'
+import { mediaSrc } from '@/lib/media-url'
 import { pathFor } from '@/payload/paths'
 
 import { BookingBlock } from './BookingBlock'
@@ -722,7 +723,7 @@ function LogoStripView({ block }: { block: Block }) {
           const img = media?.url ? (
             // eslint-disable-next-line @next/next/no-img-element -- logos keep their own aspect ratio
             <img
-              src={media.url}
+              src={mediaSrc(media.url)}
               alt={l.name}
               className="h-40 w-auto opacity-80 grayscale"
               loading="lazy"

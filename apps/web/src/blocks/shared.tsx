@@ -6,6 +6,7 @@ import type { Media } from '@ceylonvvip/db'
 import { Button, LinkUnderline, SectionHeader, cn } from '@ceylonvvip/ui-brand'
 
 import { linkProps, type CmsLink } from '@/lib/links'
+import { mediaSrc } from '@/lib/media-url'
 
 /*
  * Pieces every block renderer shares: the section wrapper (background, spacing,
@@ -106,7 +107,7 @@ export function CmsImage({
   if (!m?.url) return null
   return (
     <Image
-      src={m.url}
+      src={mediaSrc(m.url)!}
       alt={m.alt ?? ''}
       fill
       sizes={sizes}
