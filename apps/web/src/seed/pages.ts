@@ -5,6 +5,8 @@
  */
 import type { Payload } from 'payload'
 
+import { SERVICE_HERO_PHOTOS, VEHICLE_PHOTOS, type Photos } from './media'
+
 type Ref = { id: number | string }
 type Upsert = (
   collection: 'pages' | 'services' | 'vehicles',
@@ -179,7 +181,8 @@ const SERVICE_PAGES: ServicePage[] = [
     detail: {
       heading: 'Private island tours of Sri Lanka, with your own driver.',
       paras: [
-        'A CeylonVVIP island tour is planned around you: the places you want to see, the pace you prefer and the hotels you choose. Popular journeys combine the Sigiriya rock fortress and the hill capital of Kandy with tea country around Ella, the beaches of the south and the old Dutch fort at Galle. You travel in a private vehicle with an English-speaking driver, and your travel manager can arrange 5-star hotels and activities along the way.',
+        'A CeylonVVIP island tour is planned around you: the places you want to see, the pace you prefer and the hotels you choose. Popular journeys combine the Sigiriya rock fortress and the hill capital of Kandy with tea country around Ella, the beaches of the south and the old Dutch fort at Galle.',
+        'You travel in a private vehicle with an English-speaking driver, and your travel manager can arrange 5-star hotels and activities along the way.',
       ],
       faqs: [
         [
@@ -222,7 +225,8 @@ const SERVICE_PAGES: ServicePage[] = [
     detail: {
       heading: 'Wedding cars and honeymoon travel in Sri Lanka.',
       paras: [
-        'For your wedding day, CeylonVVIP provides a white BMW 520d and a white Toyota Prado 150, decorated to your wishes, with drivers in uniform. Couples marrying in Bentota, Aluthgama, Galle or anywhere on the island can book one car or both. After the celebration, our honeymoon journeys give couples a private car and driver from the coast to the hills, with 5-star hotels arranged by your travel manager.',
+        'For your wedding day, CeylonVVIP provides a white BMW 520d and a white Toyota Prado 150, decorated to your wishes, with drivers in uniform. Couples marrying in Bentota, Aluthgama, Galle or anywhere on the island can book one car or both.',
+        'After the celebration, our honeymoon journeys give couples a private car and driver from the coast to the hills, with 5-star hotels arranged by your travel manager.',
       ],
       faqs: [
         [
@@ -390,6 +394,7 @@ export async function seedPages(
   upsert: Upsert,
   whatsapp: unknown,
   phone: string,
+  photos: Photos,
 ) {
   for (const [i, v] of VEHICLES.entries()) {
     await upsert('vehicles', v.slug, {
@@ -399,6 +404,7 @@ export async function seedPages(
       luggage: v.luggage,
       summary: v.summary ?? null,
       specs: { bestFor: v.bestFor, guests: v.guests, luggage: v.bags, colours: v.colours },
+      gallery: [photos[VEHICLE_PHOTOS[v.slug] ?? 'sedanDoorOpen'].id],
     })
   }
 
@@ -450,7 +456,9 @@ export async function seedPages(
           eyebrow: `Services, ${s.number}`,
           heading: s.heading,
           intro: s.intro,
-          mediaType: 'none',
+          // Figma: a full-width photo (1440 by 760) under every service page hero.
+          mediaType: 'image',
+          image: photos[SERVICE_HERO_PHOTOS[s.slug] ?? 'sedanDoorOpen'].id,
           ctas: [{ cta: quote }],
         },
         {
@@ -566,13 +574,15 @@ export async function seedPages(
         variant: 'detail',
         header: { eyebrow: 'In detail', heading: 'Luxury car hire with driver in Sri Lanka.' },
         content: rich(
-          'Every CeylonVVIP vehicle is chauffeur-driven. Choose the BMW 520d or Audi A3 for executive travel, the Toyota Prado 150 for families and longer island tours, or the Toyota Voxy and Honda Vezel for small groups. Each comes with an English-speaking driver in uniform, a garland welcome, hot towels and a welcome drink.',
+          'Every CeylonVVIP vehicle is chauffeur-driven. Choose the BMW 520d or Audi A3 for executive travel, the Toyota Prado 150 for families and longer island tours, or the Toyota Voxy and Honda Vezel for small groups.',
+          'Each comes with an English-speaking driver in uniform, a garland welcome, hot towels and a welcome drink.',
         ),
       },
       {
         blockType: 'imageText',
         variant: 'bleed',
         header: { eyebrow: 'For weddings', heading: 'BMW and Prado, decorated for the day.' },
+        image: photos.weddingCar.id,
         content: rich(
           'Decoration is arranged to your wishes, from fresh flowers to ribbons in your colours.',
         ),
@@ -597,7 +607,8 @@ export async function seedPages(
         heading: 'Hosted, not only driven.',
         intro:
           'We look after VVIP guests in Sri Lanka: diplomats, business travellers, top professionals and private families, with our own drivers, vehicles and security team, based in Aluthgama.',
-        mediaType: 'none',
+        mediaType: 'image',
+        image: photos.rearCabin.id,
         ctas: [{ cta: { label: 'Speak to your concierge', appearance: 'link', link: whatsapp } }],
       },
       {
@@ -617,12 +628,14 @@ export async function seedPages(
             label: 'Signature experience',
             title: 'A real Sri Lankan gem, in your hands.',
             text: 'Ceylon gems have been prized for centuries. As our guest, you are invited to see and hold genuine natural stones, cut and polished or rough, from the island’s many varieties.',
+            image: photos.sapphires.id,
             cta: { label: 'Ask about the gem experience', appearance: 'link', link: whatsapp },
           },
           {
             label: 'Hotels and Ayurveda',
             title: 'Your hotels, arranged for you.',
             text: 'Share your dates and the kind of stay you prefer. Your travel manager books 5-star hotels and Ayurvedic treatment hotels anywhere on the island, and times every transfer around your stay.',
+            image: photos.hotelSuite.id,
             cta: { label: 'Request a hotel or Ayurvedic stay', appearance: 'link', link: whatsapp },
           },
         ],
@@ -634,6 +647,7 @@ export async function seedPages(
           eyebrow: 'Your travel manager',
           heading: 'One person, from first message to final mile.',
         },
+        image: photos.travelManager.id,
         content: rich(
           'One person looks after your vehicles, drivers, hotels and timings, from first message to final mile, and confirms each detail in writing.',
         ),
@@ -733,6 +747,7 @@ export async function seedPages(
         blockType: 'imageText',
         variant: 'inset',
         header: { eyebrow: 'Visit', heading: 'Aluthgama, on the south-west coast.' },
+        image: photos.map.id,
         details: [
           { title: 'Address', text: '133/A, Warapitiya, Dharga Town, Aluthgama, Sri Lanka' },
           { title: 'Hours', text: 'Available 24 hours, every day' },

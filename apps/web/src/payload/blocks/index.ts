@@ -165,6 +165,14 @@ export const Hero: Block = {
     },
     { ...media({ name: 'image' }), admin: { condition: (_, s) => s?.mediaType === 'image' } },
     {
+      name: 'caption',
+      type: 'text',
+      admin: {
+        condition: (_, s) => s?.mediaType === 'image',
+        description: 'Under the photo on the Home hero, like "The coast road, Bentota".',
+      },
+    },
+    {
       name: 'video',
       type: 'upload',
       relationTo: 'media',
@@ -437,6 +445,10 @@ export const ProcessSteps: Block = {
         { name: 'text', type: 'textarea' },
       ],
     },
+    media({
+      name: 'image',
+      description: 'Optional photo beside the steps, as on Home "Your journey".',
+    }),
     settings({ animation: 'stagger-children' }),
   ],
 }

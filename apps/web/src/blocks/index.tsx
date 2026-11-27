@@ -55,9 +55,25 @@ async function HeroBlockView({ block, first }: { block: Block; first: boolean })
   ) : undefined
   const image =
     block.mediaType === 'image' && asMedia(block.image) ? (
-      <div className="relative aspect-[390/440] w-full overflow-hidden lg:aspect-[1440/864]">
-        <CmsImage media={block.image} sizes="100vw" priority={first} />
-      </div>
+      // Figma: Home photo 1440 by 820 with a caption row; page photos 1440 by 760.
+      <figure>
+        <div
+          className={cn(
+            'relative aspect-[390/440] w-full overflow-hidden',
+            block.variant === 'home' ? 'lg:aspect-[1440/820]' : 'lg:aspect-[1440/760]',
+          )}
+        >
+          <CmsImage media={block.image} sizes="100vw" priority={first} />
+        </div>
+        {block.variant === 'home' && block.caption ? (
+          <figcaption className="flex justify-between gap-24 px-24 pt-20 text-small text-muted-foreground lg:px-64">
+            <span>{String(block.caption)}</span>
+            <span aria-hidden className="hidden lg:inline">
+              Scroll
+            </span>
+          </figcaption>
+        ) : null}
+      </figure>
     ) : null
   const Heading = first ? 'h1' : 'h2'
   // The preset picked in the CMS; heroes default to their own intro.
@@ -604,19 +620,38 @@ function PricingTableView({ block }: { block: Block }) {
 
 function ProcessStepsView({ block }: { block: Block }) {
   const steps = docs<{ id?: string; title: string; text?: string | null }>(block.steps)
+  const list = (columns: boolean) => (
+    <ol className={cn('grid border-b border-border', columns && 'lg:grid-cols-2 lg:gap-x-96')}>
+      {steps.map((s, i) => (
+        <Step
+          key={s.id ?? i}
+          number={String(i + 1).padStart(2, '0')}
+          title={s.title}
+          text={s.text ?? undefined}
+        />
+      ))}
+    </ol>
+  )
+  if (asMedia(block.image)) {
+    // Figma 01 Home / Your journey: photo to the page edge (700 by 900), steps beside it.
+    return (
+      <Section settings={block.settings as never} bleed>
+        <div className="flex flex-col gap-48 lg:flex-row lg:items-center lg:gap-140 lg:pr-64">
+          <div className="relative aspect-[390/440] w-full shrink-0 overflow-hidden bg-placeholder lg:aspect-[700/900] lg:w-[48.6%]">
+            <CmsImage media={block.image} sizes="(min-width: 1024px) 49vw, 100vw" />
+          </div>
+          <div className="min-w-0 flex-1 px-24 lg:px-0">
+            <Header header={block.header as BlockHeader} className="mb-40" />
+            {list(false)}
+          </div>
+        </div>
+      </Section>
+    )
+  }
   return (
     <Section settings={block.settings as never}>
       <Header header={block.header as BlockHeader} className="mb-40 lg:mb-72" />
-      <ol className="grid border-b border-border lg:grid-cols-2 lg:gap-x-96">
-        {steps.map((s, i) => (
-          <Step
-            key={s.id ?? i}
-            number={String(i + 1).padStart(2, '0')}
-            title={s.title}
-            text={s.text ?? undefined}
-          />
-        ))}
-      </ol>
+      {list(true)}
     </Section>
   )
 }
@@ -641,7 +676,13 @@ async function CtaBannerView({ block }: { block: Block }) {
       title={String(block.heading ?? '')}
       text={(block.text as string) ?? undefined}
       action={<Cta cta={block.cta as never} />}
-      aside={phone ? <a href={`tel:${phone.replace(/[^\d+]/g, '')}`}>{phone}</a> : undefined}
+      aside={
+        phone ? (
+          <>
+            or call <a href={`tel:${phone.replace(/[^\d+]/g, '')}`}>{phone}</a>
+          </>
+        ) : undefined
+      }
     />
   )
 }

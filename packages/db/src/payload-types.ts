@@ -243,6 +243,10 @@ export interface HeroBlock {
   mediaType?: ('image' | 'video' | 'slider' | 'none') | null;
   image?: (number | null) | Media;
   /**
+   * Under the photo on the Home hero, like "The coast road, Bentota".
+   */
+  caption?: string | null;
+  /**
    * MP4, muted and looping.
    */
   video?: (number | null) | Media;
@@ -1238,6 +1242,10 @@ export interface ProcessStepsBlock {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Optional photo beside the steps, as on Home "Your journey".
+   */
+  image?: (number | null) | Media;
   settings?: {
     bg?: ('default' | 'card') | null;
     pt?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
@@ -2033,6 +2041,7 @@ export interface HeroBlockSelect<T extends boolean = true> {
   intro?: T;
   mediaType?: T;
   image?: T;
+  caption?: T;
   video?: T;
   slides?: T;
   ctas?:
@@ -2465,6 +2474,7 @@ export interface ProcessStepsBlockSelect<T extends boolean = true> {
         text?: T;
         id?: T;
       };
+  image?: T;
   settings?:
     | T
     | {

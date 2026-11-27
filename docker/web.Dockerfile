@@ -42,6 +42,8 @@ RUN rm -rf /usr/local/lib/node_modules /usr/local/bin/npm /usr/local/bin/npx \
 COPY --from=builder --chown=node:node /repo/apps/web/.next/standalone ./
 COPY --from=builder --chown=node:node /repo/apps/web/.next/static ./apps/web/.next/static
 COPY --from=builder --chown=node:node /repo/apps/web/public ./apps/web/public
+# Figma photos for the staging seed (SEED_ON_EMPTY / SEED_REFRESH); about 3 MB.
+COPY --from=builder --chown=node:node /repo/apps/web/src/seed/images ./apps/web/seed-images
 USER node
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
