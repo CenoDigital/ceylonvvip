@@ -4,6 +4,8 @@ import path from 'node:path'
 import type { Media } from '@ceylonvvip/db'
 import type { Payload } from 'payload'
 
+import { blurDataURL } from '../lib/blur'
+
 /*
  * Photos from the Figma file (task 159). The client has no photos of their own yet,
  * so the site uses the ones in the design. Optimised JPEGs live in ./images, named by
@@ -140,6 +142,15 @@ export async function seedMedia(payload: Payload): Promise<Photos> {
         collection: 'media',
         id: docs[0].id,
         data: { focalX: 50, focalY },
+        context: { disableRevalidate: true },
+      })
+    }
+    // Photos seeded before blurred previews existed (task 166) get one now.
+    if (docs[0] && !docs[0].blurDataURL) {
+      docs[0] = await payload.update({
+        collection: 'media',
+        id: docs[0].id,
+        data: { blurDataURL: await blurDataURL(path.join(dir, filename)) },
         context: { disableRevalidate: true },
       })
     }

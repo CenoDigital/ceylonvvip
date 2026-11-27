@@ -111,6 +111,9 @@ export function CmsImage({
       alt={m.alt ?? ''}
       fill
       sizes={sizes}
+      // Blurred preview while the photo loads, instead of an empty box (task 166).
+      placeholder={m.blurDataURL ? 'blur' : 'empty'}
+      blurDataURL={m.blurDataURL ?? undefined}
       // The LCP photo (first hero): preloaded at high priority (Next 16: `preload`).
       preload={priority}
       fetchPriority={priority ? 'high' : undefined}

@@ -32,3 +32,8 @@ test('the Home hero photo has its Figma caption', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByText('The coast road, Bentota')).toBeVisible()
 })
+
+test('photos show a blurred preview while they load (task 166)', async ({ request }) => {
+  const html = await (await request.get('/')).text()
+  expect(html).toContain('data:image/webp;base64')
+})

@@ -9,11 +9,12 @@ import { cn } from '@ceylonvvip/ui-brand'
 gsap.registerPlugin(useGSAP)
 
 /*
- * Sideways gallery (client feedback 2026-11-27, task 165: "Where our guests ask to go").
- * On desktop the panel stays in place (sticky) while the page scrolls, and the row of places slides
- * sideways with the scroll, each photo drifting slightly inside its frame. On phones
- * and tablets, and with reduced motion, it is a native swipe row with snap points.
- * The track holds [data-hscroll-item] cards; ScrollTrigger is loaded only on desktop.
+ * Sideways gallery (tasks 165 and 166: "Where our guests ask to go"). On every screen
+ * the panel stays in place (sticky) while the page scrolls, and the row of places
+ * slides sideways with the scroll, each photo drifting slightly inside its frame, so
+ * mouse, trackpad and touch users all move it just by scrolling down (and back by
+ * scrolling up). With reduced motion, or before the script runs, it is a native swipe
+ * row with snap points that the arrow keys also scroll.
  */
 export function HorizontalScroll({
   header,
@@ -34,7 +35,6 @@ export function HorizontalScroll({
       if (!el || !row || !contextSafe) return
       const wanted =
         document.documentElement.classList.contains('motion') &&
-        matchMedia('(min-width: 1024px)').matches &&
         !matchMedia('(prefers-reduced-motion: reduce)').matches
       if (!wanted) return
       let live = true
@@ -97,7 +97,7 @@ export function HorizontalScroll({
 
   return (
     <div ref={root} data-hscroll className={cn('group/hs', className)}>
-      <div className="flex flex-col gap-32 lg:gap-56 lg:group-data-[hscroll-active]/hs:sticky lg:group-data-[hscroll-active]/hs:top-0 lg:group-data-[hscroll-active]/hs:h-svh lg:group-data-[hscroll-active]/hs:justify-center">
+      <div className="flex flex-col gap-32 group-data-[hscroll-active]/hs:sticky group-data-[hscroll-active]/hs:top-0 group-data-[hscroll-active]/hs:h-svh group-data-[hscroll-active]/hs:justify-center lg:gap-56">
         {header}
         <ul
           ref={track}
@@ -107,7 +107,7 @@ export function HorizontalScroll({
             'outline-none focus-visible:ring-1 focus-visible:ring-brand',
             '-mx-24 flex snap-x snap-mandatory scroll-px-24 gap-20 overflow-x-auto px-24 pb-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
             'sm:gap-32 lg:-mx-64 lg:scroll-px-64 lg:gap-48 lg:px-64',
-            // Scroll-driven on desktop: the track slides as one piece, so it must not clip itself.
+            // Scroll-driven: the track slides as one piece, so it must not clip itself.
             'group-data-[hscroll-active]/hs:snap-none group-data-[hscroll-active]/hs:overflow-visible group-data-[hscroll-active]/hs:pb-0',
           )}
         >

@@ -129,46 +129,50 @@ function RichTextView({ block }: { block: Block }) {
     return (
       // Figma Manifesto: centred H1 statement (1000px) with spaced labels below. The
       // eyebrow field holds the labels, separated by commas.
-      <Section
-        settings={block.settings as never}
-        className="flex flex-col items-center gap-36 text-center lg:gap-56"
-      >
-        <div data-scroll-fill className="max-w-1000 text-foreground">
-          <RichText
-            data={block.content}
-            className="max-w-none font-display text-h1 text-inherit [&_p+p]:mt-28"
-          />
+      // Task 166: while its words fill, the statement stays on screen (a sticky panel in
+      // a taller wrapper that Motion.tsx sizes), so the fill follows the scroll both ways.
+      <Section settings={block.settings as never}>
+        <div data-fill-pin className="group/fill">
+          <div className="flex flex-col items-center gap-36 text-center group-data-[fill-active]/fill:sticky group-data-[fill-active]/fill:top-0 group-data-[fill-active]/fill:h-svh group-data-[fill-active]/fill:justify-center lg:gap-56">
+            <div data-scroll-fill className="max-w-1000 text-foreground">
+              <RichText
+                data={block.content}
+                className="max-w-none font-display text-h1 text-inherit [&_p+p]:mt-28"
+              />
+            </div>
+            {header?.eyebrow ? (
+              <p className="flex flex-wrap justify-center gap-x-72 gap-y-12 text-label-caps text-brand">
+                {header.eyebrow.split(',').map((word) => (
+                  <span key={word}>{word.trim()}</span>
+                ))}
+              </p>
+            ) : null}
+          </div>
         </div>
-        {header?.eyebrow ? (
-          <p className="flex flex-wrap justify-center gap-x-72 gap-y-12 text-label-caps text-brand">
-            {header.eyebrow.split(',').map((word) => (
-              <span key={word}>{word.trim()}</span>
-            ))}
-          </p>
-        ) : null}
       </Section>
     )
   }
   const faqs = docs<Faq>(block.faqs)
   if (block.variant === 'detail' && !faqs.length) {
-    // Task 165: "In detail" as an editorial spread. A large heading across the page,
-    // then the text in two wide columns under a bronze label, no rule above.
+    // Tasks 165 and 166: "In detail" as an editorial spread on one grid. The label and a
+    // large heading across the top, then the text in two equal columns that start on
+    // the same left edge as the heading (one column on phones).
     return (
       <Section settings={block.settings as never}>
-        <div className="flex flex-col gap-40 lg:gap-72">
-          <div className="flex flex-col gap-20 lg:gap-32">
+        <div className="flex flex-col gap-40 lg:gap-64">
+          <div className="flex flex-col gap-20 lg:gap-28">
             {header?.eyebrow ? (
               <p className="text-label-caps text-brand">{header.eyebrow}</p>
             ) : null}
             {header?.heading ? (
-              <h2 className="max-w-1100 font-display text-display text-balance text-foreground">
+              <h2 className="max-w-1000 font-display text-display text-balance text-foreground">
                 {header.heading}
               </h2>
             ) : null}
           </div>
           <RichText
             data={block.content}
-            className="max-w-none text-lead text-muted-foreground lg:ms-auto lg:w-3/4 lg:columns-2 lg:gap-64 [&_p]:break-inside-avoid [&_p+p]:mt-24 lg:[&_p+p]:mt-0 [&_p:first-child]:text-foreground"
+            className="max-w-none text-body text-muted-foreground md:columns-2 md:gap-48 lg:gap-96 lg:text-lead [&_p]:break-inside-avoid [&_p+p]:mt-20 md:[&_p+p]:mt-0"
           />
         </div>
       </Section>
@@ -544,7 +548,7 @@ function DestinationsView({ block }: { block: Block }) {
   const items = docs<{ id?: string; name: string; line?: string | null; photo?: unknown }>(
     block.items,
   )
-  // Task 165: a sideways row (pinned and scroll-driven on desktop, swipe on phones).
+  // Tasks 165 and 166: a sideways row that slides with the scroll on every screen.
   return (
     <Section settings={block.settings as never} className="overflow-x-clip">
       <HorizontalScroll header={<HeaderRow block={block} />}>
@@ -554,7 +558,7 @@ function DestinationsView({ block }: { block: Block }) {
             data-hscroll-item
             className="flex w-[78vw] shrink-0 snap-start flex-col gap-20 sm:w-[44vw] lg:w-[34vw] xl:w-[30vw]"
           >
-            <div className="relative h-420 w-full overflow-hidden bg-placeholder sm:h-480 lg:h-[56svh] lg:max-h-640">
+            <div className="relative h-420 w-full overflow-hidden bg-placeholder sm:h-480 lg:h-[56svh] lg:max-h-640 group-data-[hscroll-active]/hs:h-[min(50svh,640px)] lg:group-data-[hscroll-active]/hs:h-[min(56svh,640px)]">
               <CmsImage
                 media={place.photo}
                 sizes="(min-width: 1024px) 34vw, (min-width: 640px) 44vw, 78vw"
