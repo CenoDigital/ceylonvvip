@@ -1,5 +1,8 @@
+import Link from 'next/link'
+
 import type { Faq, Pricing, Service, Testimonial, Vehicle } from '@ceylonvvip/db'
 import {
+  Icon,
   Enquiry,
   FaqRow,
   Feature,
@@ -178,6 +181,45 @@ function RouteListView({ block }: { block: Block }) {
 
 async function ServicesGridView({ block }: { block: Block }) {
   const services = await itemsFor<Service>(block, 'services')
+  if (block.variant === 'cards') {
+    // Services page: every service as a photo card, each opening its own page.
+    return (
+      <Section settings={block.settings as never}>
+        <Header header={block.header as BlockHeader} className="mb-40 lg:mb-72" />
+        <ul className="grid gap-x-32 gap-y-56 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-48 lg:gap-y-80">
+          {services.map((s, i) => (
+            <li key={s.id} data-animate-item>
+              <Link href={pathFor('services', s.slug)} className="group flex flex-col gap-24">
+                <div className="relative aspect-[4/5] overflow-hidden bg-placeholder">
+                  <CmsImage
+                    media={s.image}
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className="transition-transform duration-700 ease-out group-hover:scale-[1.04] motion-reduce:transition-none"
+                  />
+                </div>
+                <div className="flex items-start gap-20 border-t border-border pt-20">
+                  <span className="text-label-caps text-brand tabular-nums">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span className="flex min-w-0 flex-1 flex-col gap-8">
+                    <span className="font-display text-h3 text-foreground">{s.title}</span>
+                    {s.summary ? (
+                      <span className="text-small text-muted-foreground">{s.summary}</span>
+                    ) : null}
+                  </span>
+                  <Icon
+                    name="arrow-up-right"
+                    size={20}
+                    className="mt-4 shrink-0 transition-transform duration-300 group-hover:translate-x-2 group-hover:-translate-y-2 motion-reduce:transition-none"
+                  />
+                </div>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </Section>
+    )
+  }
   return (
     <Section settings={block.settings as never}>
       <Header header={block.header as BlockHeader} className="mb-40 lg:mb-72" />

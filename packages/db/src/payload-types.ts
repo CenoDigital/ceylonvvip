@@ -573,7 +573,7 @@ export interface Faq {
  * via the `definition` "ServicesGridBlock".
  */
 export interface ServicesGridBlock {
-  variant: 'index';
+  variant: 'index' | 'cards';
   header?: {
     /**
      * Small line above, like "Services".
