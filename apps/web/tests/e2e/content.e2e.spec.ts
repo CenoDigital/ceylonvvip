@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 // Task 159: every page shows the Figma photos (the client has none of their own yet).
 // Pages with the booking form also show the five vehicle photos on its vehicle cards.
 const PAGES: Array<[string, number]> = [
-  ['/', 9],
+  ['/', 11],
   ['/services', 7],
   ['/services/airport-transfers', 6],
   ['/services/elder-care', 6],

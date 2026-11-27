@@ -63,8 +63,13 @@ html.motion
   main
   img:not([data-animate='hero-intro'] img):not([data-animate='reveal-mask'] img):not(
     [data-animate='image-parallax'] img
-  ) {
+  ):not([data-hscroll] img) {
   clip-path: inset(0% 0% 100% 0%);
+}
+
+/* Statement words fill from faded to ink with the scroll (Motion.tsx scrollFill). */
+html.motion main [data-scroll-fill] {
+  color: color-mix(in oklab, var(--color-foreground) 16%, transparent);
 }
 
 /* Arabic (right to left, task 163): arrows point the other way; underlines and

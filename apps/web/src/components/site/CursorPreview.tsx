@@ -69,36 +69,57 @@ export function CursorPreview({
         setActive(null)
         gsap.to(c, { autoAlpha: 0, scale: 0.7, duration: 0.35, ease: 'power2.in' })
       }
-      const move = (e: PointerEvent) => {
-        xTo(e.clientX)
-        yTo(e.clientY)
-        tilt(gsap.utils.clamp(-7, 7, (e.clientX - lastX) * 0.5))
-        lastX = e.clientX
-      }
-      const over = (e: PointerEvent) => {
-        const row = (e.target as Element).closest<HTMLElement>('[data-preview]')
+      let current: string | null = null
+      let px = -1
+      let py = -1
+      // Which row is under the pointer, checked on every move and after every scroll,
+      // so the card never stays hidden over a row (smooth scrolling moves rows under a
+      // still cursor without any pointerover event).
+      const update = (x: number, y: number) => {
+        const hit = document.elementFromPoint(x, y)
+        const row = hit?.closest<HTMLElement>('[data-preview]')
         const key = row && el.contains(row) ? row.dataset.preview : undefined
         if (key && images.some((i) => i.key === key)) {
           if (!shown) {
             // Start at the cursor, not where the card was last left.
-            gsap.set(c, { x: e.clientX, y: e.clientY })
-            lastX = e.clientX
+            gsap.set(c, { x, y })
+            lastX = x
           }
-          setActive(key)
+          if (key !== current) {
+            current = key
+            setActive(key)
+          }
           show()
-        } else {
+        } else if (shown) {
+          current = null
           hide()
         }
       }
+      const move = (e: PointerEvent) => {
+        if (e.pointerType !== 'mouse') return
+        px = e.clientX
+        py = e.clientY
+        xTo(px)
+        yTo(py)
+        tilt(gsap.utils.clamp(-7, 7, (px - lastX) * 0.5))
+        lastX = px
+        update(px, py)
+      }
+      const leave = () => {
+        px = -1
+        current = null
+        hide()
+      }
+      const scrolled = () => {
+        if (px >= 0) update(px, py)
+      }
       el.addEventListener('pointermove', move)
-      el.addEventListener('pointerover', over)
-      el.addEventListener('pointerleave', hide)
-      window.addEventListener('scroll', hide, { passive: true })
+      el.addEventListener('pointerleave', leave)
+      window.addEventListener('scroll', scrolled, { passive: true })
       return () => {
         el.removeEventListener('pointermove', move)
-        el.removeEventListener('pointerover', over)
-        el.removeEventListener('pointerleave', hide)
-        window.removeEventListener('scroll', hide)
+        el.removeEventListener('pointerleave', leave)
+        window.removeEventListener('scroll', scrolled)
       }
     },
     { dependencies: [images.length, mounted], scope: root },

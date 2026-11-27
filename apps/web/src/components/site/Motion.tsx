@@ -21,7 +21,7 @@ declare global {
  * Plays the animation preset each block picked in the CMS (its `data-animate`). The
  * hero intro is CSS (globals.css) so it starts with the first paint, before any JS.
  * Sections start when they scroll into view (an IntersectionObserver, which costs
- * nothing at load); ScrollTrigger is only loaded for desktop parallax. Only opacity,
+ * nothing at load); ScrollTrigger is loaded lazily, only for scrubbed effects. Only opacity,
  * transform and clip-path move, so nothing shifts layout (CLS stays 0). Reduced motion:
  * every preset becomes a short fade.
  *
@@ -170,7 +170,10 @@ function parallax(section: HTMLElement) {
 
 /** Photos that wipe in as they scroll into view (not the hero or image presets). */
 export const IMAGE_REVEAL_SELECTOR =
-  'main img:not([data-animate="hero-intro"] img):not([data-animate="reveal-mask"] img):not([data-animate="image-parallax"] img)'
+  'main img:not([data-animate="hero-intro"] img):not([data-animate="reveal-mask"] img):not([data-animate="image-parallax"] img):not([data-hscroll] img)'
+
+/** Statement text whose words fill from faded to ink as it scrolls through the view. */
+export const SCROLL_FILL_SELECTOR = 'main [data-scroll-fill]'
 
 /** Headings that reveal line by line: everything in <main> except the hero (CSS intro). */
 export const REVEAL_SELECTOR =
@@ -191,6 +194,41 @@ function revealLines(el: HTMLElement, SplitText: typeof SplitTextPlugin) {
       })
     },
   })
+}
+
+/** Desktop photo wipe tied to the scroll: open as the photo rises into the view. */
+function scrubPhoto(img: HTMLElement) {
+  const frame = img.parentElement ?? img
+  gsap.fromTo(
+    img,
+    { clipPath: 'inset(0% 0% 100% 0%)', scale: 1.22 },
+    {
+      clipPath: 'inset(0% 0% 0% 0%)',
+      scale: 1,
+      ease: 'none',
+      scrollTrigger: { trigger: frame, start: 'top 98%', end: 'top 45%', scrub: 0.6 },
+    },
+  )
+}
+
+/*
+ * Statement text (client feedback 2026-11-27): the words start faded and turn to ink
+ * one after another as the text scrolls up through the view, scrubbed to the scroll.
+ * globals.css shows the faded colour before this runs, so nothing flashes.
+ */
+function scrollFill(el: HTMLElement, SplitText: typeof SplitTextPlugin) {
+  const split = SplitText.create(el, { type: 'words' })
+  gsap.set(el, { color: 'var(--color-foreground)' })
+  gsap.fromTo(
+    split.words,
+    { opacity: 0.16 },
+    {
+      opacity: 1,
+      ease: 'none',
+      stagger: 0.1,
+      scrollTrigger: { trigger: el, start: 'top 85%', end: 'bottom 45%', scrub: 0.5 },
+    },
+  )
 }
 
 /** A ScrollTrigger-style start ("top 85%") as an IntersectionObserver root margin. */
@@ -287,24 +325,28 @@ export function Motion() {
         }
       }
 
-      // Photos: wipe up from the bottom while settling from a slight zoom.
+      // Photos: wipe up from the bottom while settling from a slight zoom. On desktop
+      // the wipe follows the scroll (scrubbed, like the statement text); on phones and
+      // tablets it plays once as the photo comes into view (no ScrollTrigger to load).
       const photos = Array.from(document.querySelectorAll<HTMLElement>(IMAGE_REVEAL_SELECTOR))
-      if (photos.length) {
-        if (reduced) {
-          gsap.set(photos, { clipPath: 'inset(0% 0% 0% 0%)' })
-        } else {
-          const revealPhoto = contextSafe((img: HTMLElement) =>
-            gsap.fromTo(
-              img,
-              { clipPath: 'inset(0% 0% 100% 0%)', scale: 1.18 },
-              {
-                clipPath: 'inset(0% 0% 0% 0%)',
-                scale: 1,
-                duration: seconds(m.revealMask.duration) * 1.2,
-                ease: gsapEase(m.revealMask.ease),
-              },
-            ),
-          )
+      const fills = Array.from(document.querySelectorAll<HTMLElement>(SCROLL_FILL_SELECTOR))
+      if (reduced) {
+        gsap.set(photos, { clipPath: 'inset(0% 0% 0% 0%)' })
+        gsap.set(fills, { color: 'var(--color-foreground)' })
+      } else {
+        const revealPhoto = contextSafe((img: HTMLElement) =>
+          gsap.fromTo(
+            img,
+            { clipPath: 'inset(0% 0% 100% 0%)', scale: 1.18 },
+            {
+              clipPath: 'inset(0% 0% 0% 0%)',
+              scale: 1,
+              duration: seconds(m.revealMask.duration) * 1.2,
+              ease: gsapEase(m.revealMask.ease),
+            },
+          ),
+        )
+        if (photos.length && !desktop) {
           const io = new IntersectionObserver(
             (entries) => {
               for (const e of entries) {
@@ -317,6 +359,21 @@ export function Motion() {
           )
           photos.forEach((p) => io.observe(p))
           observers.push(io)
+        }
+        if (fills.length || (photos.length && desktop)) {
+          void Promise.all([import('gsap/ScrollTrigger'), import('gsap/SplitText')]).then(
+            contextSafe(([{ ScrollTrigger }, { SplitText }]) => {
+              if (!live) return
+              gsap.registerPlugin(ScrollTrigger, SplitText)
+              if (desktop) photos.forEach(scrubPhoto)
+              fills.forEach((el) => scrollFill(el, SplitText))
+              ScrollTrigger.refresh()
+            }),
+            () => {
+              gsap.set(photos, { clipPath: 'inset(0% 0% 0% 0%)' })
+              gsap.set(fills, { color: 'var(--color-foreground)' })
+            },
+          )
         }
       }
 
