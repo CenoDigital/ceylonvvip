@@ -2,7 +2,8 @@ import type { ReactNode } from 'react'
 
 import { FloatConcierge, SiteFooter, type FooterColumn, type NavLink } from '@ceylonvvip/ui-brand'
 
-import { getGlobal } from '@/lib/data'
+import { getGlobal, t } from '@/lib/data'
+import { localePath } from '@/lib/i18n'
 import { linkProps, resolveLink, whatsappHref, type CmsLink } from '@/lib/links'
 
 import { Analytics } from './Analytics'
@@ -71,6 +72,8 @@ export async function SiteChrome({ children }: { children: ReactNode }) {
         ? { label: cta.label, href: ctaLink.href, external: ctaLink.external }
         : undefined,
     language: settings.translate?.enabled ? 'EN' : undefined,
+    languageLabel: await t('Language'),
+    homeHref: localePath('/'),
     menuNote: [contact.availability, phone].filter(Boolean).join(', ') || undefined,
     bar: (bar.buttons ?? [])
       .map((b) => {

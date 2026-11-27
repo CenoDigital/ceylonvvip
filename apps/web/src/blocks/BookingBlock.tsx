@@ -2,7 +2,9 @@ import type { Form } from '@ceylonvvip/db'
 import { cn } from '@ceylonvvip/ui-brand'
 
 import { getCollection, getGlobal, getFirstForm } from '@/lib/data'
+import { currentLocale, isRtl, LOCALE_TAGS } from '@/lib/i18n'
 import { mediaSrc } from '@/lib/media-url'
+import { getUiStrings } from '@/lib/ui-strings'
 
 import { BookingForm, type BookingFormProps } from './BookingForm'
 
@@ -14,12 +16,14 @@ import { Header, Section, asMedia, type BlockHeader } from './shared'
  */
 export async function BookingBlock({ block }: { block: Record<string, unknown> }) {
   const chosen = block.form && typeof block.form === 'object' ? (block.form as Form) : null
-  const [form, services, vehicles, settings] = await Promise.all([
+  const [form, services, vehicles, settings, ui] = await Promise.all([
     chosen ?? getFirstForm(),
     getCollection('services'),
     getCollection('vehicles'),
     getGlobal('booking-settings'),
+    getUiStrings(),
   ])
+  const locale = currentLocale()
   const preselect =
     block.service && typeof block.service === 'object'
       ? (block.service as { id: number }).id
@@ -80,6 +84,9 @@ export async function BookingBlock({ block }: { block: Record<string, unknown> }
         }),
         preselectService: preselect != null ? String(preselect) : null,
         successMessage: settings.successMessage ?? null,
+        ui,
+        lang: LOCALE_TAGS[locale],
+        dir: isRtl(locale) ? 'rtl' : 'ltr',
       }
     : null
 

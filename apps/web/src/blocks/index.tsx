@@ -17,7 +17,8 @@ import {
   cn,
 } from '@ceylonvvip/ui-brand'
 
-import { getCollection, getGlobal } from '@/lib/data'
+import { getCollection, getGlobal, t } from '@/lib/data'
+import { localePath } from '@/lib/i18n'
 import { resolveLink } from '@/lib/links'
 import { mediaSrc } from '@/lib/media-url'
 import { pathFor } from '@/payload/paths'
@@ -73,7 +74,7 @@ async function HeroBlockView({ block, first }: { block: Block; first: boolean })
           <figcaption className="flex justify-between gap-24 px-24 pt-20 text-small text-muted-foreground lg:px-64">
             <span>{String(block.caption)}</span>
             <span aria-hidden className="hidden lg:inline">
-              Scroll
+              {await t('Scroll')}
             </span>
           </figcaption>
         ) : null}
@@ -243,7 +244,10 @@ async function ServicesGridView({ block }: { block: Block }) {
                   wideLg ? 'lg:col-span-3' : 'lg:col-span-1',
                 )}
               >
-                <Link href={pathFor('services', s.slug)} className="group flex flex-col gap-24">
+                <Link
+                  href={localePath(pathFor('services', s.slug))}
+                  className="group flex flex-col gap-24"
+                >
                   <div
                     className={cn(
                       'relative aspect-[4/5] overflow-hidden bg-placeholder',
@@ -297,7 +301,7 @@ async function ServicesGridView({ block }: { block: Block }) {
             number={String(i + 1).padStart(2, '0')}
             title={s.title}
             note={s.summary ?? undefined}
-            href={pathFor('services', s.slug)}
+            href={localePath(pathFor('services', s.slug))}
           />
         ))}
       </CursorPreview>
@@ -334,7 +338,14 @@ async function VehicleShowcaseView({ block }: { block: Block }) {
     return (
       <Section settings={block.settings as never} className="flex flex-col gap-28 lg:gap-48">
         <HeaderRow block={block} />
-        <FleetCarousel vehicles={slides} />
+        <FleetCarousel
+          vehicles={slides}
+          labels={{
+            of: await t('of'),
+            previous: await t('Previous vehicle'),
+            next: await t('Next vehicle'),
+          }}
+        />
       </Section>
     )
   }
@@ -749,7 +760,7 @@ async function CtaBannerView({ block }: { block: Block }) {
       aside={
         phone ? (
           <>
-            or call <a href={`tel:${phone.replace(/[^\d+]/g, '')}`}>{phone}</a>
+            {await t('or call')} <a href={`tel:${phone.replace(/[^\d+]/g, '')}`}>{phone}</a>
           </>
         ) : undefined
       }

@@ -20,7 +20,14 @@ const pad = (n: number) => String(n).padStart(2, '0')
  * an "01 of 05" counter with previous and next buttons, and a tab row of names with a
  * 2px line over the active one. Tabs follow the ARIA tabs pattern (arrow keys move).
  */
-export function FleetCarousel({ vehicles }: { vehicles: CarouselVehicle[] }) {
+export function FleetCarousel({
+  vehicles,
+  labels = {},
+}: {
+  vehicles: CarouselVehicle[]
+  /** Translated: of, previous, next. */
+  labels?: { of?: string; previous?: string; next?: string }
+}) {
   const [index, setIndex] = useState(0)
   const id = useId()
   const tabs = useRef<Array<HTMLButtonElement | null>>([])
@@ -73,12 +80,12 @@ export function FleetCarousel({ vehicles }: { vehicles: CarouselVehicle[] }) {
         {count > 1 ? (
           <div className="flex items-center gap-16">
             <p className="text-small text-muted-foreground" aria-live="polite">
-              {pad(index + 1)} of {pad(count)}
+              {pad(index + 1)} {labels.of ?? 'of'} {pad(count)}
             </p>
             <button
               type="button"
               className={round}
-              aria-label="Previous vehicle"
+              aria-label={labels.previous ?? 'Previous vehicle'}
               onClick={() => go(index - 1)}
             >
               <Icon name="arrow-left" size={18} />
@@ -86,7 +93,7 @@ export function FleetCarousel({ vehicles }: { vehicles: CarouselVehicle[] }) {
             <button
               type="button"
               className={round}
-              aria-label="Next vehicle"
+              aria-label={labels.next ?? 'Next vehicle'}
               onClick={() => go(index + 1)}
             >
               <Icon name="arrow-right" size={18} />

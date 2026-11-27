@@ -3,6 +3,7 @@
 import * as Popover from '@radix-ui/react-popover'
 import { useState, type ReactNode } from 'react'
 import { DayPicker } from 'react-day-picker'
+import { ar, de, fr, ru } from 'react-day-picker/locale'
 
 import { Icon } from '../icons/Icon'
 import { cn } from '../lib/cn'
@@ -27,6 +28,9 @@ const trigger = cn(
   'focus-visible:outline-none',
 )
 
+// Month and day names in the calendar for each site language (English is the default).
+const CALENDAR_LOCALES: Record<string, typeof de> = { de, fr, ru, ar }
+
 /** "2026-12-14" as a local date (no time zone shift). */
 function parseDate(value: string): Date | undefined {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
@@ -36,10 +40,21 @@ function parseDate(value: string): Date | undefined {
 const toValue = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 
-/** "Saturday 14 December 2026", as in Figma (no comma after the day name). */
-export const formatDateLong = (value: string) => {
+/**
+ * "Saturday 14 December 2026", as in Figma (no comma after the day name). Other
+ * languages use their own long date format.
+ */
+export const formatDateLong = (value: string, lang = 'en-GB') => {
   const d = parseDate(value)
   if (!d) return ''
+  if (!lang.startsWith('en')) {
+    return d.toLocaleDateString(lang, {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    })
+  }
   const part = (o: Intl.DateTimeFormatOptions) => d.toLocaleDateString('en-GB', o)
   return `${part({ weekday: 'long' })} ${d.getDate()} ${part({ month: 'long' })} ${d.getFullYear()}`
 }
@@ -58,6 +73,9 @@ interface PickerBase {
 export interface DateFieldProps extends PickerBase {
   /** Earliest date that can be chosen, "YYYY-MM-DD". */
   min?: string
+  /** BCP 47 language for the date text, like "de". */
+  lang?: string
+  dir?: 'ltr' | 'rtl'
 }
 
 /** Prestige/Field with a calendar: opens below the field, closes on choice. */
@@ -71,7 +89,10 @@ export function DateField({
   placeholder = 'Select a date',
   required,
   className,
+  lang,
+  dir,
 }: DateFieldProps) {
+  const calendarLocale = lang ? CALENDAR_LOCALES[lang.slice(0, 2)] : undefined
   const [open, setOpen] = useState(false)
   const selected = parseDate(value)
   const earliest = min ? parseDate(min) : undefined
@@ -87,7 +108,7 @@ export function DateField({
             className={trigger}
           >
             <span className={cn(!value && 'text-muted-foreground')}>
-              {value ? formatDateLong(value) : placeholder}
+              {value ? formatDateLong(value, lang) : placeholder}
             </span>
             {required ? <span className="sr-only">, required</span> : null}
             <Icon name="calendar" size={18} className="shrink-0 text-muted-foreground" />
@@ -107,6 +128,8 @@ export function DateField({
                 startMonth={earliest}
                 disabled={earliest ? { before: earliest } : undefined}
                 weekStartsOn={1}
+                locale={calendarLocale}
+                dir={dir}
                 autoFocus
                 onSelect={(d) => {
                   if (!d) return
@@ -115,7 +138,12 @@ export function DateField({
                 }}
                 components={{
                   Chevron: ({ orientation }) => (
-                    <Icon name={orientation === 'left' ? 'arrow-left' : 'arrow-right'} size={16} />
+                    <Icon
+                      name={
+                        (orientation === 'left') !== (dir === 'rtl') ? 'arrow-left' : 'arrow-right'
+                      }
+                      size={16}
+                    />
                   ),
                 }}
                 classNames={{
@@ -167,6 +195,8 @@ const MINUTES = Array.from({ length: 12 }, (_, i) => String(i * 5).padStart(2, '
 export interface TimeFieldProps extends PickerBase {
   /** Minutes between choices (default 5). */
   step?: number
+  /** Translated labels for the panel. */
+  labels?: { hour?: string; minute?: string; clear?: string; done?: string }
 }
 
 /** Prestige/Field with hour and minute columns; 24-hour, as Sri Lanka writes times. */
@@ -179,6 +209,7 @@ export function TimeField({
   placeholder = 'Select a time',
   required,
   className,
+  labels = {},
 }: TimeFieldProps) {
   const [open, setOpen] = useState(false)
   const [hour = '', minute = ''] = /^\d{2}:\d{2}$/.test(value) ? value.split(':') : []
@@ -218,15 +249,21 @@ export function TimeField({
               <div className="grid grid-cols-2 gap-16">
                 {(
                   [
-                    ['Hour', HOURS, hour, (h: string) => pick(h, minute)],
-                    ['Minute', MINUTES, minute, (m: string) => pick(hour, m)],
+                    ['Hour', labels.hour ?? 'Hour', HOURS, hour, (h: string) => pick(h, minute)],
+                    [
+                      'Minute',
+                      labels.minute ?? 'Minute',
+                      MINUTES,
+                      minute,
+                      (m: string) => pick(hour, m),
+                    ],
                   ] as const
-                ).map(([name, list, current, choose]) => (
+                ).map(([name, title, list, current, choose]) => (
                   <div key={name} className="flex min-w-0 flex-col items-center gap-8">
-                    <p className="text-label-caps text-muted-foreground">{name}</p>
+                    <p className="text-label-caps text-muted-foreground">{title}</p>
                     <div
                       role="listbox"
-                      aria-label={name}
+                      aria-label={title}
                       className="relative flex max-h-240 w-full flex-col [scrollbar-width:none] [&::-webkit-scrollbar]:hidden items-center gap-2 overflow-y-auto overscroll-contain"
                     >
                       {list.map((v) => (
@@ -260,10 +297,10 @@ export function TimeField({
                   className="cursor-pointer text-small text-muted-foreground underline-offset-4 hover:underline"
                   onClick={() => onChange('')}
                 >
-                  Clear
+                  {labels.clear ?? 'Clear'}
                 </button>
                 <Popover.Close className="cursor-pointer text-label-caps text-foreground underline underline-offset-4">
-                  Done
+                  {labels.done ?? 'Done'}
                 </Popover.Close>
               </div>
             </Popover.Content>

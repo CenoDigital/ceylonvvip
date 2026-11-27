@@ -17,6 +17,7 @@ export function Icon({ name, size = 24, label, ...rest }: IconProps) {
   const a11y = label ? { role: 'img', 'aria-label': label } : { 'aria-hidden': true }
   return (
     <svg
+      data-icon={name}
       width={size}
       height={size}
       viewBox="0 0 24 24"

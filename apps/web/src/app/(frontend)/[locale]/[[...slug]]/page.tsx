@@ -6,10 +6,11 @@ import { SiteChrome } from '@/components/site/SiteChrome'
 import { PageSchema } from '@/components/seo/PageSchema'
 import { getGlobal, getPage, getSlugs } from '@/lib/data'
 import { redirectOrNotFound } from '@/lib/redirects'
+import { applyLocale } from '@/lib/i18n-server'
 import { buildMetadata } from '@/lib/seo'
 import { HOME_SLUG, pathFor } from '@/payload/paths'
 
-type Props = { params: Promise<{ slug?: string[] }> }
+type Props = { params: Promise<{ locale: string; slug?: string[] }> }
 
 // Pages are built at deploy time and rebuilt on publish (revalidateTag/revalidatePath).
 export const dynamicParams = true
@@ -22,6 +23,7 @@ export async function generateStaticParams() {
 const slugFrom = (parts?: string[]) => (parts?.length ? parts.join('/') : HOME_SLUG)
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  await applyLocale(params)
   const slug = slugFrom((await params).slug)
   const [page, defaults, settings] = await Promise.all([
     getPage(slug),
@@ -41,6 +43,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CmsPage({ params }: Props) {
+  await applyLocale(params)
   const parts = (await params).slug
   const slug = slugFrom(parts)
   const page = await getPage(slug)

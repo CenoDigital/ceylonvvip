@@ -6,10 +6,11 @@ import { SiteChrome } from '@/components/site/SiteChrome'
 import { PageSchema } from '@/components/seo/PageSchema'
 import { getGlobal, getService, getSlugs } from '@/lib/data'
 import { redirectOrNotFound } from '@/lib/redirects'
+import { applyLocale } from '@/lib/i18n-server'
 import { buildMetadata } from '@/lib/seo'
 import { pathFor } from '@/payload/paths'
 
-type Props = { params: Promise<{ slug: string }> }
+type Props = { params: Promise<{ locale: string; slug: string }> }
 
 export const dynamicParams = true
 
@@ -19,6 +20,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  await applyLocale(params)
   const [service, defaults, settings] = await Promise.all([
     getService((await params).slug),
     getGlobal('seo-defaults'),
@@ -38,6 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 /** A service sales page: its sections, with the body text as a fallback when it has none. */
 export default async function ServicePage({ params }: Props) {
+  await applyLocale(params)
   const { slug } = await params
   const service = await getService(slug)
   if (!service) return redirectOrNotFound(`/services/${slug}`)

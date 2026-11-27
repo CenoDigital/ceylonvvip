@@ -1,3 +1,4 @@
+import { localePath } from '@/lib/i18n'
 import { pathFor } from '@/payload/paths'
 
 /** The shape of the cms-schema `link` group as stored by Payload. */
@@ -35,11 +36,15 @@ export function resolveLink(link: CmsLink | null | undefined): ResolvedLink | nu
         ref && typeof ref.value === 'object' ? (ref.value as { slug?: string | null }) : null
       if (!ref || !doc) return null
       const collection = ref.relationTo === 'services' ? 'services' : 'pages'
-      return { href: pathFor(collection, doc.slug), external: false }
+      return { href: localePath(pathFor(collection, doc.slug)), external: false }
     }
     case 'url':
       return link.url
-        ? { href: link.url, external: Boolean(link.newTab) || /^https?:/.test(link.url) }
+        ? {
+            // Site paths like /fleet follow the visitor's language; anchors and URLs stay.
+            href: link.url.startsWith('/') ? localePath(link.url) : link.url,
+            external: Boolean(link.newTab) || /^https?:/.test(link.url),
+          }
         : null
     case 'phone':
       return link.phone ? { href: `tel:${digits(link.phone)}`, external: false } : null

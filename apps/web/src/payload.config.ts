@@ -19,6 +19,7 @@ import {
   Vehicles,
 } from './payload/collections/content'
 import { Forms, FormSubmissions } from './payload/collections/forms'
+import { Translations } from './payload/collections/translations'
 import { Media } from './payload/collections/Media'
 import { Users } from './payload/collections/Users'
 import { globals } from './payload/globals'
@@ -66,6 +67,7 @@ export default buildConfig({
     FormSubmissions,
     Media,
     Redirects,
+    Translations,
     Users,
   ],
   globals,
