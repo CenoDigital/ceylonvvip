@@ -3,10 +3,17 @@
 @import '@ceylonvvip/tokens/theme.css';
 @import '@ceylonvvip/ui-brand/styles.css';
 
-/* Point the token fonts at the self-hosted Outfit from next/font. */
+/* Point the token fonts at the self-hosted Outfit from next/font. Russian and Arabic
+   letters fall through to Jost and Noto Kufi Arabic (set on <html> for those pages). */
 :root {
-  --font-display: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
-  --font-text: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-cyrillic: ui-sans-serif;
+  --font-arabic: ui-sans-serif;
+  --font-display:
+    var(--font-outfit), var(--font-cyrillic), var(--font-arabic), ui-sans-serif, system-ui,
+    sans-serif;
+  --font-text:
+    var(--font-outfit), var(--font-cyrillic), var(--font-arabic), ui-sans-serif, system-ui,
+    sans-serif;
 }
 
 @layer base {
@@ -58,6 +65,18 @@ html.motion
     [data-animate='image-parallax'] img
   ) {
   clip-path: inset(0% 0% 100% 0%);
+}
+
+/* Arabic (right to left, task 163): arrows point the other way; underlines and
+   hover nudges start from the right. */
+[dir='rtl'] [data-icon^='arrow-'] {
+  transform: scaleX(-1);
+}
+[dir='rtl'] .origin-left {
+  transform-origin: right;
+}
+[dir='rtl'] .text-left {
+  text-align: right;
 }
 
 /* Lenis smooth scrolling (desktop). */

@@ -5,6 +5,7 @@ import type {
   GlobalAfterChangeHook,
 } from 'payload'
 
+import { LOCALES } from '@/lib/locales'
 import { pathFor, type RoutableCollection } from '../paths'
 
 // On publish, rebuild only the pages that show this document (on-demand ISR).
@@ -29,9 +30,12 @@ export const revalidateDocument =
       revalidateTag(tag, 'max')
       if (collection) {
         revalidatePath('/sitemap.xml')
-        revalidatePath(pathFor(collection, doc?.slug))
-        if (previousDoc?.slug && previousDoc.slug !== doc?.slug) {
-          revalidatePath(pathFor(collection, previousDoc.slug))
+        // Every language version of the page (task 163); /en is the internal English path.
+        for (const l of LOCALES) {
+          revalidatePath(`/${l}${pathFor(collection, doc?.slug)}`.replace(/\/$/, ''))
+          if (previousDoc?.slug && previousDoc.slug !== doc?.slug) {
+            revalidatePath(`/${l}${pathFor(collection, previousDoc.slug)}`.replace(/\/$/, ''))
+          }
         }
       }
     })

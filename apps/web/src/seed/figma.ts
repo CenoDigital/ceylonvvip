@@ -12,6 +12,7 @@ import type { Payload } from 'payload'
 
 import { SERVICE_HERO_PHOTOS, seedMedia } from './media'
 import { seedPages } from './pages'
+import { seedTranslations } from './translations'
 
 const p = (text: string) => ({
   type: 'paragraph',
@@ -364,5 +365,6 @@ export async function seedFigma(payload: Payload) {
     WHATSAPP,
     photos,
   )
+  await seedTranslations(payload)
   payload.logger.info('Seeded the Figma pages 01 to 10 and the site chrome.')
 }

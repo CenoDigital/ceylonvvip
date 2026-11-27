@@ -3,7 +3,23 @@ import type { Metadata } from 'next'
 import type { Media, SeoDefault, SiteSetting } from '@ceylonvvip/db'
 
 import { getSiteUrl } from './site-url'
+import {
+  currentLocale,
+  DEFAULT_LOCALE,
+  LOCALE_TAGS,
+  LOCALES,
+  localePath,
+  type Locale,
+} from './i18n'
 import { isProductionSite } from './site-env'
+
+const OG_LOCALES: Record<Locale, string> = {
+  en: 'en_GB',
+  de: 'de_DE',
+  fr: 'fr_FR',
+  ru: 'ru_RU',
+  ar: 'ar_AR',
+}
 
 export const absolute = (path: string) =>
   /^https?:\/\//.test(path) ? path : `${getSiteUrl()}${path.startsWith('/') ? '' : '/'}${path}`
@@ -72,14 +88,21 @@ export function buildMetadata({
   const image = shareImage(
     asMedia(seo?.image) ?? asMedia(fallbackImage) ?? asMedia(settings.ogDefault),
   )
-  const canonical = seo?.canonical || absolute(path)
+  // Each language has its own URL (task 163); the CMS canonical applies to English only.
+  const locale = currentLocale()
+  const canonical =
+    (locale === DEFAULT_LOCALE && seo?.canonical) || absolute(localePath(path, locale))
+  const languages = Object.fromEntries([
+    ...LOCALES.map((l) => [LOCALE_TAGS[l], absolute(localePath(path, l))]),
+    ['x-default', absolute(localePath(path, DEFAULT_LOCALE))],
+  ])
   const indexable = isProductionSite() && !seo?.noindex
 
   return {
     metadataBase: new URL(getSiteUrl()),
     title: { absolute: fullTitle },
     description,
-    alternates: { canonical },
+    alternates: { canonical, languages },
     robots: { index: indexable, follow: isProductionSite() && !seo?.nofollow },
     openGraph: {
       type: 'website',
@@ -87,7 +110,7 @@ export function buildMetadata({
       title: fullTitle,
       description,
       url: canonical,
-      locale: 'en_GB',
+      locale: OG_LOCALES[locale],
       images: image ? [image] : undefined,
     },
     twitter: {

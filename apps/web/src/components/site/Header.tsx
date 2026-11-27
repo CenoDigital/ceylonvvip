@@ -2,15 +2,9 @@
 
 import { useState } from 'react'
 
-import {
-  Button,
-  Icon,
-  LanguageLabel,
-  MobileBar,
-  MobileMenu,
-  SiteNav,
-  type NavLink,
-} from '@ceylonvvip/ui-brand'
+import { Button, Icon, MobileBar, MobileMenu, SiteNav, type NavLink } from '@ceylonvvip/ui-brand'
+
+import { LanguageSwitch } from './LanguageSwitch'
 
 export interface HeaderData {
   left: NavLink[]
@@ -19,6 +13,10 @@ export interface HeaderData {
   all: NavLink[]
   concierge?: NavLink & { external?: boolean }
   language?: string
+  /** "Language" in the page language, for the switch's accessible name. */
+  languageLabel?: string
+  /** Home in the page language. */
+  homeHref?: string
   siteName: string
   menuNote?: string
   bar: Array<{ label: string; icon?: string; href?: string; menu?: boolean }>
@@ -35,7 +33,8 @@ export function Header({ data }: { data: HeaderData }) {
         right={data.right}
         action={data.concierge}
         wordmark={data.siteName}
-        language={data.language ? <LanguageLabel code={data.language} /> : undefined}
+        homeHref={data.homeHref}
+        language={<LanguageSwitch label={data.languageLabel} />}
         menuButton={
           <button
             type="button"

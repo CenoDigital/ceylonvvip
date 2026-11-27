@@ -77,6 +77,7 @@ export interface Config {
     'form-submissions': FormSubmission;
     media: Media;
     redirects: Redirect;
+    translations: Translation;
     users: User;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
@@ -96,6 +97,7 @@ export interface Config {
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    translations: TranslationsSelect<false> | TranslationsSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
@@ -1753,6 +1755,25 @@ export interface Redirect {
   createdAt: string;
 }
 /**
+ * Each row is an English text from the site and its translations. Leave a language empty to show English.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "translations".
+ */
+export interface Translation {
+  id: number;
+  /**
+   * Exactly as it appears in English on the site.
+   */
+  source: string;
+  de?: string | null;
+  fr?: string | null;
+  ru?: string | null;
+  ar?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
@@ -1938,6 +1959,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'redirects';
         value: number | Redirect;
+      } | null)
+    | ({
+        relationTo: 'translations';
+        value: number | Translation;
       } | null)
     | ({
         relationTo: 'users';
@@ -3001,6 +3026,19 @@ export interface RedirectsSelect<T extends boolean = true> {
         newTab?: T;
       };
   type?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "translations_select".
+ */
+export interface TranslationsSelect<T extends boolean = true> {
+  source?: T;
+  de?: T;
+  fr?: T;
+  ru?: T;
+  ar?: T;
   updatedAt?: T;
   createdAt?: T;
 }

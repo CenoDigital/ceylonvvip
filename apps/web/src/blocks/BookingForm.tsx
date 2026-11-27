@@ -20,6 +20,7 @@ import {
 } from '@ceylonvvip/ui-brand'
 
 import { submitBooking } from '@/app/(frontend)/actions/booking'
+import { fill } from '@/lib/fill'
 
 export interface BookingFormProps {
   form: {
@@ -52,6 +53,11 @@ export interface BookingFormProps {
   }>
   preselectService: string | null
   successMessage: string | null
+  /** Interface text in the page language (lib/ui-strings), English text → translation. */
+  ui?: Record<string, string>
+  /** BCP 47 language of the page, like "de", for dates. */
+  lang?: string
+  dir?: 'ltr' | 'rtl'
 }
 
 /**
@@ -65,7 +71,13 @@ export function BookingForm({
   vehicles,
   preselectService,
   successMessage,
+  ui = {},
+  lang,
+  dir,
 }: BookingFormProps) {
+  const tr = (text: string) => ui[text] ?? text
+  const trErrors = (e: Record<string, string>) =>
+    Object.fromEntries(Object.entries(e).map(([k, v]) => [k, tr(v)]))
   const id = useId()
   const [service, setService] = useState(preselectService ?? '')
   const [vehicle, setVehicle] = useState('none')
@@ -114,7 +126,7 @@ export function BookingForm({
     if (!parsed.success) {
       const next: Record<string, string> = {}
       for (const issue of parsed.error.issues) next[issue.path.join('.')] ??= issue.message
-      setErrors(next)
+      setErrors(trErrors(next))
       if (Object.keys(next).some((k) => k.startsWith('details.'))) setShowDetails(true)
       setFormError(null)
       return
@@ -123,7 +135,7 @@ export function BookingForm({
     startTransition(async () => {
       const result = await submitBooking(input)
       if (!result.ok) {
-        setErrors(result.errors)
+        setErrors(trErrors(result.errors))
         setFormError(result.formError ?? null)
         return
       }
@@ -161,10 +173,10 @@ export function BookingForm({
             title={
               formError ??
               (errorCount === 1
-                ? 'One answer needs attention'
-                : `${errorCount} answers need attention`)
+                ? tr('One answer needs attention')
+                : fill(tr('{count} answers need attention'), { count: errorCount }))
             }
-            text={formError ? undefined : 'They are marked in red below.'}
+            text={formError ? undefined : tr('They are marked in red below.')}
           />
         </div>
       ) : null}
@@ -199,7 +211,14 @@ export function BookingForm({
                 name={`${id}-vehicle`}
                 value={v.id}
                 vehicle={v.name}
-                detail={`Up to ${v.seats} guests${v.luggage != null ? `, ${v.luggage} bags` : ''}`}
+                detail={
+                  v.luggage != null
+                    ? fill(tr('Up to {guests} guests, {bags} bags'), {
+                        guests: v.seats,
+                        bags: v.luggage,
+                      })
+                    : fill(tr('Up to {guests} guests'), { guests: v.seats })
+                }
                 image={
                   v.image ? (
                     <Image
@@ -238,9 +257,24 @@ export function BookingForm({
           onChange={setDate}
           error={errors.date}
           required
+          placeholder={tr('Select a date')}
+          lang={lang}
+          dir={dir}
         />
         {form.timeLabel ? (
-          <TimeField label={form.timeLabel} value={time} onChange={setTime} error={errors.time} />
+          <TimeField
+            label={form.timeLabel}
+            value={time}
+            onChange={setTime}
+            error={errors.time}
+            placeholder={tr('Select a time')}
+            labels={{
+              hour: tr('Hour'),
+              minute: tr('Minute'),
+              clear: tr('Clear'),
+              done: tr('Done'),
+            }}
+          />
         ) : null}
       </div>
 

@@ -10,6 +10,7 @@ import * as migration_20261126_222453_drop_old_booking_fields from './20261126_2
 import * as migration_20261127_064853_services_grid_cards from './20261127_064853_services_grid_cards'
 import * as migration_20261127_072320_hero_caption_steps_image from './20261127_072320_hero_caption_steps_image'
 import * as migration_20261127_075437_route_row_photo from './20261127_075437_route_row_photo'
+import * as migration_20261127_080532_translations from './20261127_080532_translations'
 
 export const migrations = [
   {
@@ -71,5 +72,10 @@ export const migrations = [
     up: migration_20261127_075437_route_row_photo.up,
     down: migration_20261127_075437_route_row_photo.down,
     name: '20261127_075437_route_row_photo',
+  },
+  {
+    up: migration_20261127_080532_translations.up,
+    down: migration_20261127_080532_translations.down,
+    name: '20261127_080532_translations',
   },
 ]

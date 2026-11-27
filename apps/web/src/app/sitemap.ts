@@ -3,6 +3,7 @@ import type { MetadataRoute } from 'next'
 import config from '@payload-config'
 import { getPayload, type Where } from 'payload'
 
+import { LOCALE_TAGS, LOCALES, pathInLocale } from '@/lib/locales'
 import { absolute } from '@/lib/seo'
 import { isProductionSite } from '@/lib/site-env'
 import { pathFor } from '@/payload/paths'
@@ -44,16 +45,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       limit: 5000,
     }),
   ])
-  return [
+  // Every page in every language, each listing its translations (task 163).
+  const entries = [
     ...pages.docs.map((p) => ({
-      url: absolute(pathFor('pages', p.slug)),
+      path: pathFor('pages', p.slug),
       lastModified: p.updatedAt,
       priority: pathFor('pages', p.slug) === '/' ? 1 : 0.7,
     })),
     ...services.docs.map((s) => ({
-      url: absolute(pathFor('services', s.slug)),
+      path: pathFor('services', s.slug),
       lastModified: s.updatedAt,
       priority: 0.8,
     })),
   ]
+  return entries.flatMap(({ path, lastModified, priority }) => {
+    const languages = Object.fromEntries(
+      LOCALES.map((l) => [LOCALE_TAGS[l], absolute(pathInLocale(path, l))]),
+    )
+    return LOCALES.map((l) => ({
+      url: absolute(pathInLocale(path, l)),
+      lastModified,
+      priority,
+      alternates: { languages },
+    }))
+  })
 }

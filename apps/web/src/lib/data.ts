@@ -8,6 +8,7 @@ import { cache } from 'react'
 
 import type { Config, Page, Service } from '@ceylonvvip/db'
 
+import { currentLocale, DEFAULT_LOCALE, translateDeep, type Locale } from '@/lib/i18n'
 import { HOME_SLUG } from '@/payload/paths'
 
 /*
@@ -28,7 +29,11 @@ async function isDraft() {
 
 type GlobalSlug = keyof Config['globals']
 
-export function getGlobal<S extends GlobalSlug>(slug: S): Promise<Config['globals'][S]> {
+export async function getGlobal<S extends GlobalSlug>(slug: S): Promise<Config['globals'][S]> {
+  return translated(await getGlobalEn(slug))
+}
+
+function getGlobalEn<S extends GlobalSlug>(slug: S): Promise<Config['globals'][S]> {
   return unstable_cache(
     async () => (await payload()).findGlobal({ slug, depth: 2 }) as Promise<Config['globals'][S]>,
     ['global', slug],
@@ -57,17 +62,55 @@ async function findBySlug<C extends 'pages' | 'services'>(
 }
 
 export async function getPage(slug: string = HOME_SLUG): Promise<Page | null> {
-  if (await isDraft()) return findBySlug('pages', slug, true)
-  return unstable_cache(() => findBySlug('pages', slug, false), ['page', slug], {
-    tags: ['pages', 'vehicles', 'services', 'faqs', 'testimonials', 'pricing', 'forms'],
-  })()
+  if (await isDraft()) return translated(await findBySlug('pages', slug, true))
+  return translated(
+    await unstable_cache(() => findBySlug('pages', slug, false), ['page', slug], {
+      tags: ['pages', 'vehicles', 'services', 'faqs', 'testimonials', 'pricing', 'forms'],
+    })(),
+  )
 }
 
 export async function getService(slug: string): Promise<Service | null> {
-  if (await isDraft()) return findBySlug('services', slug, true)
-  return unstable_cache(() => findBySlug('services', slug, false), ['service', slug], {
-    tags: ['services', 'vehicles', 'faqs', 'pricing'],
-  })()
+  if (await isDraft()) return translated(await findBySlug('services', slug, true))
+  return translated(
+    await unstable_cache(() => findBySlug('services', slug, false), ['service', slug], {
+      tags: ['services', 'vehicles', 'faqs', 'pricing'],
+    })(),
+  )
+}
+
+/**
+ * Every translation for one language, English text → translated text (task 163).
+ * Cached and refreshed when a row in Translations is saved.
+ */
+export const getTranslationMap = (locale: Locale): Promise<ReadonlyMap<string, string>> =>
+  locale === DEFAULT_LOCALE
+    ? Promise.resolve(new Map())
+    : unstable_cache(
+        async () => {
+          const { docs } = await (
+            await payload()
+          ).find({ collection: 'translations', limit: 0, pagination: false, depth: 0 })
+          return docs
+            .map((d) => [d.source, d[locale as 'de' | 'fr' | 'ru' | 'ar']] as const)
+            .filter((e): e is readonly [string, string] => typeof e[1] === 'string' && e[1] !== '')
+        },
+        ['translations', locale],
+        { tags: ['translations'] },
+      )().then((entries) => new Map(entries))
+
+/** A CMS document in the language of this request (English stays as stored). */
+async function translated<T>(value: T): Promise<T> {
+  const locale = currentLocale()
+  if (locale === DEFAULT_LOCALE || value == null) return value
+  return translateDeep(value, await getTranslationMap(locale))
+}
+
+/** One UI string in the language of this request (falls back to English). */
+export async function t(text: string): Promise<string> {
+  const locale = currentLocale()
+  if (locale === DEFAULT_LOCALE) return text
+  return (await getTranslationMap(locale)).get(text) ?? text
 }
 
 /** Published slugs, for static generation. */
@@ -89,7 +132,14 @@ export const getSlugs = unstable_cache(
 )
 
 /** Lists for blocks that show "all published" items, in their set order. */
-export const getCollection = unstable_cache(
+export async function getCollection(
+  collection: 'services' | 'vehicles' | 'testimonials' | 'faqs',
+  topic?: string,
+) {
+  return translated(await getCollectionEn(collection, topic))
+}
+
+const getCollectionEn = unstable_cache(
   async (collection: 'services' | 'vehicles' | 'testimonials' | 'faqs', topic?: string) => {
     const { docs } = await (
       await payload()
@@ -113,7 +163,11 @@ export const getCollection = unstable_cache(
 )
 
 /** The first booking form, used when a Form block does not name one. */
-export const getFirstForm = unstable_cache(
+export async function getFirstForm() {
+  return translated(await getFirstFormEn())
+}
+
+const getFirstFormEn = unstable_cache(
   async () => {
     const { docs } = await (
       await payload()
