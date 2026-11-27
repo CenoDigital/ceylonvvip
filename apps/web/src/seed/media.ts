@@ -105,6 +105,9 @@ export const SERVICE_HERO_PHOTOS: Record<string, PhotoKey> = {
 
 export type Photos = Record<PhotoKey, Media>
 
+/** Photos that could not be uploaded in the last seed (storage unreachable, etc.). */
+export const photoErrors: string[] = []
+
 /** Uploads every photo once; a photo already in Media (same file name) is reused. */
 export async function seedMedia(payload: Payload): Promise<Photos> {
   const out = {} as Photos
@@ -129,14 +132,23 @@ export async function seedMedia(payload: Payload): Promise<Photos> {
         context: { disableRevalidate: true },
       })
     }
-    out[key] =
-      docs[0] ??
-      (await payload.create({
-        collection: 'media',
-        data: { alt, ...(focalY != null ? { focalX: 50, focalY } : {}) },
-        filePath: path.join(dir, filename),
-        context: { disableRevalidate: true },
-      }))
+    try {
+      out[key] =
+        docs[0] ??
+        (await payload.create({
+          collection: 'media',
+          data: { alt, ...(focalY != null ? { focalX: 50, focalY } : {}) },
+          filePath: path.join(dir, filename),
+          context: { disableRevalidate: true },
+        }))
+    } catch (error) {
+      // Keep seeding without this photo: pages and translations still load, and the
+      // photo fills in on the next seed once storage works.
+      const message = error instanceof Error ? error.message : String(error)
+      photoErrors.push(`${filename}: ${message}`)
+      payload.logger.error({ err: error }, `Seed: could not upload ${filename}`)
+      out[key] = { id: null } as unknown as Media
+    }
   }
   return out
 }

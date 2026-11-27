@@ -9,6 +9,20 @@ export type SeedOnEmptyResult =
  */
 export const SEED_VERSION = 4
 const VERSION_KEY = 'seed-version'
+/** The last seed-on-start outcome, shown on /api/health (staging has no log viewer). */
+export const LAST_KEY = 'seed-last'
+
+export interface SeedLast {
+  result: SeedOnEmptyResult
+  version: number
+  at: string
+  photoErrors?: number
+  error?: string
+}
+
+/** First line of an error, without URLs or long detail, safe to show publicly. */
+const short = (message: string) =>
+  (message.split('\n')[0] ?? '').replace(/https?:\/\/\S+/g, '[url]').slice(0, 160)
 
 /**
  * Staging only, never on production:
@@ -51,9 +65,31 @@ export async function seedIfEmpty(
     )
     await seed(payload)
     await payload.kv.set(VERSION_KEY, SEED_VERSION)
+    const { photoErrors } = await import('./media')
+    await remember(payload, {
+      result,
+      version: SEED_VERSION,
+      at: new Date().toISOString(),
+      photoErrors: photoErrors.length,
+      error: photoErrors[0] ? short(photoErrors[0]) : undefined,
+    })
     return result
   } catch (error) {
     payload.logger.error({ err: error }, 'The Figma seed failed on start.')
+    await remember(payload, {
+      result: 'failed',
+      version: SEED_VERSION,
+      at: new Date().toISOString(),
+      error: short(error instanceof Error ? error.message : String(error)),
+    })
     return 'failed'
+  }
+}
+
+async function remember(payload: Payload, last: SeedLast) {
+  try {
+    await payload.kv.set(LAST_KEY, last as never)
+  } catch {
+    // Reporting must never stop the server.
   }
 }
