@@ -1,3 +1,4 @@
+import dynamic from 'next/dynamic'
 import type { Form } from '@ceylonvvip/db'
 import { cn } from '@ceylonvvip/ui-brand'
 
@@ -6,9 +7,12 @@ import { currentLocale, isRtl, LOCALE_TAGS } from '@/lib/i18n'
 import { mediaSrc } from '@/lib/media-url'
 import { getUiStrings } from '@/lib/ui-strings'
 
-import { BookingForm, type BookingFormProps } from './BookingForm'
+import type { BookingFormProps } from './BookingForm'
 
 import { Header, Section, asMedia, type BlockHeader } from './shared'
+
+// Task 169: the form's script (validation, date picker) loads only on pages with a form.
+const BookingForm = dynamic(() => import('./BookingForm').then((m) => m.BookingForm))
 
 /**
  * Form block: Prestige/Booking/Form with its options read live from the CMS, so a newly

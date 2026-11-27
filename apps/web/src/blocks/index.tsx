@@ -1,3 +1,4 @@
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 
 import type { Faq, Pricing, Service, Testimonial, Vehicle } from '@ceylonvvip/db'
@@ -23,11 +24,22 @@ import { resolveLink } from '@/lib/links'
 import { mediaSrc } from '@/lib/media-url'
 import { pathFor } from '@/payload/paths'
 
-import { HorizontalScroll } from '@/components/site/HorizontalScroll'
-import { CursorPreview, type PreviewImage } from '@/components/site/CursorPreview'
+import type { PreviewImage } from '@/components/site/CursorPreview'
 
 import { BookingBlock } from './BookingBlock'
-import { FleetCarousel } from './FleetCarousel'
+
+/*
+ * Task 169: the interactive blocks' scripts load only on pages that show them (still
+ * rendered on the server), instead of one shared bundle on every page. Phones then
+ * fetch far less before the first photo paints.
+ */
+const HorizontalScroll = dynamic(() =>
+  import('@/components/site/HorizontalScroll').then((m) => m.HorizontalScroll),
+)
+const CursorPreview = dynamic(() =>
+  import('@/components/site/CursorPreview').then((m) => m.CursorPreview),
+)
+const FleetCarousel = dynamic(() => import('./FleetCarousel').then((m) => m.FleetCarousel))
 import { CmsImage, Cta, Header, RichText, Section, asMedia, type BlockHeader } from './shared'
 
 /* One renderer per CMS block (see src/payload/blocks). Variants follow Figma. */
