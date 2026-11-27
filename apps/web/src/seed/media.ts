@@ -38,7 +38,12 @@ export const PHOTOS = {
     alt: 'A black luxury sedan with its rear door open, ready for a guest',
   },
   ella: { file: 'ella-nine-arches', alt: 'The Nine Arches Bridge in the misty hills of Ella' },
-  sigiriya: { file: 'sigiriya-sunrise', alt: 'Sigiriya rock fortress at sunrise above the jungle' },
+  sigiriya: {
+    file: 'sigiriya-sunrise',
+    alt: 'Sigiriya rock fortress at sunrise above the jungle',
+    // Keep the summit in frame in wide crops.
+    focalY: 32,
+  },
   mpvHotel: {
     file: 'mpv-hotel-entrance',
     alt: 'A black people carrier at a lantern-lit hotel entrance at dusk',
@@ -103,9 +108,11 @@ export type Photos = Record<PhotoKey, Media>
 export async function seedMedia(payload: Payload): Promise<Photos> {
   const out = {} as Photos
   const dir = imagesDir()
-  for (const [key, { file, alt }] of Object.entries(PHOTOS) as Array<
+  for (const [key, photo] of Object.entries(PHOTOS) as Array<
     [PhotoKey, (typeof PHOTOS)[PhotoKey]]
   >) {
+    const { file, alt } = photo
+    const focalY = 'focalY' in photo ? photo.focalY : undefined
     const filename = `${file}.jpg`
     const { docs } = await payload.find({
       collection: 'media',
@@ -113,11 +120,19 @@ export async function seedMedia(payload: Payload): Promise<Photos> {
       limit: 1,
       depth: 0,
     })
+    if (docs[0] && focalY != null && docs[0].focalY !== focalY) {
+      docs[0] = await payload.update({
+        collection: 'media',
+        id: docs[0].id,
+        data: { focalX: 50, focalY },
+        context: { disableRevalidate: true },
+      })
+    }
     out[key] =
       docs[0] ??
       (await payload.create({
         collection: 'media',
-        data: { alt },
+        data: { alt, ...(focalY != null ? { focalX: 50, focalY } : {}) },
         filePath: path.join(dir, filename),
         context: { disableRevalidate: true },
       }))

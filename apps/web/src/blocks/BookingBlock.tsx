@@ -2,10 +2,11 @@ import type { Form } from '@ceylonvvip/db'
 import { cn } from '@ceylonvvip/ui-brand'
 
 import { getCollection, getGlobal, getFirstForm } from '@/lib/data'
+import { mediaSrc } from '@/lib/media-url'
 
 import { BookingForm, type BookingFormProps } from './BookingForm'
 
-import { Header, Section, type BlockHeader } from './shared'
+import { Header, Section, asMedia, type BlockHeader } from './shared'
 
 /**
  * Form block: Prestige/Booking/Form with its options read live from the CMS, so a newly
@@ -59,13 +60,24 @@ export async function BookingBlock({ block }: { block: Record<string, unknown> }
           label: s.shortLabel || s.title,
         })),
         vehicles: (
-          vehicles as Array<{ id: number; name: string; seats: number; luggage?: number | null }>
-        ).map((v) => ({
-          id: String(v.id),
-          name: v.name,
-          seats: v.seats,
-          luggage: v.luggage ?? null,
-        })),
+          vehicles as Array<{
+            id: number
+            name: string
+            seats: number
+            luggage?: number | null
+            gallery?: unknown[] | null
+          }>
+        ).map((v) => {
+          const photo = asMedia(v.gallery?.[0])
+          const src = mediaSrc(photo?.sizes?.card?.url || photo?.url)
+          return {
+            id: String(v.id),
+            name: v.name,
+            seats: v.seats,
+            luggage: v.luggage ?? null,
+            image: src ? { src, alt: photo?.alt || v.name } : null,
+          }
+        }),
         preselectService: preselect != null ? String(preselect) : null,
         successMessage: settings.successMessage ?? null,
       }
@@ -81,7 +93,7 @@ export async function BookingBlock({ block }: { block: Record<string, unknown> }
     <Section settings={block.settings as never}>
       <div
         className={cn(
-          'mx-auto flex w-full max-w-1312 flex-col gap-40',
+          'flex w-full flex-col gap-40',
           hasHeader ? 'lg:flex-row lg:items-start lg:justify-between lg:gap-96' : 'items-center',
         )}
       >

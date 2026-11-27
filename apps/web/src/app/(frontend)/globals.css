@@ -51,6 +51,15 @@ html.motion
   visibility: hidden;
 }
 
+/* Photos wipe in as they scroll into view (Motion.tsx IMAGE_REVEAL_SELECTOR). */
+html.motion
+  main
+  img:not([data-animate='hero-intro'] img):not([data-animate='reveal-mask'] img):not(
+    [data-animate='image-parallax'] img
+  ) {
+  clip-path: inset(0% 0% 100% 0%);
+}
+
 /* Lenis smooth scrolling (desktop). */
 html.lenis,
 html.lenis body {

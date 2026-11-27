@@ -254,15 +254,22 @@ export async function seedFigma(payload: Payload) {
         items: [
           {
             title: 'A garland welcome',
+            icon: 'heart',
             text: 'Fresh flowers and a garland as you arrive, with hot towels and a welcome drink.',
           },
           {
             title: 'King coconut',
+            icon: 'glass-water',
             text: 'Fresh juice served in a glass bottle, the moment you arrive.',
           },
-          { title: 'Flight tracked', text: 'Waiting time and delays never cost you anything.' },
+          {
+            title: 'Flight tracked',
+            icon: 'plane',
+            text: 'Waiting time and delays never cost you anything.',
+          },
           {
             title: 'Care and security',
+            icon: 'shield',
             text: 'Caregivers for elderly guests, and bodyguards from our own team.',
           },
         ],
@@ -311,7 +318,7 @@ export async function seedFigma(payload: Payload) {
     data: {
       tagline: 'Travel like royalty,\nfeel like family.',
       columns: [
-        { heading: 'Services', links: serviceLinks.slice(0, 6) },
+        { heading: 'Services', links: serviceLinks },
         {
           heading: 'CeylonVVIP',
           links: [

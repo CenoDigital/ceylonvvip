@@ -598,6 +598,10 @@ export const RouteList: Block = {
           type: 'text',
           admin: { description: 'Shown at the right, like "Price on request".' },
         },
+        media({
+          name: 'photo',
+          description: 'Optional: shown beside the cursor when a visitor hovers this row.',
+        }),
       ],
     },
     { name: 'footnote', type: 'text', admin: { description: 'Small line under the rows.' } },

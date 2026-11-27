@@ -3,6 +3,7 @@ import Link from 'next/link'
 import type { Faq, Pricing, Service, Testimonial, Vehicle } from '@ceylonvvip/db'
 import {
   Icon,
+  type IconName,
   Enquiry,
   FaqRow,
   Feature,
@@ -20,6 +21,8 @@ import { getCollection, getGlobal } from '@/lib/data'
 import { resolveLink } from '@/lib/links'
 import { mediaSrc } from '@/lib/media-url'
 import { pathFor } from '@/payload/paths'
+
+import { CursorPreview, type PreviewImage } from '@/components/site/CursorPreview'
 
 import { BookingBlock } from './BookingBlock'
 import { FleetCarousel } from './FleetCarousel'
@@ -91,7 +94,7 @@ async function HeroBlockView({ block, first }: { block: Block; first: boolean })
           {block.eyebrow ? (
             <p className="text-label-caps text-brand">{String(block.eyebrow)}</p>
           ) : null}
-          <Heading className="mt-24 max-w-1100 font-display text-hero whitespace-pre-line text-foreground lg:mt-40">
+          <Heading className="mt-24 max-w-1100 font-display text-hero text-balance whitespace-pre-line text-foreground lg:mt-40">
             {String(block.heading ?? '')}
           </Heading>
           {block.intro ? (
@@ -177,18 +180,38 @@ function RichTextView({ block }: { block: Block }) {
   )
 }
 
+/** Preview photo for a row: the card size when Payload made one, else the original. */
+function previewOf(key: string, media: unknown, alt: string): PreviewImage | null {
+  const m = asMedia(media)
+  const src = mediaSrc(m?.sizes?.card?.url || m?.url)
+  return src ? { key, src, alt: m?.alt || alt } : null
+}
+
 function RouteListView({ block }: { block: Block }) {
-  const rows = docs<{ id?: string; name: string; note?: string | null }>(block.items)
+  const rows = docs<{ id?: string; name: string; note?: string | null; photo?: unknown }>(
+    block.items,
+  )
+  const previews = rows
+    .map((r, i) => previewOf(String(i), r.photo, r.name))
+    .filter((p): p is PreviewImage => Boolean(p))
   return (
     <Section settings={block.settings as never}>
       <div className="flex flex-col gap-32 lg:flex-row lg:items-start lg:gap-96">
         <Header header={block.header as BlockHeader} className="lg:w-420 lg:shrink-0" />
         <div className="min-w-0 flex-1">
-          <ul className="border-b border-border">
-            {rows.map((r, i) => (
-              <RouteRow key={r.id ?? i} route={r.name} note={r.note ?? undefined} />
-            ))}
-          </ul>
+          <CursorPreview images={previews}>
+            <ul className="grid sm:grid-cols-2 sm:gap-x-48">
+              {rows.map((r, i) => (
+                <RouteRow
+                  key={r.id ?? i}
+                  ruled={false}
+                  route={r.name}
+                  note={r.note ?? undefined}
+                  data-preview={asMedia(r.photo) ? String(i) : undefined}
+                />
+              ))}
+            </ul>
+          </CursorPreview>
           {block.footnote ? (
             <p className="mt-8 text-small text-muted-foreground">{String(block.footnote)}</p>
           ) : null}
@@ -206,35 +229,54 @@ async function ServicesGridView({ block }: { block: Block }) {
       <Section settings={block.settings as never}>
         <Header header={block.header as BlockHeader} className="mb-40 lg:mb-72" />
         <ul className="grid gap-x-32 gap-y-56 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-48 lg:gap-y-80">
-          {services.map((s, i) => (
-            <li key={s.id} data-animate-item>
-              <Link href={pathFor('services', s.slug)} className="group flex flex-col gap-24">
-                <div className="relative aspect-[4/5] overflow-hidden bg-placeholder">
-                  <CmsImage
-                    media={s.image}
-                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                    className="transition-transform duration-700 ease-out group-hover:scale-[1.04] motion-reduce:transition-none"
-                  />
-                </div>
-                <div className="flex items-start gap-20 border-t border-border pt-20">
-                  <span className="text-label-caps text-brand tabular-nums">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <span className="flex min-w-0 flex-1 flex-col gap-8">
-                    <span className="font-display text-h3 text-foreground">{s.title}</span>
-                    {s.summary ? (
-                      <span className="text-small text-muted-foreground">{s.summary}</span>
-                    ) : null}
-                  </span>
-                  <Icon
-                    name="arrow-up-right"
-                    size={20}
-                    className="mt-4 shrink-0 transition-transform duration-300 group-hover:translate-x-2 group-hover:-translate-y-2 motion-reduce:transition-none"
-                  />
-                </div>
-              </Link>
-            </li>
-          ))}
+          {services.map((s, i) => {
+            // The last card of an uneven row spans it as a wide card (no orphan).
+            const last = i === services.length - 1
+            const wideLg = last && services.length % 3 === 1
+            const wideSm = last && services.length % 2 === 1
+            return (
+              <li
+                key={s.id}
+                data-animate-item
+                className={cn(
+                  wideSm && 'sm:col-span-2',
+                  wideLg ? 'lg:col-span-3' : 'lg:col-span-1',
+                )}
+              >
+                <Link href={pathFor('services', s.slug)} className="group flex flex-col gap-24">
+                  <div
+                    className={cn(
+                      'relative aspect-[4/5] overflow-hidden bg-placeholder',
+                      wideSm && 'sm:aspect-[16/8]',
+                      wideLg ? 'lg:aspect-[16/6]' : wideSm && 'lg:aspect-[4/5]',
+                    )}
+                  >
+                    <CmsImage
+                      media={s.image}
+                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                      className="transition-transform duration-700 ease-out group-hover:scale-[1.04] motion-reduce:transition-none"
+                    />
+                  </div>
+                  <div className="flex items-start gap-20">
+                    <span className="text-label-caps text-brand tabular-nums">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <span className="flex min-w-0 flex-1 flex-col gap-8">
+                      <span className="font-display text-h3 text-foreground">{s.title}</span>
+                      {s.summary ? (
+                        <span className="text-small text-muted-foreground">{s.summary}</span>
+                      ) : null}
+                    </span>
+                    <Icon
+                      name="arrow-up-right"
+                      size={20}
+                      className="mt-4 shrink-0 transition-transform duration-300 group-hover:translate-x-2 group-hover:-translate-y-2 motion-reduce:transition-none"
+                    />
+                  </div>
+                </Link>
+              </li>
+            )
+          })}
         </ul>
       </Section>
     )
@@ -242,9 +284,15 @@ async function ServicesGridView({ block }: { block: Block }) {
   return (
     <Section settings={block.settings as never}>
       <Header header={block.header as BlockHeader} className="mb-40 lg:mb-72" />
-      <div className="border-b border-border">
+      <CursorPreview
+        images={services
+          .map((s) => previewOf(String(s.id), s.image, s.title))
+          .filter((p): p is PreviewImage => Boolean(p))}
+        className="border-b border-border"
+      >
         {services.map((s, i) => (
           <IndexRow
+            data-preview={String(s.id)}
             key={s.id}
             number={String(i + 1).padStart(2, '0')}
             title={s.title}
@@ -252,7 +300,7 @@ async function ServicesGridView({ block }: { block: Block }) {
             href={pathFor('services', s.slug)}
           />
         ))}
-      </div>
+      </CursorPreview>
     </Section>
   )
 }
@@ -384,12 +432,21 @@ async function FleetComparisonView({ block }: { block: Block }) {
   )
 }
 
+// Title features fill the row: as many columns as items, up to five.
+const TITLE_COLS: Record<number, string> = {
+  2: 'lg:grid-cols-2',
+  3: 'lg:grid-cols-3',
+  4: 'lg:grid-cols-4',
+  5: 'lg:grid-cols-5',
+}
+
 function FeatureListView({ block }: { block: Block }) {
   const items = docs<{
     id?: string
     label?: string | null
     title: string
     text?: string | null
+    icon?: string | null
     image?: unknown
     cta?: unknown
   }>(block.items)
@@ -412,22 +469,32 @@ function FeatureListView({ block }: { block: Block }) {
       </Section>
     )
   }
+  const onCard = (block.settings as { bg?: string } | undefined)?.bg === 'card'
   const cols =
     variant === 'small'
-      ? 'lg:grid-cols-4'
+      ? 'sm:grid-cols-2 lg:grid-cols-4'
       : variant === 'title'
-        ? 'grid-cols-2 lg:grid-cols-5'
-        : 'lg:grid-cols-3'
+        ? cn('grid-cols-2', TITLE_COLS[Math.min(items.length, 5)] ?? 'lg:grid-cols-5')
+        : 'md:grid-cols-3'
   return (
     <Section settings={block.settings as never}>
       <Header header={block.header as BlockHeader} className="mb-32 lg:mb-56" />
-      <div className={cn('grid gap-32 lg:gap-x-48 lg:gap-y-56', cols)}>
+      <div
+        className={cn(
+          'grid',
+          variant === 'small' ? 'gap-12 lg:gap-16' : 'gap-48 lg:gap-x-64 lg:gap-y-72',
+          cols,
+        )}
+      >
         {items.map((item, i) => (
           <Feature
             key={item.id ?? i}
             variant={variant}
             title={item.title}
             text={item.text ?? undefined}
+            number={variant === 'small' ? undefined : String(i + 1).padStart(2, '0')}
+            icon={(item.icon as IconName | null) ?? undefined}
+            className={variant === 'small' && onCard ? 'bg-background' : undefined}
           />
         ))}
       </div>
@@ -442,7 +509,7 @@ function DestinationsView({ block }: { block: Block }) {
   return (
     <Section settings={block.settings as never} className="flex flex-col gap-32 lg:gap-80">
       <HeaderRow block={block} />
-      <ul className="grid gap-32 lg:grid-cols-3 lg:gap-48">
+      <ul className="grid gap-32 md:grid-cols-3 lg:gap-48">
         {items.map((place, i) => (
           <li key={place.id ?? i} className="flex flex-col gap-20">
             <div className="relative h-420 w-full overflow-hidden bg-placeholder lg:h-560">
@@ -499,17 +566,17 @@ function ImageTextView({ block }: { block: Block }) {
     <Section settings={block.settings as never} bleed={bleed}>
       <div
         className={cn(
-          'flex flex-col gap-40 lg:flex-row lg:items-center',
+          'flex flex-col gap-40 md:flex-row md:items-center md:gap-48',
           bleed ? 'lg:gap-120' : 'lg:gap-96',
-          right && 'lg:flex-row-reverse',
-          bleed && (right ? 'lg:pl-64' : 'lg:pr-64'),
+          right && 'md:flex-row-reverse',
+          bleed && (right ? 'md:pl-24 lg:pl-64' : 'md:pr-24 lg:pr-64'),
         )}
       >
         <div
           className={cn(
             'relative w-full shrink-0 overflow-hidden bg-placeholder',
             bleed
-              ? 'aspect-[390/440] lg:aspect-auto lg:h-820 lg:w-1/2'
+              ? 'aspect-[390/440] md:aspect-[4/5] md:w-1/2 lg:aspect-auto lg:h-820'
               : 'aspect-[4/3] lg:aspect-auto lg:h-560 lg:w-760',
           )}
         >
@@ -518,7 +585,7 @@ function ImageTextView({ block }: { block: Block }) {
         <div
           className={cn(
             'flex min-w-0 flex-1 flex-col items-start gap-24',
-            bleed && 'px-24 lg:px-0',
+            bleed && 'px-24 md:px-0',
           )}
         >
           <Header header={block.header as BlockHeader} />
@@ -624,7 +691,7 @@ function PricingTableView({ block }: { block: Block }) {
 function ProcessStepsView({ block }: { block: Block }) {
   const steps = docs<{ id?: string; title: string; text?: string | null }>(block.steps)
   const list = (columns: boolean) => (
-    <ol className={cn('grid border-b border-border', columns && 'lg:grid-cols-2 lg:gap-x-96')}>
+    <ol className={cn('grid', columns && 'lg:grid-cols-2 lg:gap-x-96')}>
       {steps.map((s, i) => (
         <Step
           key={s.id ?? i}

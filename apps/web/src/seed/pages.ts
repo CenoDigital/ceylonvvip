@@ -5,7 +5,7 @@
  */
 import type { Payload } from 'payload'
 
-import { SERVICE_HERO_PHOTOS, VEHICLE_PHOTOS, type Photos } from './media'
+import { SERVICE_HERO_PHOTOS, VEHICLE_PHOTOS, type PhotoKey, type Photos } from './media'
 
 type Ref = { id: number | string }
 type Upsert = (
@@ -109,7 +109,7 @@ const SERVICE_PAGES: ServicePage[] = [
         'Tangalle',
         'Anuradhapura',
         'Aluthgama and Bentota',
-      ].map((place) => [`Airport to ${place}`, 'Price on request']),
+      ].map((place) => [`Airport to ${place}`]),
       footnote: 'And every other place in Sri Lanka.',
     },
     onBoard: {
@@ -367,6 +367,20 @@ const VEHICLES = [
   },
 ]
 
+// Cursor preview photos for route rows: only where a photo really shows the place.
+const ROW_PHOTOS: Array<[RegExp, PhotoKey]> = [
+  [/Galle/, 'galle'],
+  [/Sigiriya/, 'sigiriya'],
+  [/Ella/, 'ella'],
+  [/Bentota/, 'coastRoad'],
+  [/Wedding/, 'weddingCar'],
+  [/Honeymoon|Hotel/, 'hotelSuite'],
+]
+const rowPhoto = (photos: Photos, name: string) => {
+  const key = ROW_PHOTOS.find(([re]) => re.test(name))?.[1]
+  return key ? photos[key].id : undefined
+}
+
 const enquiry = (whatsapp: unknown) => ({
   blockType: 'ctaBanner',
   variant: 'enquiry',
@@ -473,7 +487,11 @@ export async function seedPages(
                 blockType: 'routeList',
                 variant: 'rows',
                 header: { eyebrow: s.list.eyebrow, heading: s.list.heading, intro: s.list.intro },
-                items: s.list.rows.map(([name, note]) => ({ name, note })),
+                items: s.list.rows.map(([name, note]) => ({
+                  name,
+                  note,
+                  photo: rowPhoto(photos, name),
+                })),
                 footnote: s.list.footnote,
                 settings: { pt: 'none' },
               },
@@ -661,15 +679,22 @@ export async function seedPages(
         items: [
           {
             title: 'A garland welcome',
+            icon: 'heart',
             text: 'Fresh flowers and a garland as you arrive, with hot towels and a welcome drink.',
           },
           {
             title: 'King coconut',
+            icon: 'glass-water',
             text: 'Fresh juice served in a glass bottle, the moment you arrive.',
           },
-          { title: 'Flight tracked', text: 'Waiting time and delays never cost you anything.' },
+          {
+            title: 'Flight tracked',
+            icon: 'plane',
+            text: 'Waiting time and delays never cost you anything.',
+          },
           {
             title: 'Care and security',
+            icon: 'shield',
             text: 'Caregivers for elderly guests, and bodyguards from our own team.',
           },
         ],

@@ -39,11 +39,13 @@ export function SiteFooter({
         className,
       )}
     >
-      <div className="flex flex-col gap-48 lg:flex-row">
+      <div className="grid gap-48 sm:grid-cols-3 lg:flex lg:flex-row">
         {tagline ? (
-          <p className="font-display text-h3 whitespace-pre-line lg:flex-1">{tagline}</p>
+          <p className="font-display text-h3 whitespace-pre-line sm:col-span-3 lg:flex-1">
+            {tagline}
+          </p>
         ) : (
-          <div className="lg:flex-1" />
+          <div className="hidden lg:block lg:flex-1" />
         )}
         {columns.map((col) => (
           <div
@@ -74,7 +76,7 @@ export function SiteFooter({
         {/* The wordmark scales with the viewport so it always fills the width. */}
         <p
           aria-hidden
-          className="text-center font-display text-[clamp(56px,14.9vw,215px)] leading-none font-light whitespace-nowrap"
+          className="text-center font-display text-[min(13.2vw,200px)] leading-none font-light whitespace-nowrap"
         >
           CEYLONVVIP
         </p>

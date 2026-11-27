@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useId, useMemo, useState, useTransition, type FormEvent } from 'react'
 
 import { bookingSchema, todayInColombo, type DetailQuestion } from '@ceylonvvip/validation'
@@ -42,7 +43,13 @@ export interface BookingFormProps {
     >
   }
   services: Array<{ id: string; label: string }>
-  vehicles: Array<{ id: string; name: string; seats: number; luggage: number | null }>
+  vehicles: Array<{
+    id: string
+    name: string
+    seats: number
+    luggage: number | null
+    image: { src: string; alt: string } | null
+  }>
   preselectService: string | null
   successMessage: string | null
 }
@@ -193,6 +200,17 @@ export function BookingForm({
                 value={v.id}
                 vehicle={v.name}
                 detail={`Up to ${v.seats} guests${v.luggage != null ? `, ${v.luggage} bags` : ''}`}
+                image={
+                  v.image ? (
+                    <Image
+                      src={v.image.src}
+                      alt={v.image.alt}
+                      fill
+                      sizes="(min-width: 1024px) 240px, 229px"
+                      className="object-cover"
+                    />
+                  ) : undefined
+                }
                 checked={vehicle === v.id}
                 onChange={() => setVehicle(v.id)}
               />
