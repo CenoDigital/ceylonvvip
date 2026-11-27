@@ -746,6 +746,11 @@ export async function seedPages(
             label: 'Signature experience',
             title: 'A real Sri Lankan gem, in your hands.',
             text: 'Ceylon gems have been prized for centuries. As our guest, you are invited to see and hold genuine natural stones, cut and polished or rough, from the island’s many varieties.',
+            more: {
+              // Client copy (task 167).
+              heading: 'Custom jewellery design',
+              text: 'We are capable of designing any kind of jewellery according to your choice.\n\nAll our designs are custom-made to match your style, preference, and occasion, and every piece comes with a certificate, ensuring its real value.\n\nYour dream design, made just for you.',
+            },
             image: photos.sapphires.id,
             cta: { label: 'Ask about the gem experience', appearance: 'link', link: whatsapp },
           },

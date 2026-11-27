@@ -37,3 +37,12 @@ test('photos show a blurred preview while they load (task 166)', async ({ reques
   const html = await (await request.get('/')).text()
   expect(html).toContain('data:image/webp;base64')
 })
+
+test('the gem card offers custom jewellery design (task 167)', async ({ request }) => {
+  for (const path of ['/', '/about']) {
+    const html = await (await request.get(path)).text()
+    expect(html).toContain('Custom jewellery design')
+    expect(html).toContain('Your dream design, made just for you.')
+  }
+  expect(await (await request.get('/de')).text()).toContain('Schmuck nach Maß')
+})

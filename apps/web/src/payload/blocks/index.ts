@@ -292,6 +292,18 @@ export const FeatureList: Block = {
         },
         { name: 'title', type: 'text', required: true },
         { name: 'text', type: 'textarea' },
+        {
+          name: 'more',
+          type: 'group',
+          admin: {
+            description:
+              'Optional second part under the text (Signature variant), like "Custom jewellery design". Leave a blank line between paragraphs.',
+          },
+          fields: [
+            { name: 'heading', type: 'text' },
+            { name: 'text', type: 'textarea' },
+          ],
+        },
         { name: 'icon', type: 'select', options: iconOptions },
         media({ name: 'image', description: 'Used by the Signature variant.' }),
         ctaField(),
