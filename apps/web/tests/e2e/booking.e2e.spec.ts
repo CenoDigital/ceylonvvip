@@ -37,9 +37,23 @@ test('a complete request opens WhatsApp with the message', async ({ page }) => {
   await page.getByText('Airport Transfer', { exact: true }).click()
   await page.getByText('BMW 520d').first().click()
 
-  const date = new Date(Date.now() + 10 * 86_400_000).toISOString().slice(0, 10)
-  await page.getByLabel('Date').fill(date)
-  await page.getByLabel('Time').fill('09:30')
+  // Themed pickers (task 158): choose a day 10 days ahead in the calendar, then 09:30.
+  const day = new Date(Date.now() + 10 * 86_400_000)
+  const month = day.toLocaleDateString('en-US', { month: 'long' })
+  await page.getByLabel('Date').click()
+  const dayButton = page.getByRole('button', {
+    name: new RegExp(`${month} ${day.getDate()}(st|nd|rd|th), ${day.getFullYear()}`),
+  })
+  if (!(await dayButton.isVisible()))
+    await page.getByRole('button', { name: /next month/i }).click()
+  await dayButton.click()
+  await expect(page.getByLabel('Date')).toContainText(String(day.getFullYear()))
+
+  await page.getByLabel('Time').click()
+  await page.getByRole('listbox', { name: 'Hour' }).getByRole('option', { name: '09' }).click()
+  await page.getByRole('listbox', { name: 'Minute' }).getByRole('option', { name: '30' }).click()
+  await page.getByRole('button', { name: 'Done' }).click()
+  await expect(page.getByLabel('Time')).toContainText('09:30')
 
   await Promise.all([
     page.waitForURL(/wa\.me|whatsapp\.com/),

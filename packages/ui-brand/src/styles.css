@@ -47,3 +47,11 @@ dialog[open] .open-stagger {
     animation: none;
   }
 }
+
+/* Date and time picker panels open with a short fade and rise. */
+@keyframes picker-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}

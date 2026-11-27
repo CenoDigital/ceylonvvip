@@ -13,14 +13,17 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@radix-ui/react-popover": "1.3.1",
+    "react-day-picker": "10.0.2"
+  },
   "devDependencies": {
     "@ceylonvvip/config": "workspace:*",
-    "eslint": "9.39.5",
-    "typescript": "6.0.3",
-    "vitest": "5.1.1",
     "@types/react": "19.3.0",
-    "react": "19.3.1"
+    "eslint": "9.39.5",
+    "react": "19.3.1",
+    "typescript": "6.0.3",
+    "vitest": "5.1.1"
   },
   "peerDependencies": {
     "react": "^19.3.1"

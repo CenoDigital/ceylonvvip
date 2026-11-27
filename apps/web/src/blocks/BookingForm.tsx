@@ -7,9 +7,11 @@ import {
   Alert,
   Button,
   Chip,
+  DateField,
   Field,
   Stepper,
   TextAreaField,
+  TimeField,
   Toast,
   VehicleOption,
   cn,
@@ -134,6 +136,18 @@ export function BookingForm({
       className="flex flex-col gap-32"
       aria-describedby={formError || errorCount ? `${id}-alert` : undefined}
     >
+      {form.detailsToggleLabel && questions.length ? (
+        <div className="flex gap-6" aria-hidden>
+          <span className="h-2 flex-1 bg-foreground" />
+          <span
+            className={cn(
+              'h-2 flex-1 transition-colors duration-300',
+              showDetails ? 'bg-foreground' : 'bg-border',
+            )}
+          />
+        </div>
+      ) : null}
+
       {formError || errorCount ? (
         <div id={`${id}-alert`}>
           <Alert
@@ -170,11 +184,11 @@ export function BookingForm({
       {form.vehicleLabel && vehicles.length ? (
         <fieldset className="flex min-w-0 flex-col gap-12">
           <legend className={cn(label, 'mb-12')}>{form.vehicleLabel}</legend>
-          <div className="-mx-24 flex snap-x gap-16 overflow-x-auto px-24 pb-4 lg:mx-0 lg:grid lg:grid-cols-3 lg:overflow-visible lg:px-0">
+          <div className="-mx-24 flex snap-x gap-16 overflow-x-auto px-24 pb-4 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3 [&::-webkit-scrollbar]:hidden">
             {vehicles.map((v) => (
               <VehicleOption
                 key={v.id}
-                className="w-229 shrink-0 snap-start lg:w-auto"
+                className="w-229 shrink-0 snap-start sm:w-auto"
                 name={`${id}-vehicle`}
                 value={v.id}
                 vehicle={v.name}
@@ -185,7 +199,7 @@ export function BookingForm({
             ))}
             {form.noPreferenceLabel ? (
               <VehicleOption
-                className="w-229 shrink-0 snap-start lg:w-auto"
+                className="w-229 shrink-0 snap-start sm:w-auto"
                 name={`${id}-vehicle`}
                 value="none"
                 vehicle={form.noPreferenceLabel}
@@ -198,24 +212,17 @@ export function BookingForm({
         </fieldset>
       ) : null}
 
-      <div className="grid gap-32 lg:grid-cols-2">
-        <Field
+      <div className="grid gap-32 sm:grid-cols-2">
+        <DateField
           label={form.dateLabel}
-          type="date"
           min={today}
           value={date}
-          onChange={(e) => setDate(e.target.value)}
+          onChange={setDate}
           error={errors.date}
           required
         />
         {form.timeLabel ? (
-          <Field
-            label={form.timeLabel}
-            type="time"
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
-            error={errors.time}
-          />
+          <TimeField label={form.timeLabel} value={time} onChange={setTime} error={errors.time} />
         ) : null}
       </div>
 
