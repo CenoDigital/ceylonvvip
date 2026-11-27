@@ -111,7 +111,9 @@ export function CmsImage({
       alt={m.alt ?? ''}
       fill
       sizes={sizes}
-      priority={priority}
+      // The LCP photo (first hero): preloaded at high priority (Next 16: `preload`).
+      preload={priority}
+      fetchPriority={priority ? 'high' : undefined}
       className={cn('object-cover', className)}
       style={{ objectPosition: `${m.focalX ?? 50}% ${m.focalY ?? 50}%` }}
     />
