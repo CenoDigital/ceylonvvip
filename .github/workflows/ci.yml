@@ -1,5 +1,4 @@
-# All testing happens here, on GitHub Actions runners (GitHub-hosted, or the local ones in
-# docker/ci-runner when the CI_RUNNER variable is set). Coolify only receives images
+# All testing happens here, in throwaway GitHub runners. Coolify only receives images
 # that passed every job below.
 name: CI
 
@@ -22,7 +21,7 @@ env:
 jobs:
   verify:
     name: Format, lint, types, unit tests
-    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-24.04' }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -51,7 +50,7 @@ jobs:
 
   integration:
     name: Integration tests (Postgres)
-    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-24.04' }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     services:
       postgres:
@@ -104,7 +103,7 @@ jobs:
 
   security:
     name: Dependency audit, secrets, SAST
-    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-24.04' }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -130,7 +129,7 @@ jobs:
   browser:
     name: E2E, accessibility, visual, Lighthouse
     if: github.event_name != 'push'
-    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-24.04' }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     # Same image that produced the visual baselines, so fonts render identically.
     container:
@@ -220,7 +219,7 @@ jobs:
 
   image:
     name: Docker image and Trivy scan
-    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-24.04' }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     needs: [verify, integration, security]
     permissions:
@@ -262,7 +261,7 @@ jobs:
 
   deploy-staging:
     name: Deploy to staging
-    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-24.04' }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     needs: [image]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
