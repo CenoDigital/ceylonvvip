@@ -1,4 +1,5 @@
-# All testing happens here, in throwaway GitHub runners. Coolify only receives images
+# All testing happens here, on GitHub Actions runners (GitHub-hosted, or the local ones in
+# docker/ci-runner when the CI_RUNNER variable is set). Coolify only receives images
 # that passed every job below.
 name: CI
 
@@ -21,7 +22,7 @@ env:
 jobs:
   verify:
     name: Format, lint, types, unit tests
-    runs-on: ubuntu-24.04
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -50,7 +51,7 @@ jobs:
 
   integration:
     name: Integration tests (Postgres)
-    runs-on: ubuntu-24.04
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 15
     services:
       postgres:
@@ -103,7 +104,7 @@ jobs:
 
   security:
     name: Dependency audit, secrets, SAST
-    runs-on: ubuntu-24.04
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -129,7 +130,7 @@ jobs:
   browser:
     name: E2E, accessibility, visual, Lighthouse
     if: github.event_name != 'push'
-    runs-on: ubuntu-24.04
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 30
     # Same image that produced the visual baselines, so fonts render identically.
     container:
@@ -170,13 +171,16 @@ jobs:
           secret="$(openssl rand -hex 32)"
           echo "::add-mask::$secret"
           echo "PAYLOAD_SECRET=$secret" >> "$GITHUB_ENV"
+      # Migrate first: the build's page workers each start Payload, and on an empty
+      # database they would all run the migrations at once (many cores, like the local runner).
+      - name: Database schema (migrate)
+        working-directory: apps/web
+        run: pnpm migrate
       - name: Production build
         run: pnpm turbo run build --filter=web
-      - name: Load the Figma content (migrate, then seed)
+      - name: Load the Figma content (seed)
         working-directory: apps/web
-        run: |
-          pnpm migrate
-          pnpm seed
+        run: pnpm seed
       - name: Start the production server (runs migrations on boot)
         working-directory: apps/web
         # Set only here, not at build time: proves the URL is read at runtime.
@@ -216,7 +220,7 @@ jobs:
 
   image:
     name: Docker image and Trivy scan
-    runs-on: ubuntu-24.04
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 30
     needs: [verify, integration, security]
     permissions:
@@ -258,7 +262,7 @@ jobs:
 
   deploy-staging:
     name: Deploy to staging
-    runs-on: ubuntu-24.04
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 15
     needs: [image]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
