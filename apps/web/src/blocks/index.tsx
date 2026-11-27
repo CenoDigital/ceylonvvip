@@ -85,7 +85,9 @@ async function HeroBlockView({ block, first }: { block: Block; first: boolean })
     return (
       <section data-animate={animate}>
         {/* Figma 01 Home / Hero: centred, D/Hero 120 in 1100px, lead 520px, 40/40/48 gaps. */}
-        <div className="flex flex-col items-center px-24 pt-72 pb-48 text-center lg:px-64 lg:pt-136 lg:pb-96">
+        {/* Phones: the heading fills the first screen (below the 70px nav) and the photo
+            follows on scroll, so the first view is the text (fast LCP). Desktop as Figma. */}
+        <div className="flex min-h-[calc(100svh-70px)] flex-col items-center justify-center px-24 pt-72 pb-120 text-center lg:min-h-0 lg:justify-start lg:px-64 lg:pt-136 lg:pb-96">
           {block.eyebrow ? (
             <p className="text-label-caps text-brand">{String(block.eyebrow)}</p>
           ) : null}
@@ -97,7 +99,7 @@ async function HeroBlockView({ block, first }: { block: Block; first: boolean })
               {String(block.intro)}
             </p>
           ) : null}
-          {action ? <div className="mt-36 lg:mt-48">{action}</div> : null}
+          {action ? <div className="mt-36 lg:mt-48 [&>div]:justify-center">{action}</div> : null}
         </div>
         {image}
       </section>
