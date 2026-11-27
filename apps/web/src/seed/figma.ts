@@ -10,6 +10,7 @@
  */
 import type { Payload } from 'payload'
 
+import { SERVICE_HERO_PHOTOS, seedMedia } from './media'
 import { seedPages } from './pages'
 
 const p = (text: string) => ({
@@ -74,15 +75,20 @@ export async function seedFigma(payload: Payload) {
     throw new Error('The Figma seed never runs on the live site.')
   }
 
+  const photos = await seedMedia(payload)
+
   const services = []
   for (const [i, [title, summary]] of SERVICES.entries()) {
+    const slug = title.toLowerCase().replace(/ and /g, '-').replace(/\s+/g, '-')
     services.push(
-      await upsert(
-        payload,
-        'services',
-        title.toLowerCase().replace(/ and /g, '-').replace(/\s+/g, '-'),
-        { title, summary, order: i + 1 },
-      ),
+      await upsert(payload, 'services', slug, {
+        title,
+        summary,
+        order: i + 1,
+        // The photo under each service page's hero in Figma; Hotels and Ayurveda has no
+        // page in Figma, so it uses the hotel photo from Home's signature benefits.
+        image: photos[SERVICE_HERO_PHOTOS[slug] ?? 'hotelSuite'].id,
+      }),
     )
   }
   const servicesBySlug = Object.fromEntries(services.map((s) => [s.slug, s]))
@@ -94,6 +100,7 @@ export async function seedFigma(payload: Payload) {
     seats: 3,
     luggage: 4,
     summary: '2 guests, plus 1 in front. 4 bags. White with beige interior.',
+    gallery: [photos.bmw.id],
   })
 
   const fleet = await upsert(payload, 'pages', 'fleet', { title: 'Fleet' })
@@ -117,7 +124,10 @@ export async function seedFigma(payload: Payload) {
         heading: 'Travel like royalty.\nFeel like family.',
         intro:
           'Private, safe and made just for you. Chauffeured journeys across Sri Lanka for diplomats, business leaders and VVIP families.',
-        mediaType: 'none',
+        // Figma 01 Home / Hero image (1440 by 820) with its caption.
+        mediaType: 'image',
+        image: photos.coastRoad.id,
+        caption: 'The coast road, Bentota',
         ctas: [
           { cta: { label: 'Speak to your concierge', appearance: 'button', link: whatsappLink } },
           {
@@ -147,12 +157,14 @@ export async function seedFigma(payload: Payload) {
             label: 'Signature experience',
             title: 'A real Sri Lankan gem, in your hands.',
             text: 'Ceylon gems have been prized for centuries. As our guest, you are invited to see and hold genuine natural stones, cut and polished or rough, from the island’s many varieties.',
+            image: photos.sapphires.id,
             cta: { label: 'Ask about the gem experience', appearance: 'link', link: whatsappLink },
           },
           {
             label: 'Hotels and Ayurveda',
             title: 'Your hotels, arranged for you.',
             text: 'Share your dates and the kind of stay you prefer. Your travel manager books 5-star hotels and Ayurvedic treatment hotels anywhere on the island, and times every transfer around your stay.',
+            image: photos.hotelSuite.id,
             cta: {
               label: 'Request a hotel or Ayurvedic stay',
               appearance: 'link',
@@ -163,6 +175,7 @@ export async function seedFigma(payload: Payload) {
             label: 'Your travel manager',
             title: 'One person, from first message to final mile.',
             text: 'Your travel manager arranges your vehicles, drivers, hotels and timings, and is with you on WhatsApp, any time of day.',
+            image: photos.travelManager.id,
             cta: { label: 'Speak to your travel manager', appearance: 'link', link: whatsappLink },
           },
         ],
@@ -183,6 +196,7 @@ export async function seedFigma(payload: Payload) {
         blockType: 'processSteps',
         variant: 'steps',
         header: { eyebrow: 'Your journey', heading: 'From the first message to the flight home.' },
+        image: photos.rearCabin.id,
         settings: { pt: 'none', pb: 'xl', anim: 'stagger-children' },
         steps: [
           {
@@ -223,9 +237,13 @@ export async function seedFigma(payload: Payload) {
         },
         settings: { pt: 'xl' },
         items: [
-          { name: 'Sigiriya', line: 'The rock fortress, at first light' },
-          { name: 'Ella', line: 'Tea country and cool hills' },
-          { name: 'Galle', line: 'The old Dutch fort by the sea' },
+          {
+            name: 'Sigiriya',
+            line: 'The rock fortress, at first light',
+            photo: photos.sigiriya.id,
+          },
+          { name: 'Ella', line: 'Tea country and cool hills', photo: photos.ella.id },
+          { name: 'Galle', line: 'The old Dutch fort by the sea', photo: photos.galle.id },
         ],
       },
       {
@@ -254,7 +272,8 @@ export async function seedFigma(payload: Payload) {
         variant: 'detail',
         header: { eyebrow: 'In detail', heading: 'Private chauffeur service in Sri Lanka.' },
         content: rich(
-          'CeylonVVIP is a private chauffeur and travel service based in Aluthgama, on Sri Lanka’s south-west coast. We meet guests at Bandaranaike International Airport (CMB) and drive them anywhere on the island, in a private vehicle with an English-speaking driver in uniform. Guests come to us for airport transfers, tailored island tours, wedding cars, bodyguards and care for elderly travellers. One travel manager arranges everything, including 5-star and Ayurvedic hotels, and stays in touch on WhatsApp, 24 hours a day.',
+          'CeylonVVIP is a private chauffeur and travel service based in Aluthgama, on Sri Lanka’s south-west coast. We meet guests at Bandaranaike International Airport (CMB) and drive them anywhere on the island, in a private vehicle with an English-speaking driver in uniform.',
+          'Guests come to us for airport transfers, tailored island tours, wedding cars, bodyguards and care for elderly travellers. One travel manager arranges everything, including 5-star and Ayurvedic hotels, and stays in touch on WhatsApp, 24 hours a day.',
         ),
       },
       {
@@ -336,6 +355,7 @@ export async function seedFigma(payload: Payload) {
     (c, slug, data) => upsert(payload, c, slug, data),
     whatsappLink,
     WHATSAPP,
+    photos,
   )
   payload.logger.info('Seeded the Figma pages 01 to 10 and the site chrome.')
 }

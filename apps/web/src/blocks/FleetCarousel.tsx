@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { useId, useRef, useState, type KeyboardEvent } from 'react'
 
 import { Icon, cn } from '@ceylonvvip/ui-brand'
+import { mediaSrc } from '@/lib/media-url'
 
 export interface CarouselVehicle {
   id: string | number
@@ -51,7 +52,7 @@ export function FleetCarousel({ vehicles }: { vehicles: CarouselVehicle[] }) {
         {v.image ? (
           <Image
             key={v.id}
-            src={v.image.url}
+            src={mediaSrc(v.image.url)!}
             alt={v.image.alt}
             fill
             sizes="(min-width: 1024px) 1312px, 100vw"

@@ -6,6 +6,7 @@ import type { Media } from '@ceylonvvip/db'
 import { Button, LinkUnderline, SectionHeader, cn } from '@ceylonvvip/ui-brand'
 
 import { linkProps, type CmsLink } from '@/lib/links'
+import { mediaSrc } from '@/lib/media-url'
 
 /*
  * Pieces every block renderer shares: the section wrapper (background, spacing,
@@ -106,11 +107,16 @@ export function CmsImage({
   if (!m?.url) return null
   return (
     <Image
-      src={m.url}
+      src={mediaSrc(m.url)!}
       alt={m.alt ?? ''}
       fill
       sizes={sizes}
-      priority={priority}
+      // The LCP photo (first hero): preloaded at high priority (Next 16: `preload`).
+      preload={priority}
+      fetchPriority={priority ? 'high' : undefined}
+      // Decode it in the first frame, before the page's scripts start, so it paints with
+      // the text (otherwise Lighthouse counts the script time against LCP).
+      decoding={priority ? 'sync' : undefined}
       className={cn('object-cover', className)}
       style={{ objectPosition: `${m.focalX ?? 50}% ${m.focalY ?? 50}%` }}
     />
