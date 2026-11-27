@@ -18,6 +18,10 @@ export interface SeedLast {
   at: string
   photoErrors?: number
   error?: string
+  /** Which settings the server saw (no values beyond on/off and the site env name). */
+  settings?: { seedOnEmpty: boolean; seedRefresh: boolean; siteEnv: string | null }
+  /** Seed version already loaded, for "up-to-date". */
+  loaded?: number
 }
 
 /** First line of an error, without URLs or long detail, safe to show publicly. */
@@ -40,10 +44,21 @@ export async function seedIfEmpty(
 ): Promise<SeedOnEmptyResult> {
   const onEmpty = env.SEED_ON_EMPTY === 'true'
   const refresh = env.SEED_REFRESH === 'true'
-  if (!onEmpty && !refresh) return 'off'
+  // Early outcomes are recorded too, so /api/health shows why nothing ran.
+  const early = async (result: SeedOnEmptyResult, loaded?: number) => {
+    await remember(payload, {
+      result,
+      version: SEED_VERSION,
+      at: new Date().toISOString(),
+      settings: { seedOnEmpty: onEmpty, seedRefresh: refresh, siteEnv: env.SITE_ENV ?? null },
+      ...(loaded != null ? { loaded } : {}),
+    })
+    return result
+  }
+  if (!onEmpty && !refresh) return early('off')
   if (env.SITE_ENV === 'production') {
     payload.logger.warn('SEED_ON_EMPTY and SEED_REFRESH are ignored on the live site.')
-    return 'production'
+    return early('production')
   }
   const { totalDocs } = await payload.count({ collection: 'pages', overrideAccess: true })
   const empty = totalDocs === 0
@@ -51,10 +66,10 @@ export async function seedIfEmpty(
   if (empty && onEmpty) {
     result = 'seeded'
   } else if (!refresh) {
-    return 'not-empty'
+    return early('not-empty')
   } else {
     const loaded = Number((await payload.kv.get<number>(VERSION_KEY)) ?? 0)
-    if (loaded >= SEED_VERSION) return 'up-to-date'
+    if (loaded >= SEED_VERSION) return early('up-to-date', loaded)
     result = 'refreshed'
   }
   try {
