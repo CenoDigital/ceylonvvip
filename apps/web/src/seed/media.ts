@@ -8,8 +8,8 @@ import { blurDataURL } from '../lib/blur'
 
 /*
  * Photos from the Figma file (task 159). The client has no photos of their own yet,
- * so the site uses the ones in the design. Optimised JPEGs live in ./images, named by
- * subject. Three are stand-ins the client should replace (marked below): Figma labels
+ * so the site uses the ones in the design. They live in ./images as WebP made straight
+ * from the Figma originals (task 169, quality 90), named by subject. Three are stand-ins the client should replace (marked below): Figma labels
  * the portrait and the map "AI placeholder", and the Audi A3 and Honda Vezel share a
  * sedan photo that is neither car.
  */
@@ -25,7 +25,7 @@ function imagesDir(): string {
     path.resolve(process.cwd(), 'apps/web/seed-images'),
     path.resolve(process.cwd(), 'seed-images'),
   ].filter((d): d is string => Boolean(d))
-  const found = candidates.find((d) => existsSync(path.join(d, 'coast-road-bentota.jpg')))
+  const found = candidates.find((d) => existsSync(path.join(d, 'coast-road-bentota.webp')))
   if (!found) throw new Error(`Seed photos not found. Looked in: ${candidates.join(', ')}`)
   return found
 }
@@ -121,6 +121,9 @@ function withTimeout<T>(work: Promise<T>, ms: number, message: string): Promise<
 /** Photos that could not be uploaded in the last seed (storage unreachable, etc.). */
 export const photoErrors: string[] = []
 
+/** JPEG photos from earlier seeds, removed once the pages use the WebP ones. */
+export const oldJpegs: Array<number | string> = []
+
 /** Uploads every photo once; a photo already in Media (same file name) is reused. */
 export async function seedMedia(payload: Payload): Promise<Photos> {
   const out = {} as Photos
@@ -130,7 +133,7 @@ export async function seedMedia(payload: Payload): Promise<Photos> {
   >) {
     const { file, alt } = photo
     const focalY = 'focalY' in photo ? photo.focalY : undefined
-    const filename = `${file}.jpg`
+    const filename = `${file}.webp`
     const { docs } = await payload.find({
       collection: 'media',
       where: { filename: { equals: filename } },
@@ -174,6 +177,18 @@ export async function seedMedia(payload: Payload): Promise<Photos> {
       photoErrors.push(`${filename}: ${message}`)
       payload.logger.error({ err: error }, `Seed: could not upload ${filename}`)
       out[key] = { id: null } as unknown as Media
+      continue
+    }
+    // Task 169: the WebP replaces the JPEG an earlier seed uploaded. The pages are seeded
+    // again with the new photo, so the old one is no longer used anywhere.
+    const old = await payload.find({
+      collection: 'media',
+      where: { filename: { equals: `${file}.jpg` } },
+      limit: 1,
+      depth: 0,
+    })
+    for (const doc of old.docs) {
+      oldJpegs.push(doc.id)
     }
   }
   return out

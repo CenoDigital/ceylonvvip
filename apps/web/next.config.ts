@@ -22,6 +22,9 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   images: {
     localPatterns: [{ pathname: '/api/media/file/**' }],
+    // Task 169: clearer photos. Every photo is served at quality 85 (Next's default is
+    // 75); an image asking for another quality gets the nearest allowed one.
+    qualities: [85],
   },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {

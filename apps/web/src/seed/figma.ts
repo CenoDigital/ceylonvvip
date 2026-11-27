@@ -10,7 +10,7 @@
  */
 import type { Payload } from 'payload'
 
-import { SERVICE_HERO_PHOTOS, seedMedia } from './media'
+import { SERVICE_HERO_PHOTOS, oldJpegs, seedMedia } from './media'
 import { seedPages } from './pages'
 import { seedTranslations } from './translations'
 
@@ -382,5 +382,9 @@ export async function seedFigma(payload: Payload) {
     photos,
   )
   await seedTranslations(payload)
+  // Every page, service and vehicle now uses the WebP photos (task 169).
+  for (const id of oldJpegs.splice(0)) {
+    await payload.delete({ collection: 'media', id, context: { disableRevalidate: true } })
+  }
   payload.logger.info('Seeded the Figma pages 01 to 10 and the site chrome.')
 }

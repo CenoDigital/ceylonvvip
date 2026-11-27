@@ -6,7 +6,7 @@ import { SiteChrome } from '@/components/site/SiteChrome'
 import { PageSchema } from '@/components/seo/PageSchema'
 import { getGlobal, getPage } from '@/lib/data'
 import { applyLocale } from '@/lib/i18n-server'
-import { buildMetadata } from '@/lib/seo'
+import { buildMetadata, introOf } from '@/lib/seo'
 
 /*
  * The services index (task 160): the CMS page with the slug "services", built from
@@ -33,6 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: page.title,
     path: '/services',
     seo: page.seo,
+    fallbackDescription: introOf(page.layout),
     fallbackImage: page.image,
     defaults,
     settings,

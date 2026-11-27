@@ -34,6 +34,13 @@ import { CmsImage, Cta, Header, RichText, Section, asMedia, type BlockHeader } f
 
 type Block = { blockType: string; id?: string | null } & Record<string, unknown>
 
+/**
+ * Heading level for a block's item titles: h3 under the block's own heading, h2 when the
+ * block has none, so headings never skip a level after the page's h1 (task 169).
+ */
+const itemHeading = (block: Block): 'h2' | 'h3' =>
+  (block.header as { heading?: string | null } | undefined)?.heading ? 'h3' : 'h2'
+
 const docs = <T,>(value: unknown): T[] =>
   Array.isArray(value) ? value.filter((v): v is T => Boolean(v) && typeof v === 'object') : []
 
@@ -253,7 +260,7 @@ function RouteListView({ block }: { block: Block }) {
   )
 }
 
-async function ServicesGridView({ block }: { block: Block }) {
+async function ServicesGridView({ block, lead = false }: { block: Block; lead?: boolean }) {
   const services = await itemsFor<Service>(block, 'services')
   if (block.variant === 'cards') {
     // Services page: every service as a photo card, each opening its own page.
@@ -291,6 +298,7 @@ async function ServicesGridView({ block }: { block: Block }) {
                       <CmsImage
                         media={s.image}
                         sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                        priority={lead && i === 0}
                       />
                     </div>
                   </div>
@@ -352,7 +360,7 @@ function HeaderRow({ block }: { block: Block }) {
   )
 }
 
-async function VehicleShowcaseView({ block }: { block: Block }) {
+async function VehicleShowcaseView({ block, lead = false }: { block: Block; lead?: boolean }) {
   const vehicles = await itemsFor<Vehicle>(block, 'vehicles')
   const specs = block.variant === 'specs'
   if (!specs) {
@@ -392,6 +400,7 @@ async function VehicleShowcaseView({ block }: { block: Block }) {
   }
   // Figma 08 Fleet / Vehicles: per vehicle a 680px photo, then "01 of 05" and the name in
   // a 420px column beside four specs, then the block's enquiry link.
+  const VehicleHeading = itemHeading(block)
   const SPEC_LABELS = [
     ['bestFor', 'Best for'],
     ['guests', 'Guests'],
@@ -407,14 +416,20 @@ async function VehicleShowcaseView({ block }: { block: Block }) {
         return (
           <article key={v.id} className="flex flex-col gap-28 lg:gap-36">
             <div className="relative aspect-[342/260] w-full overflow-hidden bg-placeholder lg:aspect-auto lg:h-680">
-              <CmsImage media={photo} sizes="(min-width: 1024px) 1312px, 100vw" />
+              <CmsImage
+                media={photo}
+                sizes="(min-width: 1024px) 1312px, 100vw"
+                priority={lead && i === 0}
+              />
             </div>
             <div className="flex flex-col gap-28 lg:flex-row lg:gap-48">
               <div className="flex flex-col gap-12 lg:w-420 lg:shrink-0">
                 <p className="text-small text-brand">
                   {String(i + 1).padStart(2, '0')} of {String(vehicles.length).padStart(2, '0')}
                 </p>
-                <h3 className="font-display text-h2 text-foreground">{v.name}</h3>
+                <VehicleHeading className="font-display text-h2 text-foreground">
+                  {v.name}
+                </VehicleHeading>
               </div>
               {specList.length ? (
                 <dl className="grid flex-1 grid-cols-2 gap-24 lg:grid-cols-4 lg:gap-32">
@@ -510,6 +525,7 @@ function FeatureListView({ block }: { block: Block }) {
         <Header header={block.header as BlockHeader} className="px-24 lg:px-64" />
         {items.map((item, i) => (
           <FeatureSignature
+            as={itemHeading(block)}
             key={item.id ?? i}
             imageSide={i % 2 ? 'right' : 'left'}
             label={item.label ?? undefined}
@@ -542,6 +558,7 @@ function FeatureListView({ block }: { block: Block }) {
       >
         {items.map((item, i) => (
           <Feature
+            as={itemHeading(block)}
             key={item.id ?? i}
             variant={variant}
             title={item.title}
@@ -654,7 +671,7 @@ function StatsView({ block }: { block: Block }) {
   )
 }
 
-function ImageTextView({ block }: { block: Block }) {
+function ImageTextView({ block, lead = false }: { block: Block; lead?: boolean }) {
   // Figma Wedding cars / Travel manager (bleed: photo to the page edge, 720 by 820) and
   // Contact Visit (inset: photo within the margins, 760 by 560, with detail rows).
   const bleed = block.variant !== 'inset'
@@ -678,7 +695,7 @@ function ImageTextView({ block }: { block: Block }) {
               : 'aspect-[4/3] lg:aspect-auto lg:h-560 lg:w-760',
           )}
         >
-          <CmsImage media={block.image} sizes="(min-width: 1024px) 50vw, 100vw" />
+          <CmsImage media={block.image} sizes="(min-width: 1024px) 50vw, 100vw" priority={lead} />
         </div>
         <div
           className={cn(
@@ -939,15 +956,20 @@ export async function RenderBlocks({ blocks }: { blocks?: Block[] | null }) {
     <>
       {blocks.map((block, i) => {
         const key = block.id ?? `${block.blockType}-${i}`
+        // Task 169: the block whose photo is the first thing on screen (the page opens
+        // with it, or with a hero that has no photo) loads that photo at high priority.
+        const opener = blocks[0]
+        const lead =
+          i === 0 || (i === 1 && opener?.blockType === 'hero' && !asMedia(opener.image)?.url)
         switch (block.blockType) {
           case 'hero':
             return <HeroBlockView key={key} block={block} first={i === 0} />
           case 'richText':
             return <RichTextView key={key} block={block} />
           case 'servicesGrid':
-            return <ServicesGridView key={key} block={block} />
+            return <ServicesGridView key={key} block={block} lead={lead} />
           case 'vehicleShowcase':
-            return <VehicleShowcaseView key={key} block={block} />
+            return <VehicleShowcaseView key={key} block={block} lead={lead} />
           case 'fleetComparison':
             return <FleetComparisonView key={key} block={block} />
           case 'featureList':
@@ -955,7 +977,7 @@ export async function RenderBlocks({ blocks }: { blocks?: Block[] | null }) {
           case 'stats':
             return <StatsView key={key} block={block} />
           case 'imageText':
-            return <ImageTextView key={key} block={block} />
+            return <ImageTextView key={key} block={block} lead={lead} />
           case 'gallery':
             return <GalleryView key={key} block={block} />
           case 'testimonials':
