@@ -4,15 +4,11 @@
 # GitHub's ubuntu-24.04 runners. See README.md.
 FROM ghcr.io/actions/actions-runner:2.338.2
 
-# Root on purpose: the inner Docker engine needs it, and container jobs (Playwright) leave
-# root-owned files that the runner must be able to clean between jobs. The container only
-# runs this repo's own workflows and is never part of the site.
-# trivy:ignore:DS-0002
-USER root # nosemgrep: dockerfile.security.last-user-is-root.last-user-is-root
+USER root
 
 # Docker engine and the tools the workflows call directly (git, curl, openssl, jq).
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends ca-certificates curl gnupg git jq openssl unzip iptables \
+  && apt-get install -y --no-install-recommends ca-certificates curl gnupg git jq openssl unzip iptables libatomic1 python3 xz-utils zstd \
   && install -m 0755 -d /etc/apt/keyrings \
   && curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc \
   && chmod a+r /etc/apt/keyrings/docker.asc \
@@ -28,4 +24,6 @@ RUN chmod +x /entrypoint.sh
 
 ENV RUNNER_ALLOW_RUNASROOT=1
 WORKDIR /home/runner
+# The image defaults to the runner user; compose.yml starts it as root (see there why).
+USER runner
 ENTRYPOINT ["/entrypoint.sh"]
