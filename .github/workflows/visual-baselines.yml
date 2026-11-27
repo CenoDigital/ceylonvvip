@@ -33,6 +33,8 @@ jobs:
       CI: 'true'
       DATABASE_URI: postgres://ceylonvvip:ceylonvvip@postgres:5432/ceylonvvip
       PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
+      # Local media (no S3 here): one absolute folder for the seed and the server.
+      MEDIA_DIR: ${{ github.workspace }}/apps/web/media
       # Same as the CI browser job, so baselines match what CI compares.
       SITE_ENV: production
       UI_GALLERY: 'true'

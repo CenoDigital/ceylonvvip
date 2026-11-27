@@ -8,6 +8,9 @@ export const Media: CollectionConfig = {
   admin: { group: 'Content', defaultColumns: ['filename', 'alt', 'updatedAt'] },
   access: { read: anyone, create: editors, update: editors, delete: editors },
   upload: {
+    // Local disk only (no S3_*). An absolute MEDIA_DIR keeps the seed and the standalone
+    // server (which runs from its own folder) looking in the same place, as in CI.
+    staticDir: process.env.MEDIA_DIR || 'media',
     mimeTypes: ['image/*', 'application/pdf'],
     focalPoint: true,
     crop: true,
