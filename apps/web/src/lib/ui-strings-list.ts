@@ -33,6 +33,8 @@ export const UI_STRINGS = [
   'of',
   'Previous vehicle',
   'Next vehicle',
+  'Swipe',
+  'Drag',
   // Language switch
   'Language',
 ] as const

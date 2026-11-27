@@ -1,37 +1,66 @@
 'use client'
 
 import Image from 'next/image'
-import { useId, useRef, useState, type KeyboardEvent } from 'react'
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type PointerEvent as ReactPointerEvent,
+} from 'react'
 
 import { Icon, cn } from '@ceylonvvip/ui-brand'
+import { SwipeHint } from '@/components/site/SwipeHint'
 import { mediaSrc } from '@/lib/media-url'
 
 export interface CarouselVehicle {
   id: string | number
   name: string
   summary?: string | null
-  image?: { url: string; alt: string; focalX?: number | null; focalY?: number | null } | null
+  image?: {
+    url: string
+    alt: string
+    focalX?: number | null
+    focalY?: number | null
+    blurDataURL?: string | null
+  } | null
 }
 
 const pad = (n: number) => String(n).padStart(2, '0')
+/** How far (px) a swipe or drag must travel to change the vehicle. */
+const SWIPE = 56
 
 /**
  * Figma 01 Home / Fleet: one vehicle at a time. Large photo, number, name and summary,
  * an "01 of 05" counter with previous and next buttons, and a tab row of names with a
  * 2px line over the active one. Tabs follow the ARIA tabs pattern (arrow keys move).
+ *
+ * Task 168: every photo sits in one sliding row (so each is already loaded when chosen,
+ * and none is hidden by the page's photo reveal), and the row follows a finger swipe or
+ * a mouse drag. A small Swipe or Drag hint shows that it moves.
  */
 export function FleetCarousel({
   vehicles,
   labels = {},
 }: {
   vehicles: CarouselVehicle[]
-  /** Translated: of, previous, next. */
-  labels?: { of?: string; previous?: string; next?: string }
+  /** Translated: of, previous, next, swipe, drag. */
+  labels?: { of?: string; previous?: string; next?: string; swipe?: string; drag?: string }
 }) {
   const [index, setIndex] = useState(0)
+  const [drag, setDrag] = useState(0)
+  const [rtl, setRtl] = useState(false)
   const id = useId()
   const tabs = useRef<Array<HTMLButtonElement | null>>([])
+  const frame = useRef<HTMLDivElement>(null)
+  const start = useRef<{ x: number; y: number; id: number; horizontal?: boolean } | null>(null)
   const count = vehicles.length
+
+  useEffect(() => {
+    if (frame.current) setRtl(getComputedStyle(frame.current).direction === 'rtl')
+  }, [])
+
   const go = (i: number, focus = false) => {
     const next = (i + count) % count
     setIndex(next)
@@ -43,30 +72,96 @@ export function FleetCarousel({
     else return
     e.preventDefault()
   }
+
+  const onDown = (e: ReactPointerEvent) => {
+    if (count < 2 || (e.pointerType === 'mouse' && e.button !== 0)) return
+    start.current = { x: e.clientX, y: e.clientY, id: e.pointerId }
+  }
+  const onMove = (e: ReactPointerEvent) => {
+    const s = start.current
+    if (!s || s.id !== e.pointerId) return
+    const dx = e.clientX - s.x
+    const dy = e.clientY - s.y
+    if (s.horizontal === undefined) {
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return
+      // A mostly vertical move is a page scroll, not a swipe.
+      s.horizontal = Math.abs(dx) > Math.abs(dy)
+      if (!s.horizontal) {
+        start.current = null
+        return
+      }
+      e.currentTarget.setPointerCapture(e.pointerId)
+    }
+    setDrag(dx)
+  }
+  const onUp = (e: ReactPointerEvent) => {
+    const s = start.current
+    start.current = null
+    if (!s || s.id !== e.pointerId || !s.horizontal) return
+    const dx = e.clientX - s.x
+    setDrag(0)
+    if (Math.abs(dx) < SWIPE) return
+    // Dragging the photo left shows the next one (right in Arabic).
+    go(index + (dx < 0 !== rtl ? 1 : -1))
+  }
+
   const v = vehicles[index]
   if (!v) return null
   const round =
     'flex size-48 items-center justify-center rounded-full border border-foreground transition-colors hover:bg-accent outline-ring focus-visible:outline-2'
+  const offset = `calc(${rtl ? index * 100 : -index * 100}% + ${drag}px)`
 
   return (
-    <div className="flex flex-col gap-28 lg:gap-48" aria-roledescription="carousel">
+    // data-no-reveal: the page's heading and photo reveals leave this carousel alone.
+    <div data-no-reveal className="flex flex-col gap-28 lg:gap-48" aria-roledescription="carousel">
       <div
+        ref={frame}
         id={`${id}-panel`}
         role="tabpanel"
         aria-labelledby={`${id}-tab-${index}`}
-        className="relative aspect-[342/260] w-full overflow-hidden bg-placeholder lg:aspect-auto lg:h-720"
+        className={cn(
+          'relative aspect-[342/260] w-full touch-pan-y overflow-hidden bg-placeholder select-none lg:aspect-auto lg:h-720',
+          count > 1 && 'cursor-grab active:cursor-grabbing',
+        )}
+        onPointerDown={onDown}
+        onPointerMove={onMove}
+        onPointerUp={onUp}
+        onPointerCancel={onUp}
       >
-        {v.image ? (
-          <Image
-            key={v.id}
-            src={mediaSrc(v.image.url)!}
-            alt={v.image.alt}
-            fill
-            sizes="(min-width: 1024px) 1312px, 100vw"
-            className="object-cover"
-            style={{ objectPosition: `${v.image.focalX ?? 50}% ${v.image.focalY ?? 50}%` }}
-          />
-        ) : null}
+        <div
+          className={cn(
+            'flex h-full w-full',
+            !drag && 'transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]',
+          )}
+          style={{ transform: `translateX(${offset})` }}
+        >
+          {vehicles.map((item, i) => (
+            <div
+              key={item.id}
+              className="relative h-full w-full shrink-0"
+              aria-hidden={i !== index}
+            >
+              {item.image ? (
+                <Image
+                  src={mediaSrc(item.image.url)!}
+                  alt={i === index ? item.image.alt : ''}
+                  fill
+                  draggable={false}
+                  // The chosen photo and its neighbours load right away, so a swipe never
+                  // shows an empty frame; the rest load once the carousel is near.
+                  loading={Math.abs(i - index) <= 1 || i === count - 1 ? 'eager' : 'lazy'}
+                  placeholder={item.image.blurDataURL ? 'blur' : 'empty'}
+                  blurDataURL={item.image.blurDataURL ?? undefined}
+                  sizes="(min-width: 1024px) 1312px, 100vw"
+                  className="pointer-events-none object-cover"
+                  style={{
+                    objectPosition: `${item.image.focalX ?? 50}% ${item.image.focalY ?? 50}%`,
+                  }}
+                />
+              ) : null}
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="flex flex-col gap-20 lg:flex-row lg:items-center">
@@ -79,6 +174,7 @@ export function FleetCarousel({
         </div>
         {count > 1 ? (
           <div className="flex items-center gap-16">
+            <SwipeHint swipe={labels.swipe} drag={labels.drag} />
             <p className="text-small text-muted-foreground" aria-live="polite">
               {pad(index + 1)} {labels.of ?? 'of'} {pad(count)}
             </p>

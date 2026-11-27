@@ -171,7 +171,7 @@ function parallax(section: HTMLElement) {
 
 /** Photos that wipe in as they scroll into view (not the hero or image presets). */
 export const IMAGE_REVEAL_SELECTOR =
-  'main img:not([data-animate="hero-intro"] img):not([data-animate="reveal-mask"] img):not([data-animate="image-parallax"] img):not([data-hscroll] img)'
+  'main img:not([data-animate="hero-intro"] img):not([data-animate="reveal-mask"] img):not([data-animate="image-parallax"] img):not([data-hscroll] img):not([data-no-reveal] img)'
 
 /** Statement text whose words fill from faded to ink as it scrolls through the view. */
 export const SCROLL_FILL_SELECTOR = 'main [data-scroll-fill]'
