@@ -44,9 +44,7 @@ export function LanguageSwitch({ className, label }: { className?: string; label
 
   return (
     <details ref={details} className={cn('group relative', className)}>
-      <summary
-        className="flex min-h-44 cursor-pointer list-none items-center gap-8 text-nav-caps text-foreground transition-colors hover:text-muted-foreground [&::-webkit-details-marker]:hidden"
-      >
+      <summary className="flex min-h-44 cursor-pointer list-none items-center gap-8 text-nav-caps text-foreground transition-colors hover:text-muted-foreground [&::-webkit-details-marker]:hidden">
         <Icon name="globe" size={16} />
         <span className="sr-only">{label ?? 'Language'}: </span>
         {current.toUpperCase()}
