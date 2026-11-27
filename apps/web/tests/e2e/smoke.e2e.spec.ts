@@ -3,7 +3,8 @@ import { expect, test } from '@playwright/test'
 test('health check reports the database is reachable', async ({ request }) => {
   const response = await request.get('/api/health')
   expect(response.status()).toBe(200)
-  expect(await response.json()).toEqual({ status: 'ok' })
+  // It may also report the last seed-on-start outcome (seed: {...}).
+  expect(await response.json()).toMatchObject({ status: 'ok' })
 })
 
 test('home page renders', async ({ page }) => {
