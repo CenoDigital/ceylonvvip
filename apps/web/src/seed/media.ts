@@ -105,6 +105,17 @@ export const SERVICE_HERO_PHOTOS: Record<string, PhotoKey> = {
 
 export type Photos = Record<PhotoKey, Media>
 
+// An unreachable storage endpoint can stall an upload for minutes; give up sooner.
+const UPLOAD_TIMEOUT_MS = 20_000
+
+function withTimeout<T>(work: Promise<T>, ms: number, message: string): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(message)), ms)
+  })
+  return Promise.race([work, timeout]).finally(() => clearTimeout(timer))
+}
+
 /** Photos that could not be uploaded in the last seed (storage unreachable, etc.). */
 export const photoErrors: string[] = []
 
@@ -135,12 +146,16 @@ export async function seedMedia(payload: Payload): Promise<Photos> {
     try {
       out[key] =
         docs[0] ??
-        (await payload.create({
-          collection: 'media',
-          data: { alt, ...(focalY != null ? { focalX: 50, focalY } : {}) },
-          filePath: path.join(dir, filename),
-          context: { disableRevalidate: true },
-        }))
+        (await withTimeout(
+          payload.create({
+            collection: 'media',
+            data: { alt, ...(focalY != null ? { focalX: 50, focalY } : {}) },
+            filePath: path.join(dir, filename),
+            context: { disableRevalidate: true },
+          }),
+          UPLOAD_TIMEOUT_MS,
+          `upload timed out after ${UPLOAD_TIMEOUT_MS / 1000}s (storage unreachable?)`,
+        ))
     } catch (error) {
       // Keep seeding without this photo: pages and translations still load, and the
       // photo fills in on the next seed once storage works.

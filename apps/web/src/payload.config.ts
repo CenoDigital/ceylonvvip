@@ -107,8 +107,11 @@ export default buildConfig({
   ],
   sharp,
   // Staging: fill an empty database with the Figma content (SEED_ON_EMPTY, see seed/on-empty.ts).
-  onInit: async (payload) => {
-    const { seedIfEmpty } = await import('./seed/on-empty')
-    await seedIfEmpty(payload)
+  // Runs in the background: the server starts serving straight away, and a slow seed
+  // (photo uploads to storage) can never hold up startup or health checks.
+  onInit: (payload) => {
+    void import('./seed/on-empty')
+      .then(({ seedIfEmpty }) => seedIfEmpty(payload))
+      .catch((error) => payload.logger.error({ err: error }, 'Seed on start crashed.'))
   },
 })
