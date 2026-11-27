@@ -101,7 +101,10 @@ export function HorizontalScroll({
         {header}
         <ul
           ref={track}
+          // Keyboard users scroll the swipe row with the arrow keys once it has focus.
+          tabIndex={0}
           className={cn(
+            'outline-none focus-visible:ring-1 focus-visible:ring-brand',
             '-mx-24 flex snap-x snap-mandatory scroll-px-24 gap-20 overflow-x-auto px-24 pb-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
             'sm:gap-32 lg:-mx-64 lg:scroll-px-64 lg:gap-48 lg:px-64',
             // Scroll-driven on desktop: the track slides as one piece, so it must not clip itself.
