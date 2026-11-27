@@ -14,7 +14,7 @@ permissions:
 jobs:
   update:
     if: github.event_name == 'workflow_dispatch' || github.event.label.name == 'update-visual-baselines'
-    runs-on: ubuntu-24.04
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 30
     container:
       image: mcr.microsoft.com/playwright:v1.65.1-noble

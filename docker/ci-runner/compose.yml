@@ -1,0 +1,38 @@
+# Two local runners, so CI jobs run two at a time. Start with ./start.ps1 (see README.md).
+name: ceylonvvip-ci-runner
+
+x-runner: &runner
+  build: .
+  image: ceylonvvip-ci-runner:2.338.2
+  # The inner Docker engine needs it.
+  privileged: true
+  restart: unless-stopped
+  environment: &env
+    RUNNER_REPO: CenoDigital/ceylonvvip
+    RUNNER_LABELS: ceylon-local
+    # Only read on the first start, from the shell that runs start.ps1. Never stored here.
+    RUNNER_TOKEN: ${RUNNER_TOKEN:-}
+
+services:
+  runner-1:
+    <<: *runner
+    environment:
+      <<: *env
+      RUNNER_NAME: ceylon-local-1
+    volumes:
+      - state-1:/state
+      - docker-1:/var/lib/docker
+  runner-2:
+    <<: *runner
+    environment:
+      <<: *env
+      RUNNER_NAME: ceylon-local-2
+    volumes:
+      - state-2:/state
+      - docker-2:/var/lib/docker
+
+volumes:
+  state-1:
+  state-2:
+  docker-1:
+  docker-2:
