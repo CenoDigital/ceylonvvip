@@ -23,6 +23,7 @@ import { resolveLink } from '@/lib/links'
 import { mediaSrc } from '@/lib/media-url'
 import { pathFor } from '@/payload/paths'
 
+import { HorizontalScroll } from '@/components/site/HorizontalScroll'
 import { CursorPreview, type PreviewImage } from '@/components/site/CursorPreview'
 
 import { BookingBlock } from './BookingBlock'
@@ -132,10 +133,12 @@ function RichTextView({ block }: { block: Block }) {
         settings={block.settings as never}
         className="flex flex-col items-center gap-36 text-center lg:gap-56"
       >
-        <RichText
-          data={block.content}
-          className="max-w-1000 font-display text-h1 text-foreground [&_p+p]:mt-28"
-        />
+        <div data-scroll-fill className="max-w-1000 text-foreground">
+          <RichText
+            data={block.content}
+            className="max-w-none font-display text-h1 text-inherit [&_p+p]:mt-28"
+          />
+        </div>
         {header?.eyebrow ? (
           <p className="flex flex-wrap justify-center gap-x-72 gap-y-12 text-label-caps text-brand">
             {header.eyebrow.split(',').map((word) => (
@@ -146,9 +149,33 @@ function RichTextView({ block }: { block: Block }) {
       </Section>
     )
   }
+  const faqs = docs<Faq>(block.faqs)
+  if (block.variant === 'detail' && !faqs.length) {
+    // Task 165: "In detail" as an editorial spread. A large heading across the page,
+    // then the text in two wide columns under a bronze label, no rule above.
+    return (
+      <Section settings={block.settings as never}>
+        <div className="flex flex-col gap-40 lg:gap-72">
+          <div className="flex flex-col gap-20 lg:gap-32">
+            {header?.eyebrow ? (
+              <p className="text-label-caps text-brand">{header.eyebrow}</p>
+            ) : null}
+            {header?.heading ? (
+              <h2 className="max-w-1100 font-display text-display text-balance text-foreground">
+                {header.heading}
+              </h2>
+            ) : null}
+          </div>
+          <RichText
+            data={block.content}
+            className="max-w-none text-lead text-muted-foreground lg:ms-auto lg:w-3/4 lg:columns-2 lg:gap-64 [&_p]:break-inside-avoid [&_p+p]:mt-24 lg:[&_p+p]:mt-0 [&_p:first-child]:text-foreground"
+          />
+        </div>
+      </Section>
+    )
+  }
   // Figma "In detail" and "Story": header in a 420px column, lead text beside it, and
   // optionally "Questions guests ask" with open FAQ rows under the text.
-  const faqs = docs<Faq>(block.faqs)
   return (
     <Section settings={block.settings as never} className="border-t border-border">
       <div className="flex flex-col gap-32 lg:flex-row lg:items-start lg:gap-96">
@@ -517,22 +544,36 @@ function DestinationsView({ block }: { block: Block }) {
   const items = docs<{ id?: string; name: string; line?: string | null; photo?: unknown }>(
     block.items,
   )
+  // Task 165: a sideways row (pinned and scroll-driven on desktop, swipe on phones).
   return (
-    <Section settings={block.settings as never} className="flex flex-col gap-32 lg:gap-80">
-      <HeaderRow block={block} />
-      <ul className="grid gap-32 md:grid-cols-3 lg:gap-48">
+    <Section settings={block.settings as never} className="overflow-x-clip">
+      <HorizontalScroll header={<HeaderRow block={block} />}>
         {items.map((place, i) => (
-          <li key={place.id ?? i} className="flex flex-col gap-20">
-            <div className="relative h-420 w-full overflow-hidden bg-placeholder lg:h-560">
-              <CmsImage media={place.photo} sizes="(min-width: 1024px) 33vw, 100vw" />
+          <li
+            key={place.id ?? i}
+            data-hscroll-item
+            className="flex w-[78vw] shrink-0 snap-start flex-col gap-20 sm:w-[44vw] lg:w-[34vw] xl:w-[30vw]"
+          >
+            <div className="relative h-420 w-full overflow-hidden bg-placeholder sm:h-480 lg:h-[56svh] lg:max-h-640">
+              <CmsImage
+                media={place.photo}
+                sizes="(min-width: 1024px) 34vw, (min-width: 640px) 44vw, 78vw"
+              />
             </div>
-            <div className="flex flex-col gap-6">
-              <h3 className="text-h4 text-foreground">{place.name}</h3>
-              {place.line ? <p className="text-small text-muted-foreground">{place.line}</p> : null}
+            <div className="flex items-baseline gap-16">
+              <span className="text-label-caps text-brand tabular-nums">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <span className="flex flex-col gap-6">
+                <h3 className="font-display text-h3 text-foreground">{place.name}</h3>
+                {place.line ? (
+                  <p className="text-small text-muted-foreground">{place.line}</p>
+                ) : null}
+              </span>
             </div>
           </li>
         ))}
-      </ul>
+      </HorizontalScroll>
     </Section>
   )
 }

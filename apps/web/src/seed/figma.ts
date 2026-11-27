@@ -245,6 +245,17 @@ export async function seedFigma(payload: Payload) {
           },
           { name: 'Ella', line: 'Tea country and cool hills', photo: photos.ella.id },
           { name: 'Galle', line: 'The old Dutch fort by the sea', photo: photos.galle.id },
+          // Task 165: two more places (draft lines for client approval).
+          {
+            name: 'Nuwara Eliya',
+            line: 'Tea estates high in the hills',
+            photo: photos.pradoTea.id,
+          },
+          {
+            name: 'Bentota',
+            line: 'River boats and golden beaches',
+            photo: photos.bentotaRiver.id,
+          },
         ],
       },
       {
