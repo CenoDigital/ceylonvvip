@@ -10,7 +10,8 @@ import {
   serviceSchema,
   websiteSchema,
 } from '@/lib/schema'
-import { absolute, siteUrl } from '@/lib/seo'
+import { absolute } from '@/lib/seo'
+import { getSiteUrl } from '@/lib/site-url'
 
 type Block = { blockType: string } & Record<string, unknown>
 
@@ -48,6 +49,7 @@ export async function PageSchema({
     getGlobal('seo-defaults'),
   ])
   const name = settings.siteName || 'CeylonVVIP'
+  const siteUrl = getSiteUrl()
   const url = absolute(path)
   const logo = media(settings.logos?.light)?.url
 

@@ -177,6 +177,9 @@ jobs:
           pnpm seed
       - name: Start the production server (runs migrations on boot)
         working-directory: apps/web
+        # Set only here, not at build time: proves the URL is read at runtime.
+        env:
+          SITE_URL: http://127.0.0.1:3000
         run: |
           nohup node scripts/start-standalone.mjs > server.log 2>&1 &
           for _ in $(seq 1 60); do
@@ -187,6 +190,8 @@ jobs:
           exit 1
       - name: Playwright (mobile 390 px, desktop 1440 px)
         working-directory: apps/web
+        env:
+          SITE_URL: http://127.0.0.1:3000
         run: pnpm test:e2e
       - name: Lighthouse CI (mobile budgets 90+)
         if: ${{ !cancelled() }}
