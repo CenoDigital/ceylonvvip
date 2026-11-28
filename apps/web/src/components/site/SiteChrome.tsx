@@ -7,8 +7,7 @@ import { localePath } from '@/lib/i18n'
 import { linkProps, resolveLink, whatsappHref, type CmsLink } from '@/lib/links'
 
 import { Analytics } from './Analytics'
-import { Motion } from './Motion'
-import { SmoothScroll } from './SmoothScroll'
+import { MotionLazy } from './MotionLazy'
 import { Header, type HeaderData } from './Header'
 
 const toNav = (
@@ -126,8 +125,7 @@ export async function SiteChrome({ children }: { children: ReactNode }) {
             : undefined
         }
       />
-      <Motion />
-      <SmoothScroll />
+      <MotionLazy />
       <Analytics ga4={seo.analytics?.ga4} metaPixel={seo.analytics?.metaPixel} />
       {whatsapp ? <FloatConcierge href={whatsapp} label={cta?.label ?? undefined} /> : null}
     </>
