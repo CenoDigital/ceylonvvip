@@ -12,12 +12,6 @@
       "numberOfRuns": 3,
       "settings": {
         "formFactor": "mobile",
-        "screenEmulation": {
-          "mobile": true,
-          "width": 390,
-          "height": 844,
-          "deviceScaleFactor": 3
-        },
         "chromeFlags": "--no-sandbox --headless=new"
       }
     },
