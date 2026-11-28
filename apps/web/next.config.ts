@@ -29,6 +29,8 @@ const nextConfig: NextConfig = {
     // Task 169: clearer photos. Every photo is served at quality 85 (Next's default is
     // 75); an image asking for another quality gets the nearest allowed one.
     qualities: [85],
+    // AVIF first (about a third smaller than WebP at the same look), WebP for older browsers.
+    formats: ['image/avif', 'image/webp'],
   },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {

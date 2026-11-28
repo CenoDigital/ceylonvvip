@@ -322,6 +322,9 @@ export function Motion() {
 
       for (const section of sections) {
         const name = section.dataset.animate ?? ''
+        // The first two blocks are on screen at load and already painted (globals.css):
+        // no entrance animation, so the first photo is never hidden (task 169, LCP).
+        if (section.matches('main > :nth-child(-n+2)')) continue
         if (name === 'image-parallax') {
           show(section)
           if (desktop && !reduced)
