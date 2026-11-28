@@ -251,7 +251,7 @@ function RouteListView({ block }: { block: Block }) {
         <Header header={block.header as BlockHeader} className="lg:w-420 lg:shrink-0" />
         <div className="min-w-0 flex-1">
           <CursorPreview images={previews}>
-            <ul className="grid sm:grid-cols-2 sm:gap-x-48">
+            <ul className="grid sm:grid-cols-2 sm:gap-x-48 lg:grid-cols-1">
               {rows.map((r, i) => (
                 <RouteRow
                   key={r.id ?? i}
