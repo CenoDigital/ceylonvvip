@@ -45,9 +45,10 @@
 /*
  * Motion presets (task 149). `html.motion` is set before the first paint by the boot
  * script in the layout. Animated sections keep their space but hide their content
- * (visibility, so no layout shift) until GSAP has set the starting state.
+ * (visibility, so no layout shift) until GSAP has set the starting state. Not the
+ * first two blocks: they are on screen at load and paint at once (task 169, LCP).
  */
-html.motion [data-animate]:not([data-animate='hero-intro']) > * {
+html.motion [data-animate]:not([data-animate='hero-intro']):not(main > :nth-child(-n + 2)) > * {
   visibility: hidden;
 }
 
@@ -58,12 +59,13 @@ html.motion
   visibility: hidden;
 }
 
-/* Photos wipe in as they scroll into view (Motion.tsx IMAGE_REVEAL_SELECTOR). */
+/* Photos wipe in as they scroll into view (Motion.tsx IMAGE_REVEAL_SELECTOR). Not the
+   first two sections: those photos are on screen at load and must paint at once (LCP). */
 html.motion
   main
   img:not([data-animate='hero-intro'] img):not([data-animate='reveal-mask'] img):not(
     [data-animate='image-parallax'] img
-  ):not([data-hscroll] img):not([data-no-reveal] img) {
+  ):not([data-hscroll] img):not([data-no-reveal] img):not(main > :nth-child(-n + 2) img) {
   clip-path: inset(0% 0% 100% 0%);
 }
 
@@ -96,9 +98,6 @@ html.lenis body {
   overscroll-behavior: contain;
 }
 
-/* Hero intro: label, heading, text and buttons rise in turn; the photo settles from 1.08. */
-/* Text starts at 0.01, not 0: it looks the same, but the browser counts the first
-   paint, so the hero text stays the Largest Contentful Paint at first paint. */
 /* Swipe and Drag hints (task 168): the two arrows ease apart and back. */
 @keyframes swipe-nudge {
   0%,
@@ -111,6 +110,9 @@ html.lenis body {
   }
 }
 
+/* Hero intro: label, heading, text and buttons rise in turn; the photo settles from 1.08. */
+/* Text starts at 0.01, not 0: it looks the same, but the browser counts the first
+   paint, so the hero text stays the Largest Contentful Paint at first paint. */
 @keyframes hero-rise {
   from {
     opacity: 0.01;

@@ -18,16 +18,20 @@ const outfit = Outfit({
 })
 // Outfit has no Cyrillic or Arabic letters. Russian falls back to Jost (the same
 // geometric family feel) and Arabic to Noto Kufi Arabic; each loads only on its pages.
+// Not preloaded (task 169): a preload would fetch them on every page, English included,
+// competing with the first photo; the browser fetches them when Russian or Arabic text shows.
 const jost = Jost({
   subsets: ['cyrillic'],
   weight: ['300', '400', '500'],
   display: 'swap',
+  preload: false,
   variable: '--font-cyrillic',
 })
 const kufi = Noto_Kufi_Arabic({
   subsets: ['arabic'],
   weight: ['300', '400', '500'],
   display: 'swap',
+  preload: false,
   variable: '--font-arabic',
 })
 

@@ -51,6 +51,9 @@ export function FleetCarousel({
   const [index, setIndex] = useState(0)
   const [drag, setDrag] = useState(0)
   const [rtl, setRtl] = useState(false)
+  // Only the first photo loads with the page; the others wait until the page has
+  // loaded (or the visitor reaches for the carousel), so they never slow the first paint.
+  const [warm, setWarm] = useState(false)
   const id = useId()
   const tabs = useRef<Array<HTMLButtonElement | null>>([])
   const frame = useRef<HTMLDivElement>(null)
@@ -61,7 +64,21 @@ export function FleetCarousel({
     if (frame.current) setRtl(getComputedStyle(frame.current).direction === 'rtl')
   }, [])
 
+  useEffect(() => {
+    let timer = 0
+    const later = () => {
+      timer = window.setTimeout(() => setWarm(true), 300)
+    }
+    if (document.readyState === 'complete') later()
+    else window.addEventListener('load', later, { once: true })
+    return () => {
+      window.removeEventListener('load', later)
+      window.clearTimeout(timer)
+    }
+  }, [])
+
   const go = (i: number, focus = false) => {
+    setWarm(true)
     const next = (i + count) % count
     setIndex(next)
     if (focus) tabs.current[next]?.focus()
@@ -75,6 +92,7 @@ export function FleetCarousel({
 
   const onDown = (e: ReactPointerEvent) => {
     if (count < 2 || (e.pointerType === 'mouse' && e.button !== 0)) return
+    setWarm(true)
     start.current = { x: e.clientX, y: e.clientY, id: e.pointerId }
   }
   const onMove = (e: ReactPointerEvent) => {
@@ -141,14 +159,14 @@ export function FleetCarousel({
               className="relative h-full w-full shrink-0"
               aria-hidden={i !== index}
             >
-              {item.image ? (
+              {item.image && (warm || i === index) ? (
                 <Image
                   src={mediaSrc(item.image.url)!}
                   alt={i === index ? item.image.alt : ''}
                   fill
                   draggable={false}
-                  // The chosen photo and its neighbours load right away, so a swipe never
-                  // shows an empty frame; the rest load once the carousel is near.
+                  // Once warm, the chosen photo and its neighbours load right away, so a
+                  // swipe never shows an empty frame; the rest load once the carousel is near.
                   loading={Math.abs(i - index) <= 1 || i === count - 1 ? 'eager' : 'lazy'}
                   placeholder={item.image.blurDataURL ? 'blur' : 'empty'}
                   blurDataURL={item.image.blurDataURL ?? undefined}

@@ -5,6 +5,7 @@ import type { ReactNode } from 'react'
 import type { Media } from '@ceylonvvip/db'
 import { Button, LinkUnderline, SectionHeader, cn } from '@ceylonvvip/ui-brand'
 
+import { AfterLoad } from '@/components/site/AfterLoad'
 import { linkProps, type CmsLink } from '@/lib/links'
 import { mediaSrc } from '@/lib/media-url'
 
@@ -96,16 +97,19 @@ export function CmsImage({
   media,
   sizes,
   priority = false,
+  defer = false,
   className,
 }: {
   media: unknown
   sizes: string
   priority?: boolean
+  /** Further down the page: load once the page has loaded (task 169). */
+  defer?: boolean
   className?: string
 }) {
   const m = asMedia(media)
   if (!m?.url) return null
-  return (
+  const image = (
     <Image
       src={mediaSrc(m.url)!}
       alt={m.alt ?? ''}
@@ -124,6 +128,7 @@ export function CmsImage({
       style={{ objectPosition: `${m.focalX ?? 50}% ${m.focalY ?? 50}%` }}
     />
   )
+  return defer && !priority ? <AfterLoad>{image}</AfterLoad> : image
 }
 
 export function RichText({ data, className }: { data: unknown; className?: string }) {

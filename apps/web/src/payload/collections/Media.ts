@@ -4,6 +4,8 @@ import { blurDataURL } from '../../lib/blur'
 
 import { anyone, editors } from '../access'
 
+const WEBP = { format: 'webp', options: { quality: 90, effort: 5 } } as const
+
 /** Images and files. Stored on Cloudflare R2 when S3_* is configured, else on local disk. */
 export const Media: CollectionConfig = {
   slug: 'media',
@@ -32,11 +34,21 @@ export const Media: CollectionConfig = {
     mimeTypes: ['image/*', 'application/pdf'],
     focalPoint: true,
     crop: true,
+    // Task 169: every photo is stored as WebP, whatever was uploaded (PNG, JPEG...).
+    // Quality 90 keeps photos clear; the site resizes them per screen on the fly.
+    formatOptions: WEBP,
     imageSizes: [
-      { name: 'thumbnail', width: 400 },
-      { name: 'card', width: 960 },
-      { name: 'wide', width: 1920 },
-      { name: 'og', width: 1200, height: 630, position: 'centre' },
+      { name: 'thumbnail', width: 400, formatOptions: WEBP },
+      { name: 'card', width: 960, formatOptions: WEBP },
+      { name: 'wide', width: 1920, formatOptions: WEBP },
+      // Social previews stay JPEG: some apps (older WhatsApp, LinkedIn) do not show WebP.
+      {
+        name: 'og',
+        width: 1200,
+        height: 630,
+        position: 'centre',
+        formatOptions: { format: 'jpeg', options: { quality: 85, mozjpeg: true } },
+      },
     ],
     adminThumbnail: 'thumbnail',
   },

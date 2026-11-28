@@ -199,7 +199,7 @@ function drift(img: HTMLElement) {
 
 /** Photos that wipe in as they scroll into view (not the hero or image presets). */
 export const IMAGE_REVEAL_SELECTOR =
-  'main img:not([data-animate="hero-intro"] img):not([data-animate="reveal-mask"] img):not([data-animate="image-parallax"] img):not([data-hscroll] img):not([data-no-reveal] img)'
+  'main img:not([data-animate="hero-intro"] img):not([data-animate="reveal-mask"] img):not([data-animate="image-parallax"] img):not([data-hscroll] img):not([data-no-reveal] img):not(main > :nth-child(-n+2) img)'
 
 /** Statement text whose words fill from faded to ink as it scrolls through the view. */
 export const SCROLL_FILL_SELECTOR = 'main [data-scroll-fill]'
@@ -322,6 +322,9 @@ export function Motion() {
 
       for (const section of sections) {
         const name = section.dataset.animate ?? ''
+        // The first two blocks are on screen at load and already painted (globals.css):
+        // no entrance animation, so the first photo is never hidden (task 169, LCP).
+        if (section.matches('main > :nth-child(-n+2)')) continue
         if (name === 'image-parallax') {
           show(section)
           if (desktop && !reduced)

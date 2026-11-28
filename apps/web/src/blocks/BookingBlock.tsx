@@ -6,7 +6,8 @@ import { currentLocale, isRtl, LOCALE_TAGS } from '@/lib/i18n'
 import { mediaSrc } from '@/lib/media-url'
 import { getUiStrings } from '@/lib/ui-strings'
 
-import { BookingForm, type BookingFormProps } from './BookingForm'
+import type { BookingFormProps } from './BookingForm'
+import { BookingFormLazy as BookingForm } from './BookingFormLazy'
 
 import { Header, Section, asMedia, type BlockHeader } from './shared'
 

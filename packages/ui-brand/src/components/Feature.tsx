@@ -12,6 +12,8 @@ export interface FeatureProps {
   number?: string
   /** Small variant: an icon in a gold ring. */
   icon?: IconName
+  /** The title's heading level: h3 under a section heading, h2 when the section has none. */
+  as?: 'h2' | 'h3'
   className?: string
 }
 
@@ -20,7 +22,15 @@ export interface FeatureProps {
  * Small: a parchment card with a gold-ringed icon. Large and title: a bronze numeral
  * leads instead of a line.
  */
-export function Feature({ variant = 'large', title, text, number, icon, className }: FeatureProps) {
+export function Feature({
+  variant = 'large',
+  title,
+  text,
+  number,
+  icon,
+  as: Heading = 'h3',
+  className,
+}: FeatureProps) {
   if (variant === 'small') {
     return (
       <div
@@ -37,7 +47,7 @@ export function Feature({ variant = 'large', title, text, number, icon, classNam
           </span>
         ) : null}
         <div className="flex flex-col gap-10">
-          <h3 className="text-h4 text-foreground">{title}</h3>
+          <Heading className="text-h4 text-foreground">{title}</Heading>
           {text ? <p className="text-small text-muted-foreground">{text}</p> : null}
         </div>
       </div>
@@ -48,11 +58,11 @@ export function Feature({ variant = 'large', title, text, number, icon, classNam
       {number ? (
         <span className="font-display text-h3 leading-none text-brand tabular-nums">{number}</span>
       ) : null}
-      <h3
+      <Heading
         className={cn('text-foreground', variant === 'large' ? 'font-display text-h3' : 'text-h4')}
       >
         {title}
-      </h3>
+      </Heading>
       {variant !== 'title' && text ? (
         <p
           className={cn('text-muted-foreground', variant === 'large' ? 'text-body' : 'text-small')}

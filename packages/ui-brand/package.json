@@ -4,6 +4,9 @@
   "private": true,
   "description": "Front-end design system: themed components and GSAP motion presets",
   "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
   "exports": {
     ".": "./src/index.ts",
     "./styles.css": "./src/styles.css"

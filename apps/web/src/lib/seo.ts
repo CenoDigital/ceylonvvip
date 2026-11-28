@@ -33,6 +33,19 @@ export interface SeoFields {
   nofollow?: boolean | null
 }
 
+/**
+ * Task 169: a page without its own SEO description uses its hero intro, the sentence
+ * that already sums the page up, so every page has a meta description for search results.
+ */
+export function introOf(layout: unknown): string | undefined {
+  if (!Array.isArray(layout)) return undefined
+  const hero = layout.find(
+    (b): b is { blockType: 'hero'; intro?: unknown } =>
+      Boolean(b) && typeof b === 'object' && (b as { blockType?: unknown }).blockType === 'hero',
+  )
+  return typeof hero?.intro === 'string' && hero.intro.trim() ? hero.intro.trim() : undefined
+}
+
 const asMedia = (value: unknown): Media | null =>
   value && typeof value === 'object' && 'url' in value ? (value as Media) : null
 

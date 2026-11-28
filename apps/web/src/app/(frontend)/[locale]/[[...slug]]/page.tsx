@@ -7,7 +7,7 @@ import { PageSchema } from '@/components/seo/PageSchema'
 import { getGlobal, getPage, getSlugs } from '@/lib/data'
 import { redirectOrNotFound } from '@/lib/redirects'
 import { applyLocale } from '@/lib/i18n-server'
-import { buildMetadata } from '@/lib/seo'
+import { buildMetadata, introOf } from '@/lib/seo'
 import { HOME_SLUG, pathFor } from '@/payload/paths'
 
 type Props = { params: Promise<{ locale: string; slug?: string[] }> }
@@ -35,6 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: page.title,
     path: pathFor('pages', page.slug),
     seo: page.seo,
+    fallbackDescription: introOf(page.layout),
     fallbackImage: page.image,
     defaults,
     settings,

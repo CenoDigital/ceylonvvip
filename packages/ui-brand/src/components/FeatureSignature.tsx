@@ -14,6 +14,8 @@ export interface FeatureSignatureProps {
   image?: ReactNode
   /** Figma Layout: Image left or Image right (desktop). Mobile always stacks. */
   imageSide?: 'left' | 'right'
+  /** The title's heading level: h3 under a section heading, h2 when the section has none. */
+  as?: 'h2' | 'h3'
   className?: string
 }
 
@@ -29,6 +31,7 @@ export function FeatureSignature({
   action,
   image,
   imageSide = 'left',
+  as: Heading = 'h3',
   className,
 }: FeatureSignatureProps) {
   return (
@@ -44,7 +47,7 @@ export function FeatureSignature({
       </div>
       <div className="flex min-w-0 flex-1 flex-col items-start gap-20 px-24 lg:gap-28 lg:px-0">
         {label ? <p className="text-label-caps text-brand">{label}</p> : null}
-        <h3 className="font-display text-h1 text-foreground">{title}</h3>
+        <Heading className="font-display text-h1 text-foreground">{title}</Heading>
         {text ? <p className="text-body text-muted-foreground lg:text-lead">{text}</p> : null}
         {more}
         {action}
