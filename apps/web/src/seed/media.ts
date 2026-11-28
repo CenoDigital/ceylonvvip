@@ -224,6 +224,42 @@ function withTimeout<T>(work: Promise<T>, ms: number, message: string): Promise<
   return Promise.race([work, timeout]).finally(() => clearTimeout(timer))
 }
 
+const UPLOAD_ATTEMPTS = 3
+
+/**
+ * Storage is often slow for the first minute after a deploy, so an upload that times
+ * out is tried again. A timed-out upload can still finish in the background, so each
+ * retry first looks for the photo by file name instead of uploading a duplicate.
+ */
+async function uploadWithRetry(
+  payload: Payload,
+  filename: string,
+  upload: () => Promise<Media>,
+): Promise<Media> {
+  let lastError: unknown
+  for (let attempt = 1; attempt <= UPLOAD_ATTEMPTS; attempt++) {
+    if (attempt > 1) {
+      const { docs } = await payload.find({
+        collection: 'media',
+        where: { filename: { equals: filename } },
+        limit: 1,
+        depth: 0,
+      })
+      if (docs[0]) return docs[0]
+    }
+    try {
+      return await withTimeout(
+        upload(),
+        UPLOAD_TIMEOUT_MS,
+        `upload timed out after ${UPLOAD_TIMEOUT_MS / 1000}s, ${attempt} of ${UPLOAD_ATTEMPTS} tries (storage unreachable?)`,
+      )
+    } catch (error) {
+      lastError = error
+    }
+  }
+  throw lastError
+}
+
 /** Photos that could not be uploaded in the last seed (storage unreachable, etc.). */
 export const photoErrors: string[] = []
 
@@ -269,15 +305,13 @@ export async function seedMedia(payload: Payload): Promise<Photos> {
     try {
       out[key] =
         docs[0] ??
-        (await withTimeout(
+        (await uploadWithRetry(payload, filename, () =>
           payload.create({
             collection: 'media',
             data: { alt, ...focal },
             filePath: path.join(dir, filename),
             context: { disableRevalidate: true },
           }),
-          UPLOAD_TIMEOUT_MS,
-          `upload timed out after ${UPLOAD_TIMEOUT_MS / 1000}s (storage unreachable?)`,
         ))
     } catch (error) {
       // Keep seeding without this photo: pages and translations still load, and the
