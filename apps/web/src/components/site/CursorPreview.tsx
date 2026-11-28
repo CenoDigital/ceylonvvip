@@ -66,14 +66,23 @@ export function CursorPreview({
         shown = true
         gsap.to(c, { autoAlpha: 1, scale: 1, duration: 0.6, ease: 'back.out(1.6)' })
       }
+      // The photo stays in the card while it fades out: clearing it first showed an empty
+      // ivory card for the length of the fade, often while scrolling.
       const hide = () => {
         shown = false
-        setActive(null)
         gsap.to(c, { autoAlpha: 0, scale: 0.7, duration: 0.35, ease: 'power2.in' })
       }
       let current: string | null = null
       let px = -1
       let py = -1
+      // The card only appears once its photo has loaded, so it is never empty. A photo
+      // still loading shows as soon as it arrives, if the pointer is still on its row.
+      const ready = (key: string) => {
+        const img = c.querySelector<HTMLImageElement>(`img[data-key="${CSS.escape(key)}"]`)
+        if (!img || (img.complete && img.naturalWidth > 0)) return Boolean(img)
+        img.addEventListener('load', () => px >= 0 && update(px, py), { once: true })
+        return false
+      }
       // Which row is under the pointer, checked on every move and after every scroll,
       // so the card never stays hidden over a row (smooth scrolling moves rows under a
       // still cursor without any pointerover event).
@@ -81,7 +90,7 @@ export function CursorPreview({
         const hit = document.elementFromPoint(x, y)
         const row = hit?.closest<HTMLElement>('[data-preview]')
         const key = row && el.contains(row) ? row.dataset.preview : undefined
-        if (key && images.some((i) => i.key === key)) {
+        if (key && images.some((i) => i.key === key) && ready(key)) {
           if (!shown) {
             // Start at the cursor, not where the card was last left.
             gsap.set(c, { x, y })
@@ -140,6 +149,7 @@ export function CursorPreview({
               {images.map((img) => (
                 <Image
                   key={img.key}
+                  data-key={img.key}
                   src={img.src}
                   alt=""
                   fill

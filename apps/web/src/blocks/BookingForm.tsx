@@ -40,7 +40,13 @@ export interface BookingFormProps {
     note: string | null
     consentLabel: string | null
     details: Array<
-      DetailQuestion & { placeholder: string | null; width: string; services: string[] }
+      DetailQuestion & {
+        placeholder: string | null
+        width: string
+        services: string[]
+        /** Shown in the main form instead of behind "Add details". */
+        upfront?: boolean
+      }
     >
   }
   services: Array<{ id: string; label: string }>
@@ -79,7 +85,8 @@ export function BookingForm({
   const trErrors = (e: Record<string, string>) =>
     Object.fromEntries(Object.entries(e).map(([k, v]) => [k, tr(v)]))
   const id = useId()
-  const [service, setService] = useState(preselectService ?? '')
+  // One or more services (task 174).
+  const [selected, setSelected] = useState<string[]>(preselectService ? [preselectService] : [])
   const [vehicle, setVehicle] = useState('none')
   const [date, setDate] = useState('')
   const [time, setTime] = useState('')
@@ -94,9 +101,16 @@ export function BookingForm({
   const [pending, startTransition] = useTransition()
 
   const questions = useMemo(
-    () => form.details.filter((q) => !q.services.length || q.services.includes(service)),
-    [form.details, service],
+    () =>
+      form.details.filter(
+        (q) => !q.services.length || q.services.some((s) => selected.includes(s)),
+      ),
+    [form.details, selected],
   )
+  const upfront = questions.filter((q) => q.upfront)
+  const later = questions.filter((q) => !q.upfront)
+  const toggleService = (sid: string) =>
+    setSelected((list) => (list.includes(sid) ? list.filter((x) => x !== sid) : [...list, sid]))
   const schema = useMemo(
     () =>
       bookingSchema(questions, {
@@ -111,7 +125,7 @@ export function BookingForm({
     const website = new FormData(e.currentTarget).get('website')
     const input = {
       form: form.id,
-      service,
+      services: selected,
       vehicle,
       date,
       time,
@@ -144,6 +158,41 @@ export function BookingForm({
     })
   }
 
+  function renderQuestion(q: (typeof questions)[number]) {
+    const common = {
+      label: q.label,
+      placeholder: q.placeholder ?? undefined,
+      required: q.required ?? false,
+      error: errors[`details.${q.name}`],
+      value: details[q.name] ?? '',
+      className: q.width === 'half' ? undefined : 'lg:col-span-2',
+    }
+    return q.type === 'textarea' ? (
+      <TextAreaField
+        key={q.name}
+        {...common}
+        onChange={(e) => setDetails((d) => ({ ...d, [q.name]: e.target.value }))}
+      />
+    ) : (
+      <Field
+        key={q.name}
+        {...common}
+        type={q.type === 'number' ? 'text' : q.type}
+        inputMode={q.type === 'number' ? 'numeric' : undefined}
+        autoComplete={
+          q.type === 'email'
+            ? 'email'
+            : q.type === 'tel'
+              ? 'tel'
+              : q.name === 'name'
+                ? 'name'
+                : undefined
+        }
+        onChange={(e) => setDetails((d) => ({ ...d, [q.name]: e.target.value }))}
+      />
+    )
+  }
+
   const errorCount = Object.keys(errors).length
   const today = todayInColombo()
   const label = 'text-label-caps text-muted-foreground'
@@ -155,7 +204,7 @@ export function BookingForm({
       className="flex flex-col gap-32"
       aria-describedby={formError || errorCount ? `${id}-alert` : undefined}
     >
-      {form.detailsToggleLabel && questions.length ? (
+      {form.detailsToggleLabel && later.length ? (
         <div className="flex gap-6" aria-hidden>
           <span className="h-2 flex-1 bg-foreground" />
           <span
@@ -182,22 +231,23 @@ export function BookingForm({
       ) : null}
 
       <fieldset className="flex min-w-0 flex-col gap-12">
-        <legend className={cn(label, 'mb-12', errors.service && 'text-destructive')}>
+        <legend className={cn(label, 'mb-12', errors.services && 'text-destructive')}>
           {form.serviceLabel}
         </legend>
         <div className="flex flex-wrap gap-8">
           {services.map((s) => (
             <Chip
               key={s.id}
+              type="checkbox"
               name={`${id}-service`}
               value={s.id}
               label={s.label}
-              checked={service === s.id}
-              onChange={() => setService(s.id)}
+              checked={selected.includes(s.id)}
+              onChange={() => toggleService(s.id)}
             />
           ))}
         </div>
-        {errors.service ? <p className="text-small text-destructive">{errors.service}</p> : null}
+        {errors.services ? <p className="text-small text-destructive">{errors.services}</p> : null}
       </fieldset>
 
       {form.vehicleLabel && vehicles.length ? (
@@ -301,43 +351,14 @@ export function BookingForm({
         ) : null}
       </div>
 
-      {showDetails && questions.length ? (
+      {upfront.length ? (
+        <div className="grid min-w-0 gap-32 lg:grid-cols-2">{upfront.map(renderQuestion)}</div>
+      ) : null}
+
+      {showDetails && later.length ? (
         <fieldset className="grid min-w-0 gap-32 lg:grid-cols-2">
           <legend className="sr-only">{form.detailsToggleLabel ?? 'Details'}</legend>
-          {questions.map((q) => {
-            const common = {
-              label: q.label,
-              placeholder: q.placeholder ?? undefined,
-              required: q.required ?? false,
-              error: errors[`details.${q.name}`],
-              value: details[q.name] ?? '',
-              className: q.width === 'half' ? undefined : 'lg:col-span-2',
-            }
-            return q.type === 'textarea' ? (
-              <TextAreaField
-                key={q.name}
-                {...common}
-                onChange={(e) => setDetails((d) => ({ ...d, [q.name]: e.target.value }))}
-              />
-            ) : (
-              <Field
-                key={q.name}
-                {...common}
-                type={q.type === 'number' ? 'text' : q.type}
-                inputMode={q.type === 'number' ? 'numeric' : undefined}
-                autoComplete={
-                  q.type === 'email'
-                    ? 'email'
-                    : q.type === 'tel'
-                      ? 'tel'
-                      : q.name === 'name'
-                        ? 'name'
-                        : undefined
-                }
-                onChange={(e) => setDetails((d) => ({ ...d, [q.name]: e.target.value }))}
-              />
-            )
-          })}
+          {later.map(renderQuestion)}
         </fieldset>
       ) : null}
 
@@ -371,7 +392,7 @@ export function BookingForm({
         <Button type="submit" disabled={pending} aria-busy={pending}>
           {form.submitLabel}
         </Button>
-        {form.detailsToggleLabel && questions.length && !showDetails ? (
+        {form.detailsToggleLabel && later.length && !showDetails ? (
           <button
             type="button"
             className={cn(

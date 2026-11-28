@@ -10,7 +10,7 @@ const tomorrow = () => {
 
 const valid = {
   form: 1,
-  service: '3',
+  services: ['3'],
   vehicle: 'none',
   date: tomorrow(),
   time: '09:30',
@@ -27,13 +27,13 @@ describe('bookingSchema', () => {
   it('needs a service, a date from today and at least one adult', () => {
     const result = bookingSchema().safeParse({
       ...valid,
-      service: '',
+      services: [],
       date: '2020-01-01',
       adults: 0,
     })
     expect(result.success).toBe(false)
     const paths = result.error?.issues.map((i) => i.path.join('.'))
-    expect(paths).toEqual(expect.arrayContaining(['service', 'date', 'adults']))
+    expect(paths).toEqual(expect.arrayContaining(['services', 'date', 'adults']))
   })
 
   it('checks extra questions by type, and only requires the required ones', () => {
@@ -45,6 +45,10 @@ describe('bookingSchema', () => {
     expect(schema.safeParse({ ...valid, details: { email: 'guest@example.com' } }).success).toBe(
       true,
     )
+  })
+
+  it('accepts several services together', () => {
+    expect(bookingSchema().safeParse({ ...valid, services: ['1', '3'] }).success).toBe(true)
   })
 
   it('rejects a filled honeypot', () => {

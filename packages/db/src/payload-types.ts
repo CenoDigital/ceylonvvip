@@ -1444,6 +1444,10 @@ export interface Form {
         type: 'text' | 'email' | 'tel' | 'number' | 'textarea';
         placeholder?: string | null;
         required?: boolean | null;
+        /**
+         * Shown with the date and guests, not behind "Add details", like Pickup.
+         */
+        upfront?: boolean | null;
         width?: ('full' | 'half') | null;
         /**
          * Empty means every service, like "Flight number" only for Airport Transfers.
@@ -1707,7 +1711,7 @@ export interface FormSubmission {
   summary?: string | null;
   status?: ('new' | 'contacted' | 'confirmed' | 'closed') | null;
   form?: (number | null) | Form;
-  service?: (number | null) | Service;
+  services?: (number | Service)[] | null;
   vehicle?: (number | null) | Vehicle;
   date?: string | null;
   time?: string | null;
@@ -2919,6 +2923,7 @@ export interface FormsSelect<T extends boolean = true> {
         type?: T;
         placeholder?: T;
         required?: T;
+        upfront?: T;
         width?: T;
         services?: T;
         id?: T;
@@ -2944,7 +2949,7 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
   summary?: T;
   status?: T;
   form?: T;
-  service?: T;
+  services?: T;
   vehicle?: T;
   date?: T;
   time?: T;

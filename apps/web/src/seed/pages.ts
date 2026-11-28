@@ -549,6 +549,35 @@ export async function seedPages(
     submitLabel: 'Continue on WhatsApp',
     detailsToggleLabel: 'Add details, optional',
     note: 'Your request opens in WhatsApp, ready to send. No payment is taken here.',
+    // Task 174: pickup and destination in the main form for every service, and the
+    // flight number only for airport transfers, so the travel manager can track it.
+    details: [
+      {
+        name: 'pickup',
+        label: 'Pickup',
+        type: 'text',
+        placeholder: 'Hotel, villa or address',
+        width: 'half',
+        upfront: true,
+      },
+      {
+        name: 'destination',
+        label: 'Destination',
+        type: 'text',
+        placeholder: 'Where you are going',
+        width: 'half',
+        upfront: true,
+      },
+      {
+        name: 'flightNumber',
+        label: 'Flight number',
+        type: 'text',
+        placeholder: 'For example UL 504',
+        width: 'half',
+        upfront: true,
+        services: [services['airport-transfers']?.id].filter(Boolean),
+      },
+    ],
   } as never
   const bookingForm = forms[0]
     ? await payload.update({ collection: 'forms', id: forms[0].id, data: formData })

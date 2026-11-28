@@ -13,6 +13,7 @@ import * as migration_20261127_075437_route_row_photo from './20261127_075437_ro
 import * as migration_20261127_080532_translations from './20261127_080532_translations'
 import * as migration_20261127_150212_media_blur from './20261127_150212_media_blur'
 import * as migration_20261127_172842_signature_more from './20261127_172842_signature_more'
+import * as migration_20261128_150638_booking_multi_service from './20261128_150638_booking_multi_service'
 
 export const migrations = [
   {
@@ -89,5 +90,10 @@ export const migrations = [
     up: migration_20261127_172842_signature_more.up,
     down: migration_20261127_172842_signature_more.down,
     name: '20261127_172842_signature_more',
+  },
+  {
+    up: migration_20261128_150638_booking_multi_service.up,
+    down: migration_20261128_150638_booking_multi_service.down,
+    name: '20261128_150638_booking_multi_service',
   },
 ]

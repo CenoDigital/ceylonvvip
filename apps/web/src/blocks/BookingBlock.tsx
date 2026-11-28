@@ -55,6 +55,7 @@ export async function BookingBlock({ block }: { block: Record<string, unknown> }
             placeholder: d.placeholder ?? null,
             required: Boolean(d.required),
             width: d.width ?? 'full',
+            upfront: Boolean(d.upfront),
             services: (d.services ?? []).map((s) => String(typeof s === 'object' ? s.id : s)),
           })),
         },

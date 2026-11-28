@@ -175,7 +175,7 @@ function parallax(section: HTMLElement) {
  * at a slight zoom so the drift never shows an edge; the wipe-in reveals settle to it.
  */
 export const DRIFT_SELECTOR =
-  'main img[data-nimg="fill"]:not([data-hscroll] img):not([data-animate="image-parallax"] img)'
+  'main img[data-nimg="fill"]:not([data-hscroll] img):not([data-animate="image-parallax"] img):not(form img)'
 const DRIFT_SCALE = 1.12
 const DRIFT_PERCENT = 5
 
@@ -199,7 +199,7 @@ function drift(img: HTMLElement) {
 
 /** Photos that wipe in as they scroll into view (not the hero or image presets). */
 export const IMAGE_REVEAL_SELECTOR =
-  'main img:not([data-animate="hero-intro"] img):not([data-animate="reveal-mask"] img):not([data-animate="image-parallax"] img):not([data-hscroll] img):not([data-no-reveal] img):not(main > :nth-child(-n+2) img)'
+  'main img:not([data-animate="hero-intro"] img):not([data-animate="reveal-mask"] img):not([data-animate="image-parallax"] img):not([data-hscroll] img):not([data-no-reveal] img):not(form img):not(main > :nth-child(-n+2) img)'
 
 /** Statement text whose words fill from faded to ink as it scrolls through the view. */
 export const SCROLL_FILL_SELECTOR = 'main [data-scroll-fill]'
