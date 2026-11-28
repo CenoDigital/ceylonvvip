@@ -72,17 +72,18 @@ export function SiteFooter({
           </div>
         ))}
       </div>
-      <div className="border-t border-border pt-20 lg:pt-24">
-        {/* The wordmark scales with the viewport so it always fills the width. */}
+      <div className="@container border-t border-border pt-20 lg:pt-24">
+        {/* The wordmark is sized from the footer's own width, so it runs edge to edge
+            at every screen size (its width is about 6.07 times its font size). */}
         <p
           aria-hidden
-          className="text-center font-display text-[min(13.2vw,200px)] leading-none font-light whitespace-nowrap"
+          className="text-center font-display text-[16.4cqw] leading-none font-light whitespace-nowrap"
         >
           CEYLONVVIP
         </p>
       </div>
-      <div className="flex flex-col gap-24 text-small text-muted-foreground lg:flex-row lg:items-start lg:justify-between">
-        <div className="flex flex-col lg:contents">
+      <div className="flex flex-col items-center gap-12 text-center text-small text-muted-foreground lg:flex-row lg:justify-center lg:gap-32">
+        <div className="flex flex-col items-center gap-12 lg:contents">
           {copyright ? <p>{copyright}</p> : null}
           {legal.length ? (
             <p className="flex gap-18">
