@@ -91,28 +91,50 @@ export const PHOTOS = {
     alt: 'Palm trees against a pink and violet sunset on the south coast',
   },
   journey: { file: 'golden-beach', alt: 'Waves on a long golden beach lined with palm trees' },
-  // Service cards (Home and Services): scenery; each service page keeps its car photo.
+  // Service cards (Home and Services): each shows its service (the client's request);
+  // each service page keeps its car photo. Free photos, no attribution required:
+  // Unsplash and Pexels licences. Sources:
+  // cardAirport: unsplash.com/photos/AxjVptC_MYQ (Horizon flights)
+  // cardTours: unsplash.com/photos/ePAa2c9XbtE (Matt Dany)
+  // cardWedding: unsplash.com/photos/lbmuW0e2x-g (Damian Chojnacki)
+  // cardActivities: unsplash.com/photos/v2zEiziFb44 (Tom Paisley)
+  // cardSecurity: pexels.com/photo/7594130 (Pavel Danilyuk)
+  // cardCare: pexels.com/photo/5267336 (KEON VINES)
+  // cardHotels: unsplash.com/photos/kvf5kfVMqng (Charanjeet Dhiman)
   cardAirport: {
-    file: 'card-airport',
-    alt: 'An aircraft wing above the clouds in a deep blue sky',
+    file: 'svc-airport',
+    alt: 'A couple with their bags walking from a white car to a private plane',
+    focalX: 45,
+    focalY: 60,
   },
   cardTours: {
-    file: 'card-island-train',
-    alt: 'The hill country train passing tea gardens in the morning sun',
+    file: 'svc-tours',
+    alt: 'A traveller leaning out of the hill country train past tea gardens near Ella',
   },
   cardWedding: {
-    file: 'card-wedding-frangipani',
-    alt: 'Pink frangipani flowers among green leaves',
+    file: 'svc-wedding',
+    alt: 'A dark sedan dressed with a garland of white flowers for a wedding',
+    focalX: 60,
   },
-  cardActivities: { file: 'card-elephants', alt: 'A herd of elephants bathing in a river' },
+  cardActivities: {
+    file: 'svc-activities',
+    alt: 'An elephant beside a safari jeep with guests on a national park plain',
+    focalX: 60,
+  },
   cardSecurity: {
-    file: 'card-hotel-atrium',
-    alt: 'A grand hotel atrium with a vase of fresh flowers on a round table',
+    file: 'svc-security',
+    alt: 'A man in a dark coat opening the rear door of a black limousine',
+    focalY: 40,
   },
-  cardCare: { file: 'card-lotus', alt: 'A pink lotus flower among dark green leaves' },
+  cardCare: {
+    file: 'svc-care',
+    alt: 'A companion steadying an elderly man with a walking stick on a city street',
+  },
   cardHotels: {
-    file: 'card-ayurveda',
-    alt: 'Warm herbal oil poured from a brass vessel for an Ayurvedic treatment',
+    file: 'svc-ayurveda',
+    alt: 'A guest receiving shirodhara, warm oil poured on the forehead from a brass vessel',
+    focalX: 30,
+    focalY: 40,
   },
   bentotaBeach: { file: 'bentota-beach', alt: 'Palm trees on a beach on the south-west coast' },
   bentotaRiver: {
@@ -146,6 +168,14 @@ const RETIRED_FILES = [
   'galle-fort',
   'hotel-sunset-suite',
   'bentota-river',
+  // Scenic service cards tried before the relevant photos (never on staging).
+  'card-airport',
+  'card-island-train',
+  'card-wedding-frangipani',
+  'card-elephants',
+  'card-hotel-atrium',
+  'card-lotus',
+  'card-ayurveda',
 ]
 
 export type PhotoKey = keyof typeof PHOTOS
