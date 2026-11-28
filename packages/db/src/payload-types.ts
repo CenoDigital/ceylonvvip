@@ -245,7 +245,7 @@ export interface HeroBlock {
   mediaType?: ('image' | 'video' | 'slider' | 'none') | null;
   image?: (number | null) | Media;
   /**
-   * Under the photo on the Home hero, like "The Toyota Prado 150".
+   * Under the photo on the Home hero, like "Sunset on the south coast".
    */
   caption?: string | null;
   /**

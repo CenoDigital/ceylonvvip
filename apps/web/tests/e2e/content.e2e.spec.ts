@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 // Task 159: every page shows the Figma photos (the client has none of their own yet).
 // Pages with the booking form also show the five vehicle photos on its vehicle cards.
 const PAGES: Array<[string, number]> = [
-  ['/', 11],
+  ['/', 10],
   ['/services', 7],
   ['/services/airport-transfers', 6],
   ['/services/elder-care', 6],
@@ -29,9 +29,9 @@ for (const [path, photos] of PAGES) {
   })
 }
 
-test('the Home hero photo has its Figma caption', async ({ page }) => {
+test('the Home hero photo has its caption', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByText('The coast road, Bentota')).toBeVisible()
+  await expect(page.getByText('Sunset on the south coast')).toBeVisible()
 })
 
 test('photos show a blurred preview while they load (task 166)', async ({ request }) => {
@@ -51,7 +51,7 @@ test('the gem card offers custom jewellery design (task 167)', async ({ request 
 test('the fleet carousel shows each vehicle photo, by button and by swipe (task 168)', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/fleet')
   const carousel = page.locator('[aria-roledescription="carousel"]')
   await carousel.scrollIntoViewIfNeeded()
   const shown = () =>

@@ -10,7 +10,7 @@
  */
 import type { Payload } from 'payload'
 
-import { SERVICE_HERO_PHOTOS, oldJpegs, seedMedia } from './media'
+import { SERVICE_CARD_PHOTOS, oldJpegs, seedMedia } from './media'
 import { seedPages } from './pages'
 import { seedTranslations } from './translations'
 
@@ -86,9 +86,9 @@ export async function seedFigma(payload: Payload) {
         title,
         summary,
         order: i + 1,
-        // The photo under each service page's hero in Figma; Hotels and Ayurveda has no
-        // page in Figma, so it uses the hotel photo from Home's signature benefits.
-        image: photos[SERVICE_HERO_PHOTOS[slug] ?? 'hotelSuite'].id,
+        // The card photo in the services grid: scenery, so Home shows no car photos
+        // (the client's request). Each service page keeps its own car photo.
+        image: photos[SERVICE_CARD_PHOTOS[slug] ?? 'hotelSuite'].id,
       }),
     )
   }
@@ -127,8 +127,8 @@ export async function seedFigma(payload: Payload) {
           'Private, safe and made just for you. Chauffeured journeys across Sri Lanka for diplomats, business leaders and VVIP families.',
         // Figma 01 Home / Hero image (1440 by 820) with its caption.
         mediaType: 'image',
-        image: photos.prado.id,
-        caption: 'The Toyota Prado 150',
+        image: photos.homeHero.id,
+        caption: 'Sunset on the south coast',
         ctas: [
           { cta: { label: 'Speak to your concierge', appearance: 'button', link: whatsappLink } },
           {
@@ -202,7 +202,7 @@ export async function seedFigma(payload: Payload) {
         blockType: 'processSteps',
         variant: 'steps',
         header: { eyebrow: 'Your journey', heading: 'From the first message to the flight home.' },
-        image: photos.rearCabin.id,
+        image: photos.journey.id,
         settings: { pt: 'none', pb: 'xl', anim: 'stagger-children' },
         steps: [
           {
@@ -224,14 +224,7 @@ export async function seedFigma(payload: Payload) {
           },
         ],
       },
-      {
-        blockType: 'vehicleShowcase',
-        variant: 'teaser',
-        source: 'all',
-        header: { eyebrow: 'The fleet', heading: 'Five vehicles. One standard.' },
-        cta: { label: 'See the fleet', appearance: 'link', link: internal('pages', fleet) },
-        settings: { bg: 'card' },
-      },
+      // No fleet teaser on Home (the client's request): the cars are on the Fleet page.
       {
         blockType: 'destinations',
         variant: 'columns',

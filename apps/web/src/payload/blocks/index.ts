@@ -169,7 +169,7 @@ export const Hero: Block = {
       type: 'text',
       admin: {
         condition: (_, s) => s?.mediaType === 'image',
-        description: 'Under the photo on the Home hero, like "The Toyota Prado 150".',
+        description: 'Under the photo on the Home hero, like "Sunset on the south coast".',
       },
     },
     {

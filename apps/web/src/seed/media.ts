@@ -85,6 +85,35 @@ export const PHOTOS = {
     file: 'nuwara-eliya-tea',
     alt: 'Tea estates on the green hills around Nuwara Eliya',
   },
+  // Home page: places, not cars (the cars are on the fleet and service pages).
+  homeHero: {
+    file: 'south-coast-sunset',
+    alt: 'Palm trees against a pink and violet sunset on the south coast',
+  },
+  journey: { file: 'golden-beach', alt: 'Waves on a long golden beach lined with palm trees' },
+  // Service cards (Home and Services): scenery; each service page keeps its car photo.
+  cardAirport: {
+    file: 'card-airport',
+    alt: 'An aircraft wing above the clouds in a deep blue sky',
+  },
+  cardTours: {
+    file: 'card-island-train',
+    alt: 'The hill country train passing tea gardens in the morning sun',
+  },
+  cardWedding: {
+    file: 'card-wedding-frangipani',
+    alt: 'Pink frangipani flowers among green leaves',
+  },
+  cardActivities: { file: 'card-elephants', alt: 'A herd of elephants bathing in a river' },
+  cardSecurity: {
+    file: 'card-hotel-atrium',
+    alt: 'A grand hotel atrium with a vase of fresh flowers on a round table',
+  },
+  cardCare: { file: 'card-lotus', alt: 'A pink lotus flower among dark green leaves' },
+  cardHotels: {
+    file: 'card-ayurveda',
+    alt: 'Warm herbal oil poured from a brass vessel for an Ayurvedic treatment',
+  },
   bentotaBeach: { file: 'bentota-beach', alt: 'Palm trees on a beach on the south-west coast' },
   bentotaRiver: {
     file: 'outrigger-boat',
@@ -99,6 +128,8 @@ export const PHOTOS = {
   travelManager: {
     file: 'travel-manager-placeholder',
     alt: 'Your travel manager, in a hotel lobby',
+    // The face is near the top of this tall photo: keep it in frame in every crop.
+    focalY: 14,
   },
 } as const
 
@@ -137,6 +168,17 @@ export const SERVICE_HERO_PHOTOS: Record<string, PhotoKey> = {
   'security-bodyguards': 'pradoHotel',
   'elder-care': 'rearCabin',
   'hotels-ayurveda': 'hotelSuite',
+}
+
+// The photo on each service's card in the services grid (Home and Services).
+export const SERVICE_CARD_PHOTOS: Record<string, PhotoKey> = {
+  'airport-transfers': 'cardAirport',
+  'island-tours': 'cardTours',
+  'wedding-honeymoon': 'cardWedding',
+  activities: 'cardActivities',
+  'security-bodyguards': 'cardSecurity',
+  'elder-care': 'cardCare',
+  'hotels-ayurveda': 'cardHotels',
 }
 
 export type Photos = Record<PhotoKey, Media>
