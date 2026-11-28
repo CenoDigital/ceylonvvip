@@ -29,21 +29,21 @@ export function RouteRow({
       data-preview={preview}
       aria-current={active || undefined}
       className={cn(
-        // Below lg (phones, and the two columns on tablets): the place keeps at least 60%
+        // Below xl (phones, tablets, small laptops): the place keeps at least 60%
         // of the row, so a short note ("On request") stays at the right as in Figma and a
         // long one drops below the place and wraps.
-        // From lg up: one line, the note never wraps (as before).
-        'flex flex-wrap items-center gap-x-16 gap-y-6 py-18 lg:flex-nowrap',
+        // From xl up: one line, the note never wraps (as before).
+        'flex flex-wrap items-center gap-x-16 gap-y-6 py-18 xl:flex-nowrap',
         ruled && 'border-t',
         ruled && (active ? 'border-b-2 border-brand' : 'border-border'),
         className,
       )}
     >
-      <span className="min-w-0 grow basis-[60%] text-h4 text-foreground lg:basis-0">{route}</span>
+      <span className="min-w-0 grow basis-[60%] text-h4 text-foreground xl:basis-0">{route}</span>
       {note ? (
         <span
           className={cn(
-            'min-w-0 text-small lg:shrink-0 lg:whitespace-nowrap',
+            'min-w-0 text-small xl:shrink-0 xl:whitespace-nowrap',
             active ? 'text-brand' : 'text-muted-foreground',
           )}
         >
