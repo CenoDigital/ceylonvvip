@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 
 import { cn } from '../lib/cn'
+import { Monogram } from './Monogram'
 
 export interface FooterColumn {
   heading: string
@@ -82,29 +83,34 @@ export function SiteFooter({
           CEYLONVVIP
         </p>
       </div>
-      <div className="flex flex-col items-center gap-12 text-center text-small text-muted-foreground lg:flex-row lg:justify-center lg:gap-32">
-        <div className="flex flex-col items-center gap-12 lg:contents">
-          {copyright ? <p>{copyright}</p> : null}
-          {legal.length ? (
-            <p className="flex gap-18">
-              {legal.map((l) => (
-                <a
-                  key={`${l.label}-${l.href}`}
-                  href={l.href}
-                  className="transition-colors hover:text-foreground"
-                >
-                  {l.label}
-                </a>
-              ))}
-            </p>
-          ) : null}
-        </div>
+      {/* A quiet signature: the gold monogram, the copyright in small spaced capitals,
+          and the credit a shade softer underneath. */}
+      <div className="flex flex-col items-center gap-20 text-center">
+        <Monogram size={44} />
+        {copyright ? (
+          <p className="text-[11px] leading-relaxed tracking-[0.28em] text-muted-foreground uppercase">
+            {copyright}
+          </p>
+        ) : null}
+        {legal.length ? (
+          <p className="flex gap-24 text-[11px] tracking-[0.28em] text-muted-foreground uppercase">
+            {legal.map((l) => (
+              <a
+                key={`${l.label}-${l.href}`}
+                href={l.href}
+                className="transition-colors hover:text-foreground"
+              >
+                {l.label}
+              </a>
+            ))}
+          </p>
+        ) : null}
         {credit ? (
           <a
             href={credit.href}
             target="_blank"
             rel="noopener"
-            className="transition-colors hover:text-foreground"
+            className="text-small text-muted-foreground/75 transition-colors hover:text-foreground"
           >
             {credit.label}
           </a>
