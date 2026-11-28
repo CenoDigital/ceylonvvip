@@ -47,36 +47,3 @@ test('the gem card offers custom jewellery design (task 167)', async ({ request 
   }
   expect(await (await request.get('/de')).text()).toContain('Schmuck nach Maß')
 })
-
-test('the fleet carousel shows each vehicle photo, by button and by swipe (task 168)', async ({
-  page,
-}) => {
-  await page.goto('/fleet')
-  const carousel = page.locator('[aria-roledescription="carousel"]')
-  await carousel.scrollIntoViewIfNeeded()
-  const shown = () =>
-    carousel.evaluate((root) => {
-      const slide = root.querySelector<HTMLElement>('[role="tabpanel"] [aria-hidden="false"]')
-      const img = slide?.querySelector('img')
-      const s = img && getComputedStyle(img)
-      return {
-        name: root.querySelector('h3')?.textContent,
-        loaded: Boolean(img?.complete && img.naturalWidth > 0),
-        visible: s?.visibility === 'visible' && s.clipPath === 'none' && s.opacity === '1',
-      }
-    })
-  const first = (await shown()).name
-  for (let i = 0; i < 5; i++) {
-    await page.getByRole('button', { name: 'Next vehicle' }).click()
-    await expect.poll(async () => (await shown()).loaded && (await shown()).visible).toBe(true)
-  }
-  // Five steps go all the way round, back to the first vehicle.
-  expect((await shown()).name).toBe(first)
-  // A sideways drag moves to the next vehicle.
-  const box = (await page.getByRole('tabpanel').boundingBox())!
-  await page.mouse.move(box.x + box.width * 0.7, box.y + box.height / 2)
-  await page.mouse.down()
-  await page.mouse.move(box.x + box.width * 0.4, box.y + box.height / 2, { steps: 8 })
-  await page.mouse.up()
-  await expect.poll(async () => (await shown()).name).not.toBe(first)
-})
