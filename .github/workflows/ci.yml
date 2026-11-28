@@ -1,5 +1,8 @@
-# All testing happens here, in throwaway GitHub runners. Coolify only receives images
-# that passed every job below.
+# Checks on every pull request and on main: format, lint, types and unit tests, the
+# security scans, and the Docker image with its Trivy scan. Coolify only receives images
+# that passed them. The end-to-end, accessibility, visual, Lighthouse and Postgres
+# integration tests are run locally before merging (pnpm --filter web test:e2e and
+# test:int), not here, to keep CI short.
 name: CI
 
 on:
@@ -48,59 +51,6 @@ jobs:
           pnpm prettier --write packages/db/src/payload-types.ts > /dev/null || true
           git diff --exit-code -- packages/db/src/payload-types.ts
 
-  integration:
-    name: Integration tests (Postgres)
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    services:
-      postgres:
-        image: postgres:16.16-alpine
-        env:
-          POSTGRES_USER: ceylonvvip
-          POSTGRES_PASSWORD: ceylonvvip
-          POSTGRES_DB: ceylonvvip
-        ports: ['5432:5432']
-        options: >-
-          --health-cmd "pg_isready -U ceylonvvip -d ceylonvvip"
-          --health-interval 5s --health-timeout 3s --health-retries 10
-      storage:
-        image: rustfs/rustfs:1.0.6
-        env:
-          RUSTFS_ACCESS_KEY: ceylonvvip
-          RUSTFS_SECRET_KEY: ceylonvvip-ci
-        ports: ['9000:9000']
-    env:
-      DATABASE_URI: postgres://ceylonvvip:ceylonvvip@127.0.0.1:5432/ceylonvvip
-      S3_ENDPOINT: http://127.0.0.1:9000
-      S3_REGION: us-east-1
-      S3_BUCKET: ceylonvvip-media
-      S3_ACCESS_KEY_ID: ceylonvvip
-      S3_SECRET_ACCESS_KEY: ceylonvvip-ci
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - name: Throwaway Payload secret
-        run: |
-          secret="$(openssl rand -hex 32)"
-          echo "::add-mask::$secret"
-          echo "PAYLOAD_SECRET=$secret" >> "$GITHUB_ENV"
-      - run: pnpm --filter web test:int
-      - name: Every schema change has a migration
-        run: |
-          pnpm --filter web migrate:create schema-check --skip-empty
-          if [ -n "$(git status --porcelain -- apps/web/src/migrations)" ]; then
-            git status --short -- apps/web/src/migrations
-            echo "::error::The Payload schema changed without a migration. Run: pnpm --filter web migrate:create <name>"
-            exit 1
-          fi
-
   security:
     name: Dependency audit, secrets, SAST
     runs-on: ubuntu-24.04
@@ -126,102 +76,11 @@ jobs:
           semgrep scan --config p/default --config p/typescript --config p/react --config p/nextjs
           --error --metrics off /src
 
-  browser:
-    name: E2E, accessibility, visual, Lighthouse
-    if: github.event_name != 'push'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 30
-    # Same image that produced the visual baselines, so fonts render identically.
-    container:
-      image: mcr.microsoft.com/playwright:v1.65.1-noble
-      options: --ipc=host
-    services:
-      postgres:
-        image: postgres:16.16-alpine
-        env:
-          POSTGRES_USER: ceylonvvip
-          POSTGRES_PASSWORD: ceylonvvip
-          POSTGRES_DB: ceylonvvip
-        options: >-
-          --health-cmd "pg_isready -U ceylonvvip -d ceylonvvip"
-          --health-interval 5s --health-timeout 3s --health-retries 10
-    env:
-      CI: 'true'
-      DATABASE_URI: postgres://ceylonvvip:ceylonvvip@postgres:5432/ceylonvvip
-      PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
-      # Local media (no S3 here): one absolute folder for the seed and the server.
-      MEDIA_DIR: ${{ github.workspace }}/apps/web/media
-      # Test the build as production serves it (indexable), so Lighthouse SEO is meaningful.
-      SITE_ENV: production
-      # The component gallery (/next/ui) for the visual tests; never set on the live site.
-      UI_GALLERY: 'true'
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - name: Throwaway Payload secret
-        run: |
-          secret="$(openssl rand -hex 32)"
-          echo "::add-mask::$secret"
-          echo "PAYLOAD_SECRET=$secret" >> "$GITHUB_ENV"
-      # Migrate first: the build's page workers each start Payload, and on an empty
-      # database they would all run the migrations at once (many cores, like the local runner).
-      - name: Database schema (migrate)
-        working-directory: apps/web
-        run: pnpm migrate
-      - name: Production build
-        run: pnpm turbo run build --filter=web
-      - name: Load the Figma content (seed)
-        working-directory: apps/web
-        run: pnpm seed
-      - name: Start the production server (runs migrations on boot)
-        working-directory: apps/web
-        # Set only here, not at build time: proves the URL is read at runtime.
-        env:
-          SITE_URL: http://127.0.0.1:3000
-        run: |
-          nohup node scripts/start-standalone.mjs > server.log 2>&1 &
-          for _ in $(seq 1 60); do
-            curl -fsS http://127.0.0.1:3000/api/health && exit 0
-            sleep 2
-          done
-          cat server.log
-          exit 1
-      - name: Playwright (mobile 390 px, desktop 1440 px)
-        working-directory: apps/web
-        env:
-          SITE_URL: http://127.0.0.1:3000
-        run: pnpm test:e2e
-      - name: Lighthouse CI (mobile budgets 90+)
-        if: ${{ !cancelled() }}
-        working-directory: apps/web
-        run: |
-          CHROME_PATH="$(node -e "console.log(require('@playwright/test').chromium.executablePath())")"
-          export CHROME_PATH
-          pnpm exec lhci autorun
-      - name: Upload reports
-        if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: browser-reports
-          path: |
-            apps/web/playwright-report
-            apps/web/test-results
-            apps/web/lighthouse-report
-            apps/web/server.log
-          retention-days: 14
-
   image:
     name: Docker image and Trivy scan
     runs-on: ubuntu-24.04
     timeout-minutes: 30
-    needs: [verify, integration, security]
+    needs: [verify, security]
     permissions:
       contents: read
       packages: write
