@@ -238,7 +238,7 @@ export async function seedFigma(payload: Payload) {
         items: [
           {
             name: 'Sigiriya',
-            line: 'The rock fortress, at first light',
+            line: 'The 5th-century rock fortress',
             photo: photos.sigiriya.id,
           },
           { name: 'Ella', line: 'Tea country and cool hills', photo: photos.ella.id },

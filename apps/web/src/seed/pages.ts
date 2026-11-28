@@ -172,19 +172,19 @@ const SERVICE_PAGES: ServicePage[] = [
       eyebrow: 'Signature places',
       heading: 'Where guests ask to go.',
       rows: [
-        ['Sigiriya', 'The rock fortress'],
-        ['Kandy', 'The hill capital'],
+        ['Sigiriya', 'The 5th-century rock fortress'],
+        ['Kandy', 'The Temple of the Tooth'],
         ['Ella', 'Tea country and cool hills'],
         ['Galle', 'The old Dutch fort'],
-        ['Mirissa', 'Quiet southern beaches'],
+        ['Mirissa', 'Whale watching, November to April'],
         ['Yala', 'Leopards on safari'],
       ],
     },
     detail: {
       heading: 'Private island tours of Sri Lanka, with your own driver.',
       paras: [
-        'A CeylonVVIP island tour is planned around you: the places you want to see, the pace you prefer and the hotels you choose. Popular journeys combine the Sigiriya rock fortress and the hill capital of Kandy with tea country around Ella, the beaches of the south and the old Dutch fort at Galle.',
-        'You travel in a private vehicle with an English-speaking driver, and your travel manager can arrange 5-star hotels and activities along the way.',
+        'A CeylonVVIP island tour is planned around you: the places you want to see, the pace you prefer and the hotels you choose. Popular journeys combine the Sigiriya rock fortress and the Temple of the Tooth in Kandy with tea country around Ella, whale watching off Mirissa and the old fort at Galle.',
+        'You travel in a private vehicle with an English-speaking driver, and your travel manager arranges 5-star hotels and activities along the way. Temples ask for covered shoulders and knees, and park seasons vary, so we’ll confirm timings when you book.',
       ],
       faqs: [
         [
@@ -247,8 +247,11 @@ const SERVICE_PAGES: ServicePage[] = [
     heading: 'Activities, arranged privately.',
     intro: 'Bentota River Safari, water sports and hiking, with private transport there and back.',
     features: [
-      ['Bentota River Safari', 'A quiet boat trip on the Bentota river, close to Aluthgama.'],
-      ['Water sports', 'On the coast near Bentota, arranged around your day.'],
+      [
+        'Bentota River Safari',
+        'A boat trip through the mangroves of the Bentota River, close to Aluthgama.',
+      ],
+      ['Water sports', 'On the coast near Bentota, best from November to April.'],
       ['Hiking', 'Walks in the hills, with your driver waiting when you return.'],
     ],
     // Draft (task 164, for client approval).
@@ -259,8 +262,8 @@ const SERVICE_PAGES: ServicePage[] = [
       rows: [
         ['Bentota River Safari', 'Mangroves, birds and village life'],
         ['Water sports at Bentota', 'On the coast near Aluthgama'],
-        ['Hikes around Ella', 'Tea country and the Nine Arches Bridge'],
-        ['Sunrise at Sigiriya', 'An early climb, with breakfast after'],
+        ['Hikes around Ella', 'Little Adam’s Peak and the Nine Arches Bridge'],
+        ['Morning at Sigiriya', 'An early climb, with breakfast after'],
         ['The ramparts of Galle', 'A slow walk around the old fort'],
       ],
       footnote: 'Something else in mind? Your travel manager will arrange it.',
@@ -384,7 +387,7 @@ const SERVICE_PAGES: ServicePage[] = [
         ['Beach hotels on the south-west coast', 'Bentota, Aluthgama and Galle'],
         ['Ayurvedic treatment hotels', 'Programmes of a week or more'],
         ['Hill country hotels', 'Tea estates around Nuwara Eliya and Ella'],
-        ['Hotels near the ancient cities', 'For Sigiriya and Dambulla'],
+        ['Hotels near the ancient cities', 'Close to Sigiriya and the Dambulla caves'],
       ],
     },
     detail: {
