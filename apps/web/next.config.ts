@@ -20,6 +20,10 @@ const nextConfig: NextConfig = {
     '@ceylonvvip/validation',
   ],
   poweredByHeader: false,
+  experimental: {
+    // Task 169: import only the ui-brand components a page uses, not the whole barrel.
+    optimizePackageImports: ['@ceylonvvip/ui-brand'],
+  },
   images: {
     localPatterns: [{ pathname: '/api/media/file/**' }],
     // Task 169: clearer photos. Every photo is served at quality 85 (Next's default is
