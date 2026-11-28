@@ -49,7 +49,7 @@ export function MobileMenu({
       onCancel={onClose}
       className={cn(
         'fixed inset-0 m-0 h-dvh max-h-none w-full max-w-none bg-background p-0 text-foreground backdrop:bg-transparent lg:hidden',
-        'flex-col open:flex open:animate-menu-in motion-reduce:open:animate-none',
+        'flex-col open:flex open:animate-menu-in',
       )}
     >
       <div className="flex items-center px-24 py-22">

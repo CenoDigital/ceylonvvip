@@ -44,7 +44,7 @@ export function IndexRow({
       <Icon
         name="arrow-right"
         size={20}
-        className="size-18 shrink-0 transition-transform duration-300 group-hover:translate-x-4 rtl:group-hover:-translate-x-4 lg:size-20 motion-reduce:transition-none"
+        className="size-18 shrink-0 transition-transform duration-300 group-hover:translate-x-4 rtl:group-hover:-translate-x-4 lg:size-20"
       />
     </a>
   )

@@ -169,6 +169,34 @@ function parallax(section: HTMLElement) {
   }
 }
 
+/*
+ * Task 170: every photo drifts gently up and down inside its frame as the page scrolls
+ * (like the destination photos drift sideways), on every page and screen. Photos sit
+ * at a slight zoom so the drift never shows an edge; the wipe-in reveals settle to it.
+ */
+export const DRIFT_SELECTOR =
+  'main img[data-nimg="fill"]:not([data-hscroll] img):not([data-animate="image-parallax"] img)'
+const DRIFT_SCALE = 1.12
+const DRIFT_PERCENT = 5
+
+function drift(img: HTMLElement) {
+  gsap.set(img, { scale: DRIFT_SCALE })
+  gsap.fromTo(
+    img,
+    { yPercent: -DRIFT_PERCENT },
+    {
+      yPercent: DRIFT_PERCENT,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: img.parentElement ?? img,
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: true,
+      },
+    },
+  )
+}
+
 /** Photos that wipe in as they scroll into view (not the hero or image presets). */
 export const IMAGE_REVEAL_SELECTOR =
   'main img:not([data-animate="hero-intro"] img):not([data-animate="reveal-mask"] img):not([data-animate="image-parallax"] img):not([data-hscroll] img):not([data-no-reveal] img)'
@@ -205,7 +233,7 @@ function scrubPhoto(img: HTMLElement) {
     { clipPath: 'inset(0% 0% 100% 0%)', scale: 1.22 },
     {
       clipPath: 'inset(0% 0% 0% 0%)',
-      scale: 1,
+      scale: DRIFT_SCALE,
       ease: 'none',
       scrollTrigger: { trigger: frame, start: 'top 98%', end: 'top 45%', scrub: 0.6 },
     },
@@ -266,8 +294,12 @@ export function Motion() {
     (_context, contextSafe) => {
       window.__motion = true
       if (!document.documentElement.classList.contains('motion') || !contextSafe) return
-      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
-      const desktop = matchMedia('(min-width: 1024px)').matches
+      // Full motion for every visitor, whatever their system's reduced-motion setting
+      // (client decision, task 169: Windows "Animation effects" off turned it all off).
+      const reduced = false
+      // Desktop effects for any mouse or trackpad, at any window width (task 170).
+      const desktop =
+        matchMedia('(pointer: fine)').matches || matchMedia('(min-width: 1024px)').matches
       const sections = Array.from(
         document.querySelectorAll<HTMLElement>('[data-animate]:not([data-animate="hero-intro"])'),
       )
@@ -364,7 +396,7 @@ export function Motion() {
             { clipPath: 'inset(0% 0% 100% 0%)', scale: 1.18 },
             {
               clipPath: 'inset(0% 0% 0% 0%)',
-              scale: 1,
+              scale: DRIFT_SCALE,
               duration: seconds(m.revealMask.duration) * 1.2,
               ease: gsapEase(m.revealMask.ease),
             },
@@ -397,6 +429,17 @@ export function Motion() {
           )
           photos.forEach((p) => io.observe(p))
           observers.push(io)
+        }
+        const drifting = Array.from(document.querySelectorAll<HTMLElement>(DRIFT_SELECTOR))
+        if (drifting.length) {
+          void import('gsap/ScrollTrigger').then(
+            contextSafe(({ ScrollTrigger }) => {
+              if (!live) return
+              gsap.registerPlugin(ScrollTrigger)
+              drifting.forEach(drift)
+              ScrollTrigger.refresh()
+            }),
+          )
         }
         if (fills.length || (photos.length && desktop)) {
           void Promise.all([import('gsap/ScrollTrigger'), import('gsap/SplitText')]).then(

@@ -34,7 +34,7 @@ export function NextLink({ href, title, number, label = 'Next', className }: Nex
       <Icon
         name="arrow-right"
         size={32}
-        className="size-22 shrink-0 transition-transform duration-300 group-hover:translate-x-6 rtl:group-hover:-translate-x-6 lg:size-32 motion-reduce:transition-none"
+        className="size-22 shrink-0 transition-transform duration-300 group-hover:translate-x-6 rtl:group-hover:-translate-x-6 lg:size-32"
       />
     </a>
   )

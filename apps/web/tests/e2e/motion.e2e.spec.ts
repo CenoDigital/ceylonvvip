@@ -18,8 +18,13 @@ async function scrollAndMeasureCls(page: Page) {
       }
     }).observe({ type: 'layout-shift', buffered: true })
   })
-  const height = await page.evaluate(() => document.body.scrollHeight)
-  for (let y = 0; y <= height; y += 400) {
+  // Until the bottom is really reached: sections like the sideways places row grow
+  // taller once their scroll script loads, so the height read at the start can be short.
+  for (let i = 0; i < 400; i++) {
+    const atBottom = await page.evaluate(
+      () => window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2,
+    )
+    if (atBottom) break
     await page.mouse.wheel(0, 400)
     await page.waitForTimeout(60)
   }
@@ -59,9 +64,12 @@ test('stats count up to their real values', async ({ page }) => {
   }
 })
 
-test('reduced motion still shows every section', async ({ page }) => {
+// Task 169 (client decision): a system asking for reduced motion (Windows "Animation
+// effects" off) still gets the full motion, and every section still ends up shown.
+test('reduced motion setting: full motion still plays, every section shows', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/')
+  await expect(page.locator('[data-hscroll]')).toHaveAttribute('data-hscroll-active', '')
   await scrollAndMeasureCls(page)
   const hidden = await page.$$eval(
     '[data-animate] > *',

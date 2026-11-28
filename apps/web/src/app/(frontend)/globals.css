@@ -142,12 +142,3 @@ html.motion [data-animate='hero-intro'] [data-hero-action] {
 html.motion [data-animate='hero-intro'] img {
   animation: hero-settle var(--motion-hero-intro-image-duration) var(--ease-power3-out) both;
 }
-@media (prefers-reduced-motion: reduce) {
-  html.motion [data-animate='hero-intro'] :is(.text-label-caps, h1, h2, p, [data-hero-action]) {
-    animation-name: hero-fade;
-    animation-delay: 0s;
-  }
-  html.motion [data-animate='hero-intro'] img {
-    animation: none;
-  }
-}

@@ -8,6 +8,20 @@ for (const { name, path } of pages) {
   test(`${name} matches the approved baseline`, async ({ page }) => {
     await page.goto(path)
     await page.evaluate(() => document.fonts.ready)
+    // Every photo fully loaded and its blurred preview gone (the site removes it just
+    // after the load), so the screenshot never catches a half-loaded photo.
+    await page.evaluate(() => {
+      for (const img of Array.from(document.images)) img.loading = 'eager'
+    })
+    await page.waitForFunction(
+      () =>
+        Array.from(document.images).every(
+          (img) => img.complete && img.naturalWidth > 0 && !img.style.backgroundImage,
+        ),
+      undefined,
+      { timeout: 30_000 },
+    )
+    await page.waitForTimeout(500)
     await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true })
   })
 }

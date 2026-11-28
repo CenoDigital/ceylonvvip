@@ -286,11 +286,13 @@ async function ServicesGridView({ block }: { block: Block }) {
                       wideLg ? 'lg:aspect-[16/6]' : wideSm && 'lg:aspect-[4/5]',
                     )}
                   >
-                    <CmsImage
-                      media={s.image}
-                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                      className="transition-transform duration-700 ease-out group-hover:scale-[1.04] motion-reduce:transition-none"
-                    />
+                    {/* The hover zoom is on a wrapper: the photo itself drifts with the scroll. */}
+                    <div className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-[1.04]">
+                      <CmsImage
+                        media={s.image}
+                        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                      />
+                    </div>
                   </div>
                   <div className="flex items-start gap-20">
                     <span className="text-label-caps text-brand tabular-nums">
@@ -305,7 +307,7 @@ async function ServicesGridView({ block }: { block: Block }) {
                     <Icon
                       name="arrow-up-right"
                       size={20}
-                      className="mt-4 shrink-0 transition-transform duration-300 group-hover:translate-x-2 group-hover:-translate-y-2 motion-reduce:transition-none"
+                      className="mt-4 shrink-0 transition-transform duration-300 group-hover:translate-x-2 group-hover:-translate-y-2"
                     />
                   </div>
                 </Link>

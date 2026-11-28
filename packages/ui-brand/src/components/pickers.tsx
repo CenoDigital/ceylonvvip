@@ -18,7 +18,7 @@ import { FieldShell, fieldControl } from './form'
 
 const panel = cn(
   'z-50 border border-border bg-background p-20 text-foreground shadow-[0_24px_48px_-24px_rgba(26,22,18,0.35)]',
-  'data-[state=open]:animate-[picker-in_180ms_var(--ease-power2-out)] motion-reduce:animate-none',
+  'data-[state=open]:animate-[picker-in_180ms_var(--ease-power2-out)]',
   'focus:outline-none',
 )
 
