@@ -112,6 +112,15 @@ export const Forms: CollectionConfig = {
                     { name: 'placeholder', type: 'text' },
                     { name: 'required', type: 'checkbox' },
                     {
+                      name: 'upfront',
+                      label: 'Show in the main form',
+                      type: 'checkbox',
+                      admin: {
+                        description:
+                          'Shown with the date and guests, not behind "Add details", like Pickup.',
+                      },
+                    },
+                    {
                       name: 'width',
                       type: 'radio',
                       defaultValue: 'full',
@@ -212,7 +221,13 @@ export const FormSubmissions: CollectionConfig = {
       admin: { position: 'sidebar' },
     },
     { name: 'form', type: 'relationship', relationTo: 'forms', admin: { readOnly: true } },
-    { name: 'service', type: 'relationship', relationTo: 'services', admin: { readOnly: true } },
+    {
+      name: 'services',
+      type: 'relationship',
+      relationTo: 'services',
+      hasMany: true,
+      admin: { readOnly: true },
+    },
     { name: 'vehicle', type: 'relationship', relationTo: 'vehicles', admin: { readOnly: true } },
     {
       type: 'row',

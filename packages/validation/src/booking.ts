@@ -51,7 +51,8 @@ export function bookingSchema(
 ) {
   return z.object({
     form: z.union([z.string(), z.number()]),
-    service: z.string().min(1, 'Choose a service.'),
+    // One or more services (task 174): a guest can book a transfer and a tour together.
+    services: z.array(z.string().min(1)).min(1, 'Choose a service.').max(20),
     vehicle: z.string().optional(),
     date: z
       .string()

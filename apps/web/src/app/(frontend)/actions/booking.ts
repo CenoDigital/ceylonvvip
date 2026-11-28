@@ -82,22 +82,32 @@ export async function submitBooking(raw: unknown): Promise<BookingResult> {
   }
   const data = parsed.data
 
-  const [service, vehicle, contact, settings] = await Promise.all([
-    payload.findByID({ collection: 'services', id: data.service, depth: 0 }).catch(() => null),
+  const [chosen, vehicle, contact, settings] = await Promise.all([
+    Promise.all(
+      [...new Set(data.services)].map((id) =>
+        payload.findByID({ collection: 'services', id, depth: 0 }).catch(() => null),
+      ),
+    ),
     data.vehicle && data.vehicle !== 'none'
       ? payload.findByID({ collection: 'vehicles', id: data.vehicle, depth: 0 }).catch(() => null)
       : null,
     payload.findGlobal({ slug: 'contact-business' }),
     payload.findGlobal({ slug: 'booking-settings' }),
   ])
-  if (!service || service._status !== 'published')
-    return { ok: false, errors: { service: 'Choose a service.' } }
+  // Every chosen service must still be published (task 174: one or more services).
+  const services = chosen.filter((s): s is NonNullable<typeof s> => Boolean(s))
+  if (!services.length || services.length !== chosen.length)
+    return { ok: false, errors: { services: 'Choose a service.' } }
+  if (services.some((s) => s._status !== 'published'))
+    return { ok: false, errors: { services: 'Choose a service.' } }
+  const serviceIds = new Set(services.map((s) => String(s.id)))
+  const serviceTitles = services.map((s) => s.title).join(', ')
 
-  // Only questions that apply to the chosen service are kept.
+  // Only questions that apply to at least one chosen service are kept.
   const applicable = (form.details ?? []).filter(
     (q) =>
       !q.services?.length ||
-      q.services.some((s) => String(typeof s === 'object' ? s.id : s) === String(service.id)),
+      q.services.some((s) => serviceIds.has(String(typeof s === 'object' ? s.id : s))),
   )
   const answers = Object.fromEntries(
     applicable
@@ -106,7 +116,7 @@ export async function submitBooking(raw: unknown): Promise<BookingResult> {
   ) as Record<string, string>
 
   const values = {
-    service: service.title,
+    service: serviceTitles,
     vehicle: vehicle?.name ?? '',
     date: formatDate(data.date),
     time: data.time ?? '',
@@ -123,7 +133,7 @@ export async function submitBooking(raw: unknown): Promise<BookingResult> {
     ...applicable.map((q) => `${q.label}: {${q.name}}`),
   ].join('\n')
   const message = fillTemplate(settings.whatsappTemplate || fallback, values)
-  const summary = `${service.title}, ${values.date}, ${data.adults + data.children} guests`
+  const summary = `${serviceTitles}, ${values.date}, ${data.adults + data.children} guests`
 
   await payload.create({
     collection: 'form-submissions',
@@ -132,7 +142,7 @@ export async function submitBooking(raw: unknown): Promise<BookingResult> {
       summary,
       status: 'new',
       form: form.id,
-      service: service.id,
+      services: services.map((s) => s.id),
       vehicle: vehicle?.id,
       date: data.date,
       time: data.time ?? '',
