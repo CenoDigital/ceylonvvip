@@ -20,7 +20,7 @@
     "@ceylonvvip/config": "workspace:*",
     "eslint": "9.39.5",
     "payload": "3.94.2",
-    "typescript": "6.0.3",
+    "typescript": "7.0.2",
     "vitest": "5.1.1"
   },
   "peerDependencies": {
