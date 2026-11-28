@@ -127,8 +127,8 @@ export async function seedFigma(payload: Payload) {
           'Private, safe and made just for you. Chauffeured journeys across Sri Lanka for diplomats, business leaders and VVIP families.',
         // Figma 01 Home / Hero image (1440 by 820) with its caption.
         mediaType: 'image',
-        image: photos.coastRoad.id,
-        caption: 'The coast road, Bentota',
+        image: photos.prado.id,
+        caption: 'The Toyota Prado 150',
         ctas: [
           { cta: { label: 'Speak to your concierge', appearance: 'button', link: whatsappLink } },
           {
@@ -254,7 +254,7 @@ export async function seedFigma(payload: Payload) {
           {
             name: 'Nuwara Eliya',
             line: 'Tea estates high in the hills',
-            photo: photos.pradoTea.id,
+            photo: photos.nuwaraEliya.id,
           },
           {
             name: 'Bentota',
@@ -382,7 +382,7 @@ export async function seedFigma(payload: Payload) {
     photos,
   )
   await seedTranslations(payload)
-  // Every page, service and vehicle now uses the WebP photos (task 169).
+  // Every page, service and vehicle now uses the current photos (task 169).
   for (const id of oldJpegs.splice(0)) {
     await payload.delete({ collection: 'media', id, context: { disableRevalidate: true } })
   }

@@ -468,8 +468,8 @@ const ROW_PHOTOS: Array<[RegExp, PhotoKey]> = [
   [/Galle/, 'galle'],
   [/Sigiriya/, 'sigiriya'],
   [/Ella/, 'ella'],
-  [/Bentota/, 'coastRoad'],
-  [/Wedding/, 'weddingCar'],
+  [/Bentota/, 'bentotaBeach'],
+  [/Wedding/, 'bmwSide'],
   [/River Safari/, 'bentotaRiver'],
   [/Beach hotels|Ayurvedic/, 'hotelSuite'],
   [/Honeymoon|Hotel/, 'hotelSuite'],
@@ -516,7 +516,7 @@ export async function seedPages(
       luggage: v.luggage,
       summary: v.summary ?? null,
       specs: { bestFor: v.bestFor, guests: v.guests, luggage: v.bags, colours: v.colours },
-      gallery: [photos[VEHICLE_PHOTOS[v.slug] ?? 'sedanDoorOpen'].id].filter(Boolean),
+      gallery: [photos[VEHICLE_PHOTOS[v.slug] ?? 'prado'].id].filter(Boolean),
     })
   }
 
@@ -570,7 +570,7 @@ export async function seedPages(
           intro: s.intro,
           // Figma: a full-width photo (1440 by 760) under every service page hero.
           mediaType: 'image',
-          image: photos[SERVICE_HERO_PHOTOS[s.slug] ?? 'sedanDoorOpen'].id,
+          image: photos[SERVICE_HERO_PHOTOS[s.slug] ?? 'prado'].id,
           ctas: [{ cta: quote }],
         },
         {
@@ -698,7 +698,7 @@ export async function seedPages(
         blockType: 'imageText',
         variant: 'bleed',
         header: { eyebrow: 'For weddings', heading: 'BMW and Prado, decorated for the day.' },
-        image: photos.weddingCar.id,
+        image: photos.bmwSide.id,
         content: rich(
           'Decoration is arranged to your wishes, from fresh flowers to ribbons in your colours.',
         ),

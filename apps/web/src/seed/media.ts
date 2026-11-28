@@ -25,57 +25,76 @@ function imagesDir(): string {
     path.resolve(process.cwd(), 'apps/web/seed-images'),
     path.resolve(process.cwd(), 'seed-images'),
   ].filter((d): d is string => Boolean(d))
-  const found = candidates.find((d) => existsSync(path.join(d, 'coast-road-bentota.webp')))
+  const found = candidates.find((d) => existsSync(path.join(d, 'prado-150-front.webp')))
   if (!found) throw new Error(`Seed photos not found. Looked in: ${candidates.join(', ')}`)
   return found
 }
 
 export const PHOTOS = {
-  coastRoad: {
-    file: 'coast-road-bentota',
-    alt: 'A black sedan on the coast road at Bentota at dusk',
+  // The client's own white Toyota Prado 150 and BMW 520d (photos from the client).
+  prado: {
+    file: 'prado-150-front',
+    alt: 'A white Toyota Prado 150 on a road lined with tropical trees',
   },
+  pradoSide: {
+    file: 'prado-150-side',
+    alt: 'A white Toyota Prado 150 seen from the side, parked by tropical trees',
+  },
+  pradoAirport: {
+    file: 'prado-airport',
+    alt: 'A white Toyota Prado 150 waiting at Bandaranaike International Airport',
+  },
+  pradoHotel: {
+    file: 'prado-hotel',
+    alt: 'A white Toyota Prado 150 at a hotel entrance in the evening',
+  },
+  bmw: { file: 'bmw-520d-front', alt: 'A white BMW 520d parked by tropical trees' },
+  bmwSide: { file: 'bmw-520d-side', alt: 'A white BMW 520d seen from the side' },
+  rearCabin: {
+    file: 'bmw-rear-seats',
+    alt: 'The beige leather rear seats of the BMW 520d, with the door open',
+  },
+  // Figma stand-ins for the Toyota Voxy, Audi A3 and Honda Vezel: replace them with
+  // real photos of those cars.
   sedanDoorOpen: {
     file: 'sedan-door-open',
     alt: 'A black luxury sedan with its rear door open, ready for a guest',
-  },
-  ella: { file: 'ella-nine-arches', alt: 'The Nine Arches Bridge in the misty hills of Ella' },
-  sigiriya: {
-    file: 'sigiriya-sunrise',
-    alt: 'Sigiriya rock fortress at sunrise above the jungle',
-    // Keep the summit in frame in wide crops.
-    focalY: 32,
   },
   mpvHotel: {
     file: 'mpv-hotel-entrance',
     alt: 'A black people carrier at a lantern-lit hotel entrance at dusk',
   },
+  // Places, from Pixabay (Pixabay Content License, free for commercial use).
+  sigiriya: {
+    file: 'sigiriya-rock',
+    alt: 'Sigiriya rock fortress above the gardens and the jungle',
+    // Keep the summit in frame in tall crops.
+    focalY: 18,
+  },
+  ella: {
+    file: 'ella-nine-arches-train',
+    alt: 'A blue train crossing the Nine Arches Bridge in the green hills of Ella',
+    focalX: 58,
+  },
+  galle: {
+    file: 'galle-lighthouse',
+    alt: 'Galle Fort lighthouse and ramparts above the sea',
+    focalX: 26,
+  },
+  nuwaraEliya: {
+    file: 'nuwara-eliya-tea',
+    alt: 'Tea estates on the green hills around Nuwara Eliya',
+  },
+  bentotaBeach: { file: 'bentota-beach', alt: 'Palm trees on a beach on the south-west coast' },
+  bentotaRiver: {
+    file: 'outrigger-boat',
+    alt: 'A wooden outrigger boat on a sandy beach',
+    focalX: 30,
+  },
+  hotelSuite: { file: 'hotel-pool', alt: 'A hotel pool among palm trees under a blue sky' },
   sapphires: { file: 'ceylon-sapphires', alt: 'Blue and pink Ceylon sapphires on white cloth' },
-  galle: { file: 'galle-fort', alt: 'Galle Fort lighthouse and ramparts above a turquoise sea' },
-  weddingCar: {
-    file: 'wedding-car',
-    alt: 'A black sedan dressed with white orchids and ribbon for a wedding',
-  },
-  pradoTea: {
-    file: 'prado-tea-country',
-    alt: 'A black Toyota Prado on a road through tea country',
-  },
-  chauffeur: {
-    file: 'chauffeur-door',
-    alt: 'A chauffeur in a suit opening the rear door of a car with beige leather seats',
-  },
-  rearCabin: {
-    file: 'rear-cabin',
-    alt: 'Beige leather rear seats with a folded towel and a glass bottle of water',
-  },
   // Placeholder in Figma: replace with a map of the office.
   map: { file: 'map-placeholder', alt: 'Map of Sri Lanka with routes from Aluthgama' },
-  bmw: { file: 'bmw-520d-villa', alt: 'A black BMW 520d in a villa driveway by the sea' },
-  hotelSuite: {
-    file: 'hotel-sunset-suite',
-    alt: 'A hotel suite opening onto a beach terrace at sunset',
-  },
-  bentotaRiver: { file: 'bentota-river', alt: 'A wooden boat on the Bentota river at sunset' },
   // Placeholder in Figma: replace with a photo of the real travel manager.
   travelManager: {
     file: 'travel-manager-placeholder',
@@ -83,25 +102,40 @@ export const PHOTOS = {
   },
 } as const
 
+/** Photos earlier seeds uploaded that no page uses any more; removed after seeding. */
+const RETIRED_FILES = [
+  'coast-road-bentota',
+  'prado-tea-country',
+  'bmw-520d-villa',
+  'wedding-car',
+  'chauffeur-door',
+  'rear-cabin',
+  'sigiriya-sunrise',
+  'ella-nine-arches',
+  'galle-fort',
+  'hotel-sunset-suite',
+  'bentota-river',
+]
+
 export type PhotoKey = keyof typeof PHOTOS
-// Figma photo per vehicle (08 Fleet). The Audi A3 and Honda Vezel share a stand-in
-// sedan photo in Figma; replace both with real photos of the cars.
+// Photo per vehicle (08 Fleet). The Voxy, Audi A3 and Honda Vezel still use the Figma
+// stand-ins; replace them with real photos of the cars.
 export const VEHICLE_PHOTOS: Record<string, PhotoKey> = {
   'bmw-520d': 'bmw',
-  'toyota-prado-150': 'pradoTea',
+  'toyota-prado-150': 'pradoSide',
   'toyota-voxy': 'mpvHotel',
   'audi-a3': 'sedanDoorOpen',
   'honda-vezel': 'sedanDoorOpen',
 }
 
-// Figma: the photo under each service page's hero.
+// The photo under each service page's hero.
 export const SERVICE_HERO_PHOTOS: Record<string, PhotoKey> = {
-  'airport-transfers': 'sedanDoorOpen',
+  'airport-transfers': 'pradoAirport',
   'island-tours': 'sigiriya',
-  'wedding-honeymoon': 'weddingCar',
+  'wedding-honeymoon': 'bmwSide',
   activities: 'bentotaRiver',
-  'security-bodyguards': 'mpvHotel',
-  'elder-care': 'chauffeur',
+  'security-bodyguards': 'pradoHotel',
+  'elder-care': 'rearCabin',
   'hotels-ayurveda': 'hotelSuite',
 }
 
@@ -121,7 +155,7 @@ function withTimeout<T>(work: Promise<T>, ms: number, message: string): Promise<
 /** Photos that could not be uploaded in the last seed (storage unreachable, etc.). */
 export const photoErrors: string[] = []
 
-/** JPEG photos from earlier seeds, removed once the pages use the WebP ones. */
+/** Photos from earlier seeds (old JPEGs, retired photos), removed once pages are reseeded. */
 export const oldJpegs: Array<number | string> = []
 
 /** Uploads every photo once; a photo already in Media (same file name) is reused. */
@@ -133,6 +167,9 @@ export async function seedMedia(payload: Payload): Promise<Photos> {
   >) {
     const { file, alt } = photo
     const focalY = 'focalY' in photo ? photo.focalY : undefined
+    const focalX = 'focalX' in photo ? photo.focalX : undefined
+    const focal =
+      focalY != null || focalX != null ? { focalX: focalX ?? 50, focalY: focalY ?? 50 } : null
     const filename = `${file}.webp`
     const { docs } = await payload.find({
       collection: 'media',
@@ -140,11 +177,11 @@ export async function seedMedia(payload: Payload): Promise<Photos> {
       limit: 1,
       depth: 0,
     })
-    if (docs[0] && focalY != null && docs[0].focalY !== focalY) {
+    if (docs[0] && focal && (docs[0].focalX !== focal.focalX || docs[0].focalY !== focal.focalY)) {
       docs[0] = await payload.update({
         collection: 'media',
         id: docs[0].id,
-        data: { focalX: 50, focalY },
+        data: focal,
         context: { disableRevalidate: true },
       })
     }
@@ -163,7 +200,7 @@ export async function seedMedia(payload: Payload): Promise<Photos> {
         (await withTimeout(
           payload.create({
             collection: 'media',
-            data: { alt, ...(focalY != null ? { focalX: 50, focalY } : {}) },
+            data: { alt, ...focal },
             filePath: path.join(dir, filename),
             context: { disableRevalidate: true },
           }),
@@ -191,5 +228,13 @@ export async function seedMedia(payload: Payload): Promise<Photos> {
       oldJpegs.push(doc.id)
     }
   }
+  // Photos replaced by the client's car photos and the Pixabay places (task 169).
+  const retired = await payload.find({
+    collection: 'media',
+    where: { filename: { in: RETIRED_FILES.flatMap((f) => [`${f}.webp`, `${f}.jpg`]) } },
+    limit: 100,
+    depth: 0,
+  })
+  for (const doc of retired.docs) oldJpegs.push(doc.id)
   return out
 }
